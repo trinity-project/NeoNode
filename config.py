@@ -22,23 +22,28 @@ class SettingHolder(object):
         self.NEOCLIURL = "http://127.0.0.1:10332"
         self.APPLICATIONLOGDIR = "/root/neo/neo-cli/ApplicationLogs_00746E41"
         self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
-        self.PASSWD_HASH="$2b$10$F7GVmj.eahbHMIUjOxooYuLBMqZaIGcJZ7KxufGfbxwGTErKCzNQm"
-        self.REMOTE_ADDR="47.75.69.238"
-        self.FUNDING_ADDRESS="AQvEy2G42YfNhA69A9hiDoR6k3RUYA4H6x"
-        self.WEBAPI="https://tokenswap.trinity.ink/monitor/transactions"
+        self.PASSWD_HASH=ENVIRON.get("PASSWORD_HASH")
+        self.REMOTE_ADDR=ENVIRON.get("REMOTE_ADDR")
+        self.FUNDING_ADDRESS=ENVIRON.get("FUNDING_ADDRESS")
+        self.WEBAPI=ENVIRON.get("WEB_API")
     def setup_testnet(self):
         self.CONTRACTHASH = "0x849d095d07950b9e56d0c895ec48ec5100cfdff1"
         self.NEOCLIURL = "http://127.0.0.1:20332"
         self.APPLICATIONLOGDIR="/root/neo-cli-274/ApplicationLogs_74746E41"
         self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
-        self.PASSWD_HASH="$2b$10$F7GVmj.eahbHMIUjOxooYuLBMqZaIGcJZ7KxufGfbxwGTErKCzNQm"
-        self.REMOTE_ADDR="47.75.69.238"
-        self.FUNDING_ADDRESS="AGgZna4kbTXPm16yYZyG6RyrQz2Sqotno6"
-        self.WEBAPI = "http://tokenswap.trinity.tech/monitor/transactions"
+        self.PASSWD_HASH=ENVIRON.get("PASSWORD_HASH")
+        self.REMOTE_ADDR=ENVIRON.get("REMOTE_ADDR")
+        self.FUNDING_ADDRESS=ENVIRON.get("FUNDING_ADDRESS")
+        self.WEBAPI=ENVIRON.get("WEB_API")
     def setup_privtnet(self):
         self.CONTRACTHASH = "0x849d095d07950b9e56d0c895ec48ec5100cfdff1"
         self.NEOCLIURL = "http://47.254.64.251:20332"
         self.APPLICATIONLOGDIR = "/home/maiganne/projects/Node"
+        self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
+        self.PASSWD_HASH=ENVIRON.get("PASSWORD_HASH")
+        self.REMOTE_ADDR=ENVIRON.get("REMOTE_ADDR")
+        self.FUNDING_ADDRESS=ENVIRON.get("FUNDING_ADDRESS")
+        self.WEBAPI=ENVIRON.get("WEB_API")
 
 setting=SettingHolder()
 
