@@ -7,10 +7,9 @@ from neocore.Cryptography.Crypto import Crypto
 from neocore.UInt160 import UInt160
 
 from config import setting
-from data_model.account_info_model import Tx, LocalBlockCout, Vout, Balance, BlockHeight, InvokeTx, ContractTx
+from data_model.account_info_model import Tx, LocalBlockCout, Vout, Balance, BlockHeight, InvokeTx, ContractTx,logger
 from project_log import setup_mylogger
 
-logger=setup_mylogger(logfile="log/store_account_info.log")
 
 
 

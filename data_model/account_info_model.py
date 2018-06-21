@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from config import setting
 from project_log import setup_mylogger
 
-logger=setup_mylogger()
+logger=setup_mylogger("../log/store_account_info.log")
 
 
 
