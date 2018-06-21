@@ -2,7 +2,7 @@ import pymysql
 
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text, create_engine, SmallInteger, DECIMAL, Index, Boolean, or_
+from sqlalchemy import Column, Integer, String, Text, create_engine, SmallInteger, DECIMAL, Index, Boolean, or_,UniqueConstraint
 from sqlalchemy.orm import sessionmaker
 
 from config import setting
@@ -168,7 +168,7 @@ class Vout(AccountInfoBase):
     value = Column(DECIMAL(17,8))
 
     __table_args__ = (
-        Index('tx_id', 'vout_number'),
+        UniqueConstraint('tx_id', 'vout_number'),
     )
 
 
