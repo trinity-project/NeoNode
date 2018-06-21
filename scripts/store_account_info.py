@@ -197,7 +197,7 @@ while True:
                         tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
                         value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
                         block_height=block_height)
-        break
+        # break
         local_block_count+=1
         localBlockCount.height=local_block_count
         LocalBlockCout.update(localBlockCount)
