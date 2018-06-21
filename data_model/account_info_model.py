@@ -161,7 +161,7 @@ class Tx(BlockInfoBase):
 class Vout(AccountInfoBase):
     __tablename__ = 'vout'
     id = Column(Integer, primary_key=True)
-    tx_id = Column(String(66),index=True)
+    tx_id = Column(String(66))
     address = Column(String(40))
     asset_id = Column(String(66))
     vout_number = Column(SmallInteger)
@@ -208,7 +208,7 @@ class Vout(AccountInfoBase):
 class InvokeTx(AccountInfoBase):
     __tablename__ = 'invoke_tx'
     id = Column(Integer, primary_key=True)
-    tx_id = Column(String(66))
+    tx_id = Column(String(66),unique=True)
     contract = Column(String(42))
     address_from = Column(String(40))
     address_to = Column(String(40))
@@ -269,7 +269,7 @@ class InvokeTx(AccountInfoBase):
 class ContractTx(AccountInfoBase):
     __tablename__ = 'contract_tx'
     id = Column(Integer, primary_key=True)
-    tx_id = Column(String(66))
+    tx_id = Column(String(66),unique=True)
     asset = Column(String(66))
     address_from = Column(String(40))
     address_to = Column(String(40))
