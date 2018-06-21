@@ -162,7 +162,7 @@ class Vout(AccountInfoBase):
     __tablename__ = 'vout'
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66))
-    address = Column(String(40))
+    address = Column(String(40),index=True)
     asset_id = Column(String(66))
     vout_number = Column(SmallInteger)
     value = Column(DECIMAL(17,8))
