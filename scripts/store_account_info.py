@@ -10,8 +10,7 @@ from config import setting
 from data_model.account_info_model import Tx, LocalBlockCout, Vout, Balance, BlockHeight, InvokeTx, ContractTx
 from project_log import setup_mylogger
 
-logger=setup_mylogger(logfile="../log/store_account_info.log")
-
+logger=setup_mylogger(logfile="log/store_account_info.log")
 
 
 
@@ -90,7 +89,7 @@ while True:
     if not block_h:
         continue
 
-    if local_block_count<=block_h.height:
+    if local_block_count<=block_h.height-1:
         exist_instance=Tx.query(local_block_count)
         if  exist_instance:
             for tx in exist_instance:
@@ -207,7 +206,7 @@ while True:
 
 
     else:
-        time.sleep(15)
+        time.sleep(5)
 
 
 

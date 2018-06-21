@@ -5,7 +5,7 @@ from config import setting
 from project_log import setup_mylogger
 from data_model.block_info_model import LocalBlockCout,Tx
 
-logger=setup_mylogger(logfile="../log/store_block_info.log")
+logger=setup_mylogger(logfile="log/store_block_info.log")
 
 
 class TRANSACTION_TYPE(object):
@@ -49,7 +49,7 @@ while True:
     block_info=getblock(local_block_count)
     if not block_info:
 
-        time.sleep(15)
+        time.sleep(5)
         continue
     if len(block_info["tx"])>1:
         for tx in block_info["tx"][1:]:
