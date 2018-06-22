@@ -54,22 +54,28 @@ while True:
     if len(block_info["tx"])>1:
         for tx in block_info["tx"][1:]:
             tx_type=tx["type"]
-            # if tx_type not in [TRANSACTION_TYPE.CONTRACT,TRANSACTION_TYPE.INVOKECONTRACT,
-            #                    TRANSACTION_TYPE.CLAIM,TRANSACTION_TYPE.ISSUE]:
-            #     continue
             tx_id=tx["txid"]
             block_height=block_info["index"]
             block_time=block_info["time"]
             vin=json.dumps(tx["vin"])
             vout=json.dumps(tx["vout"])
-            # scripts=json.dumps(tx["scripts"])
             scripts=""
             attributes=json.dumps(tx["attributes"])
             script=tx.get("script")
             Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,script,attributes,scripts)
 
-
-
+    else:
+        if block_info["tx"][0]["vout"]:
+            tx_type=tx["type"]
+            tx_id=tx["txid"]
+            block_height=block_info["index"]
+            block_time=block_info["time"]
+            vin=json.dumps(tx["vin"])
+            vout=json.dumps(tx["vout"])
+            scripts=""
+            attributes=json.dumps(tx["attributes"])
+            script=tx.get("script")
+            Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,script,attributes,scripts)
 
     local_block_count+=1
     localBlockCount.height=local_block_count
