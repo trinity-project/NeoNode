@@ -101,39 +101,39 @@ while True:
 
 
                 #store contract tx
-                # if tx_type == TRANSACTION_TYPE.CONTRACT and len(vout) <=2:
-                #     asset_set=set()
-                #     for item in vout:
-                #         asset_set.add(item["asset"])
-                #     if len(asset_set)==1 and asset_set.pop() in [setting.NEO_ASSETID, setting.GAS_ASSETID]:
-                #         tmp_set=set()
-                #         address_from=None
-                #         for _vin in vin:
-                #             exist_instance = Vout.query(_vin["txid"], _vin["vout"])
-                #             if exist_instance:
-                #                 tmp_set.add(exist_instance.address)
-                #                 if len(tmp_set)==2:
-                #                     break
-                #                 else:
-                #                     address_from=tmp_set.pop()
-                #
-                #
-                #         if address_from:
-                #             for _vout in vout:
-                #                 if _vout["address"] == address_from:
-                #                     address_to=None
-                #                     value=None
-                #                     asset=None
-                #                     continue
-                #                 address_to=_vout["address"]
-                #                 value=_vout["value"]
-                #                 asset=_vout["asset"]
-                #
-                #             if address_to and value and asset:
-                #                 ContractTx.save(
-                #                     tx_id=tx_id, asset=asset, address_from=address_from, address_to=address_to,
-                #                     value=Decimal(str(value)), block_timestamp=block_time,
-                #                     block_height=block_height)
+                if tx_type == TRANSACTION_TYPE.CONTRACT and len(vout) <=2:
+                    asset_set=set()
+                    for item in vout:
+                        asset_set.add(item["asset"])
+                    if len(asset_set)==1 and asset_set.pop() in [setting.NEO_ASSETID, setting.GAS_ASSETID]:
+                        tmp_set=set()
+                        address_from=None
+                        for _vin in vin:
+                            exist_instance = Vout.query(_vin["txid"], _vin["vout"])
+                            if exist_instance:
+                                tmp_set.add(exist_instance.address)
+                                if len(tmp_set)==2:
+                                    break
+                                else:
+                                    address_from=tmp_set.pop()
+
+
+                        if address_from:
+                            for _vout in vout:
+                                if _vout["address"] == address_from:
+                                    address_to=None
+                                    value=None
+                                    asset=None
+                                    continue
+                                address_to=_vout["address"]
+                                value=_vout["value"]
+                                asset=_vout["asset"]
+
+                            if address_to and value and asset:
+                                ContractTx.save(
+                                    tx_id=tx_id, asset=asset, address_from=address_from, address_to=address_to,
+                                    value=Decimal(str(value)), block_timestamp=block_time,
+                                    block_height=block_height)
 
                 #store vout and calculate balance
                 if vout:
@@ -174,29 +174,28 @@ while True:
 
 
                 #store nep5 tx
-                # if tx_type != TRANSACTION_TYPE.INVOKECONTRACT:
-                #     continue
-                #
-                #
-                # content = get_application_log(tx_id)
-                # if not content:
-                #     continue
-                # if not content["notifications"]:
-                #     continue
-                # for notification in content["notifications"]:
-                #     contract = notification["contract"]
-                #     if contract != setting.CONTRACTHASH:
-                #         continue
-                #     if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode()!="transfer":
-                #         continue
-                #     address_from = hex2address(notification["state"]["value"][1]["value"])
-                #     address_to = hex2address(notification["state"]["value"][2]["value"])
-                #     value = hex2interger(notification["state"]["value"][3]["value"])
-                #     InvokeTx.save(
-                #         tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
-                #         value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
-                #         block_height=block_height)
-        # break
+                if tx_type != TRANSACTION_TYPE.INVOKECONTRACT:
+                    continue
+
+
+                content = get_application_log(tx_id)
+                if not content:
+                    continue
+                if not content["notifications"]:
+                    continue
+                for notification in content["notifications"]:
+                    contract = notification["contract"]
+                    if contract != setting.CONTRACTHASH:
+                        continue
+                    if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode()!="transfer":
+                        continue
+                    address_from = hex2address(notification["state"]["value"][1]["value"])
+                    address_to = hex2address(notification["state"]["value"][2]["value"])
+                    value = hex2interger(notification["state"]["value"][3]["value"])
+                    InvokeTx.save(
+                        tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
+                        value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
+                        block_height=block_height)
         local_block_count+=1
         localBlockCount.height=local_block_count
         LocalBlockCout.update(localBlockCount)
