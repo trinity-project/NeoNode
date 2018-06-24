@@ -8,7 +8,7 @@ from data_model.account_info_model import InvokeTx
 
 from project_log import setup_mylogger
 
-logger=setup_mylogger("log/push_transfer_info.log")
+logger=setup_mylogger(logfile="log/push_transfer_info.log")
 
 
 
