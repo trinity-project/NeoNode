@@ -2,10 +2,9 @@ import json
 import requests
 import time
 from config import setting
-from project_log import setup_mylogger
-from data_model.block_info_model import LocalBlockCout,Tx
+from data_model.block_info_model import LocalBlockCout,Tx,logger
 
-logger=setup_mylogger(logfile="log/store_block_info.log")
+
 
 
 class TRANSACTION_TYPE(object):

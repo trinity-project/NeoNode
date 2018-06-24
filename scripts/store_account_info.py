@@ -8,7 +8,6 @@ from neocore.UInt160 import UInt160
 
 from config import setting
 from data_model.account_info_model import Tx, LocalBlockCout, Vout, Balance, BlockHeight, InvokeTx, ContractTx,logger
-from project_log import setup_mylogger
 
 
 
