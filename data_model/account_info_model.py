@@ -23,8 +23,7 @@ block_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE[
 account_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                                                setting.MYSQLDATABASE["passwd"],
                                                setting.MYSQLDATABASE["host"],
-                                               # setting.MYSQLDATABASE["db_account_info"]
-                                               "account_info_1"
+                                               setting.MYSQLDATABASE["db_account_info"]
                                                             ),
                                     pool_recycle=3600,pool_size=100)
 
