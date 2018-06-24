@@ -4,11 +4,11 @@
 import time
 import requests
 from config import setting
-from data_model.store_nep5tx_model import InvokeTx
+from data_model.account_info_model import InvokeTx
 
 from project_log import setup_mylogger
 
-logger=setup_mylogger()
+logger=setup_mylogger("log/push_transfer_info.log")
 
 
 
