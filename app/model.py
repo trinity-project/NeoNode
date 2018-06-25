@@ -124,7 +124,7 @@ class InvokeTx(db.Model):
             "addressFrom":self.address_from,
             "addressTo":self.address_to,
             "value":float(self.value),
-            "vmState":self.vm_state,
+            "vmState":"1" if self.vm_state=="HALT, BREAK" else "0",
             "blockTime":self.block_timestamp,
             "blockHeight":self.block_height
         }
