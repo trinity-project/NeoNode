@@ -22,7 +22,7 @@ class SettingHolder(object):
         self.NEOCLIURL = "http://127.0.0.1:10332"
         self.APPLICATIONLOGDIR = "/root/neo/neo-cli/ApplicationLogs_00746E41"
         self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
-        self.PASSWD_HASH=ENVIRON.get("PASSWORD_HASH")
+        self.PASSWD_HASH="$2b$10$F7GVmj.eahbHMIUjOxooYuLBMqZaIGcJZ7KxufGfbxwGTErKCzNQm"
         self.REMOTE_ADDR=ENVIRON.get("REMOTE_ADDR")
         self.FUNDING_ADDRESS=ENVIRON.get("FUNDING_ADDRESS")
         self.WEBAPI=ENVIRON.get("WEB_API")
