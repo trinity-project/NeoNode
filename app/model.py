@@ -123,7 +123,7 @@ class InvokeTx(db.Model):
             "asset":self.contract,
             "addressFrom":self.address_from,
             "addressTo":self.address_to,
-            "value":str(self.value),
+            "value":str(float(self.value)),
             "vmState":"1" if self.vm_state=="HALT, BREAK" else "0",
             "blockTime":self.block_timestamp,
             "blockHeight":self.block_height
@@ -147,7 +147,7 @@ class ContractTx(db.Model):
             "asset":self.asset,
             "addressFrom":self.address_from,
             "addressTo":self.address_to,
-            "value":str(self.value),
+            "value":str(float(self.value)),
             "blockTime":self.block_timestamp,
             "blockHeight":self.block_height
         }
