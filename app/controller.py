@@ -1,39 +1,10 @@
 import time
-from flask import render_template, request
-from flask_socketio import SocketIO, emit,join_room
-from app import  jsonrpc,app,socketio
+from flask import request
+from app import  jsonrpc
 from app import service
-from utils import verify_password
+from .utils import verify_password
 
 from config import setting
-
-
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-
-
-# @socketio.on('connect_event')
-# def connected_msg(msg):
-#     print (msg['data'])
-#     # while True:
-#     emit('server_response', {'data': msg['data']})
-#     # time.sleep(1)
-#
-# @socketio.on('client_event')
-# def client_msg(msg):
-#
-#     join_room(1)
-#     block_height = service.query_block_height_by_txid(msg['data'])
-#     emit('server_response', {'data': block_height},room=1)
-
-
-
-# @jsonrpc.method("createMultiSigAddress")
-# def create_multisig_address(publicKey1,publicKey2,publicKey3):
-#     return service.createMultiSigContract(publicKey1,publicKey2,publicKey3)
-
-
 
 
 @jsonrpc.method("constructTx")
@@ -46,11 +17,6 @@ def construct_tx(addressFrom,addressTo,value,assetId):
 @jsonrpc.method("sign")
 def sign(txData,privtKey):
     return service.sign(txData,privtKey)
-
-
-# @jsonrpc.method("multiSign")
-# def multi_sign(txData,privtKey1,privtKey2,verificationScript):
-#     return service.multi_sign(txData,privtKey1,privtKey2,verificationScript)
 
 
 @jsonrpc.method("sendRawTx")
@@ -93,9 +59,6 @@ def verify_signature(message,signature,pubkey):
     return service.verify_signature(message,signature,pubkey)
 
 
-# @jsonrpc.method("verifyTransfer")
-# def verify_transfer(addressFrom,addressTo,value):
-#     return service.verify_transfer(addressFrom,addressTo,value)
 
 @jsonrpc.method("autoTransferTNC")
 def transfer_tnc(addressTo,value):
