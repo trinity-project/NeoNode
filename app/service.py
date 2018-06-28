@@ -129,7 +129,7 @@ def get_transaction_by_address(address,asset,timestamp=None,page=1):
             timestamp_filter
             ).paginate(page=page,per_page=2).items
     elif asset==setting.CONTRACTHASH:
-        timestamp_filter=InvokeTx.block_timestamp >=timestamp if timestamp else None
+        timestamp_filter=InvokeTx.block_timestamp >=timestamp if timestamp else ""
 
         query_tx = InvokeTx.query.filter(
             or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
