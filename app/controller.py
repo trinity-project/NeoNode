@@ -28,7 +28,7 @@ def get_transaction(txid):
     return service.get_transaction(txid)
 
 @jsonrpc.method("getTransactionByAddress")
-def get_transaction_by_address(address,asset,timestamp,page):
+def get_transaction_by_address(address,asset,timestamp=None,page=1):
     return service.get_transaction_by_address(address,asset,timestamp,page)
 
 
