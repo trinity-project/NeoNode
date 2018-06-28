@@ -119,17 +119,22 @@ def get_transaction(txid):
     return None
 
 
-def get_transaction_by_address(address,asset):
+def get_transaction_by_address(address,asset,timestamp,page=1):
     if asset==setting.NEO_ASSETID or asset==setting.GAS_ASSETID:
+        timestamp_filter=ContractTx.block_timestamp >=timestamp if timestamp else None
 
         query_tx=ContractTx.query.filter(
             or_(ContractTx.address_from==address,ContractTx.address_to==address),
-            ContractTx.asset==asset
-        ).all()
+            ContractTx.asset==asset,
+            timestamp_filter
+            ).paginate(page=page,per_page=2)
     elif asset==setting.CONTRACTHASH:
+        timestamp_filter=InvokeTx.block_timestamp >=timestamp if timestamp else None
+
         query_tx = InvokeTx.query.filter(
-            or_(InvokeTx.address_from == address, InvokeTx.address_to == address)
-        ).all()
+            or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
+            timestamp_filter
+        ).paginate(page=page,per_page=2)
 
 
     else:

@@ -28,8 +28,8 @@ def get_transaction(txid):
     return service.get_transaction(txid)
 
 @jsonrpc.method("getTransactionByAddress")
-def get_transaction_by_address(address,asset):
-    return service.get_transaction_by_address(address,asset)
+def get_transaction_by_address(address,asset,timestamp,page):
+    return service.get_transaction_by_address(address,asset,timestamp,page)
 
 
 @jsonrpc.method("getBalance")
