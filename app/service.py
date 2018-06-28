@@ -121,7 +121,7 @@ def get_transaction(txid):
 
 def get_transaction_by_address(address,asset,timestamp=None,page=1):
     if asset==setting.NEO_ASSETID or asset==setting.GAS_ASSETID:
-        timestamp_filter=ContractTx.block_timestamp >=timestamp if timestamp else None
+        timestamp_filter=ContractTx.block_timestamp >=timestamp if timestamp else ""
 
         query_tx=ContractTx.query.filter(
             or_(ContractTx.address_from==address,ContractTx.address_to==address),
@@ -133,7 +133,7 @@ def get_transaction_by_address(address,asset,timestamp=None,page=1):
 
         query_tx = InvokeTx.query.filter(
             or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
-            # timestamp_filter
+            timestamp_filter
         ).paginate(page=page,per_page=2).items
 
 
