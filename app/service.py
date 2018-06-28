@@ -119,7 +119,7 @@ def get_transaction(txid):
     return None
 
 
-def get_transaction_by_address(address,asset,timestamp,page=1):
+def get_transaction_by_address(address,asset,timestamp=None,page=1):
     if asset==setting.NEO_ASSETID or asset==setting.GAS_ASSETID:
         timestamp_filter=ContractTx.block_timestamp >=timestamp if timestamp else None
 
