@@ -8,9 +8,7 @@ from neocore.UInt160 import UInt160
 
 from config import setting
 from data_model.account_info_model import Tx, LocalBlockCout, Vout, Balance, BlockHeight, InvokeTx, ContractTx,logger
-
-
-
+from plugin.redis_client import redis_client
 
 
 def hex_reverse(input):
@@ -133,6 +131,8 @@ while True:
                                     tx_id=tx_id, asset=asset, address_from=address_from, address_to=address_to,
                                     value=Decimal(str(value)), block_timestamp=block_time,
                                     block_height=block_height)
+                                redis_client.publish("monitor",json.dumps({"playload":tx_id,"messageType":"monitorTx"}))
+                                redis_client.publish("monitor",json.dumps({"playload":block_height,"messageType":"monitorBlockHeight"}))
 
                 #store vout and calculate balance
                 if vout:
@@ -195,6 +195,10 @@ while True:
                         tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
                         value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
                         block_height=block_height)
+                    # send to redis subpub
+                    redis_client.publish("monitor", json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
+                    redis_client.publish("monitor",
+                                         json.dumps({"playload": block_height, "messageType": "monitorBlockHeight"}))
         local_block_count+=1
         localBlockCount.height=local_block_count
         LocalBlockCout.update(localBlockCount)

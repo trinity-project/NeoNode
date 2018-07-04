@@ -184,46 +184,6 @@ def construct_multi_tx(addressFrom,addressTo,value,assetId):
     res=createMultiTx(addressFrom,addressTo,value,assetId)
     return res
 
-# def multi_transfer_tnc(addressFrom,addressTo):
-#     tx_data=construct_multi_tx(addressFrom=addressFrom,addressTo=addressTo,value=1,assetId="0x0c34a8fd0109df360c7cf7ca454404901db77f5e")
-#     tx_id = tx_data["txId"]
-#     raw_data=sign(txData=tx_data["txData"],privtKey="c23e3dd5f88591a6b5be66c3c68e8f3e6969d9c67fd2d5f585e577071581e760")
-#     response=send_raw_tx(raw_data)
-#     print(response)
-#     if response=="success":
-#         return tx_id
-#     else:
-#         return None
-
-# def get_neovout(address,amount):
-#     items=NeoVout.query.filter_by(address=address).order_by(NeoVout.value.desc()).all()
-#     if items:
-#         tmplist=[]
-#         totalvalue=0
-#         for item in items:
-#             if item.value>=amount:
-#                 return [(item.tx_id,item.value,item.vout_number)]
-#             tmplist.append((item.tx_id,item.value,item.vout_number))
-#             totalvalue+=item.value
-#             if totalvalue>=amount:
-#                 return tmplist
-#
-#     return []
-#
-# def get_gasvout(address,amount):
-#     items=GasVout.query.filter_by(address=address).order_by(GasVout.value.desc()).all()
-#     if items:
-#         tmplist=[]
-#         totalvalue=0
-#         for item in items:
-#             if item.value>=amount:
-#                 return [(item.tx_id,float(item.value),item.vout_number)]
-#             tmplist.append((item.tx_id,float(item.value),item.vout_number))
-#             totalvalue+=item.value
-#             if totalvalue>=amount:
-#                 return tmplist
-#
-#     return []
 
 
 def get_vout(address,amount):
@@ -275,15 +235,3 @@ def verify_signature(message,signature,pubkey):
         "result":result
     }
 
-
-# def verify_transfer(addressFrom,addressTo,value):
-#     item = InvokeTx.query.filter_by(address_from=addressFrom,
-#                                      address_to=addressTo,
-#                                      value=Decimal(str(value)),
-#                                      vm_state="HALT, BREAK"
-#                                      ).first()
-#
-#     if item:
-#         return {"txId":item.tx_id}
-#
-#     return {}
