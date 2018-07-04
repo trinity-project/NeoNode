@@ -217,7 +217,7 @@ while True:
 
 
     else:
-        time.sleep(5)
+        time.sleep(10)
 
 
 
