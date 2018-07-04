@@ -84,7 +84,10 @@ while True:
     block_h=BlockHeight.query()
     if not block_h:
         continue
-
+    try:
+        redis_client.publish("monitor", json.dumps({"playload": block_h, "messageType": "monitorBlockHeight"}))
+    except:
+        logger.error("connect redis fail")
     if local_block_count<=block_h.height-1:
         exist_instance=Tx.query(local_block_count)
         if  exist_instance:
@@ -131,8 +134,13 @@ while True:
                                     tx_id=tx_id, asset=asset, address_from=address_from, address_to=address_to,
                                     value=Decimal(str(value)), block_timestamp=block_time,
                                     block_height=block_height)
-                                redis_client.publish("monitor",json.dumps({"playload":tx_id,"messageType":"monitorTx"}))
-                                redis_client.publish("monitor",json.dumps({"playload":block_height,"messageType":"monitorBlockHeight"}))
+
+                                try:
+                                    redis_client.publish("monitor",
+                                                         json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
+
+                                except:
+                                    logger.error("connect redis fail")
 
                 #store vout and calculate balance
                 if vout:
@@ -198,8 +206,6 @@ while True:
                     # send to redis subpub
                     try:
                         redis_client.publish("monitor", json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
-                        redis_client.publish("monitor",
-                                             json.dumps({"playload": block_height, "messageType": "monitorBlockHeight"}))
 
                     except:
                         logger.error("connect redis fail")
