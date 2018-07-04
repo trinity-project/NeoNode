@@ -196,9 +196,13 @@ while True:
                         value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
                         block_height=block_height)
                     # send to redis subpub
-                    redis_client.publish("monitor", json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
-                    redis_client.publish("monitor",
-                                         json.dumps({"playload": block_height, "messageType": "monitorBlockHeight"}))
+                    try:
+                        redis_client.publish("monitor", json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
+                        redis_client.publish("monitor",
+                                             json.dumps({"playload": block_height, "messageType": "monitorBlockHeight"}))
+
+                    except:
+                        logger.error("connect redis fail")
         local_block_count+=1
         localBlockCount.height=local_block_count
         LocalBlockCout.update(localBlockCount)
