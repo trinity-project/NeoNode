@@ -1,11 +1,14 @@
 import binascii
-
+import requests
 from base58 import b58decode
 from decimal import Decimal
+from neocore.KeyPair import KeyPair
 from neocore.UInt160 import UInt160
 from neocore.UInt256 import UInt256
 from neocore.BigInteger import BigInteger
 from neocore.Cryptography.Crypto import Crypto
+
+from config import setting
 
 
 def str_reverse(input):
@@ -97,63 +100,73 @@ def create_opdata(address_from, address_to, value, contract_hash):
     return op_data
 
 
+
 def createRSMCContract(hashSelf,pubkeySelf,hashOther,pubkeyOther,magicTimestamp):
     magicTimestamp = binascii.hexlify(str(magicTimestamp).encode()).decode()
     length=hex(int(len(magicTimestamp)/2))[2:]
     magicTimestamp=length+magicTimestamp
-    contractTemplate="5dc56b6c766b00527ac46c766b51527ac46c766b52527ac461{magicTimestamp}6c766b53527ac46168295379737" \
-                     "4656d2e457865637574696f6e456e67696e652e476574536372697074436f6e7461696e65726c766b54527ac46c766b" \
-                     "54c361681d4e656f2e5472616e73616374696f6e2e476574417474726962757465736c766b55527ac4616c766b55c36" \
-                     "c766b56527ac4006c766b57527ac46258016c766b56c36c766b57c3c36c766b58527ac4616c766b58c36168154e656f" \
-                     "2e4174747269627574652e476574446174616114{hashOther}9c6c766b59527ac46c766b59c3646700616c766b00c36121" \
-                     "{pubkeySelf}ac642f006c766b51c36121{pubkeyOther}ac620400006c766b5a527ac462b8006c766b58c36168154e656f2e4" \
-                     "174747269627574652e476574446174616114{hashSelf}9c6c766b5b527ac46c766b5bc3644c00616c766b52c36c766b5" \
-                     "4c3617c653e016c766b5c527ac46c766b5cc36422006c766b52c36c766b00c36c766b51c3615272654a006c766b5a52" \
-                     "7ac4623700006c766b5a527ac4622c00616c766b57c351936c766b57527ac46c766b57c36c766b56c3c09f639ffe006" \
-                     "c766b5a527ac46203006c766b5ac3616c756656c56b6c766b00527ac46c766b51527ac46c766b52527ac4616168184e" \
-                     "656f2e426c6f636b636861696e2e4765744865696768746c766b53527ac46c766b00c302e803936c766b53c39f6c766" \
-                     "b54527ac46c766b54c36466006c766b51c36121{pubkeySelf}ac642f006c766b52c36121{pubkeyOther}ac620400006c766b" \
-                     "55527ac4620e00006c766b55527ac46203006c766b55c3616c75665ec56b6c766b00527ac46c766b51527ac4616c766" \
-                     "b00c36168174e656f2e426c6f636b636861696e2e476574426c6f636b6c766b52527ac46c766b52c36168194e656f2e" \
-                     "426c6f636b2e4765745472616e73616374696f6e736c766b53527ac46c766b51c361681d4e656f2e5472616e7361637" \
-                     "4696f6e2e476574417474726962757465736c766b54527ac4616c766b54c36c766b55527ac4006c766b56527ac462d1" \
-                     "006c766b55c36c766b56c3c36c766b57527ac4616c766b57c36168154e656f2e4174747269627574652e47657444617" \
-                     "4616c766b58527ac4616c766b53c36c766b59527ac4006c766b5a527ac46264006c766b59c36c766b5ac3c36c766b5b" \
-                     "527ac4616c766b5bc36168174e656f2e5472616e73616374696f6e2e476574486173686c766b58c39c6c766b5c527ac" \
-                     "46c766b5cc3640e00516c766b5d527ac4624a00616c766b5ac351936c766b5a527ac46c766b5ac36c766b59c3c09f63" \
-                     "93ff616c766b56c351936c766b56527ac46c766b56c36c766b55c3c09f6326ff006c766b5d527ac46203006c766b5dc" \
-                     "3616c7566"
-    RSMCContract=contractTemplate.format(hashOther=hashOther,pubkeySelf=pubkeySelf,hashSelf=hashSelf,pubkeyOther=pubkeyOther,\
-                                         magicTimestamp=magicTimestamp)
+    contractTemplate="5dc56b6c766b00527ac46c766b51527ac46c766b52527ac461{magicTimestamp}6c766b53527ac4616829537" \
+                     "97374656d2e457865637574696f6e456e67696e652e476574536372697074436f6e7461696e65726c766b5452" \
+                     "7ac46c766b54c361681d4e656f2e5472616e73616374696f6e2e476574417474726962757465736c766b55527" \
+                     "ac4616c766b55c36c766b56527ac4006c766b57527ac462b4016c766b56c36c766b57c3c36c766b58527ac461" \
+                     "6c766b58c36168154e656f2e4174747269627574652e476574446174616114{hashOther}9c6c766b59527ac4" \
+                     "6c766b59c364c300616c766b00c36121{pubkeySelf}ac642f006c766b51c36121{pubkeyOther}ac635f006c" \
+                     "766b00c36121{pubkeyOther}ac642f006c766b51c36121{pubkeySelf}ac62040000620400516c766b5a527a" \
+                     "c462b8006c766b58c36168154e656f2e4174747269627574652e476574446174616114{hashSelf}9c6c766b5" \
+                     "b527ac46c766b5bc3644c00616c766b52c36c766b54c3617c6599016c766b5c527ac46c766b5cc36422006c76" \
+                     "6b52c36c766b00c36c766b51c3615272654a006c766b5a527ac4623700006c766b5a527ac4622c00616c766b5" \
+                     "7c351936c766b57527ac46c766b57c36c766b56c3c09f6343fe006c766b5a527ac46203006c766b5ac3616c75" \
+                     "6656c56b6c766b00527ac46c766b51527ac46c766b52527ac4616168184e656f2e426c6f636b636861696e2e4" \
+                     "765744865696768746c766b53527ac46c766b00c3011e936c766b53c39f6c766b54527ac46c766b54c364c200" \
+                     "6c766b51c36121{pubkeySelf}ac642f006c766b52c36121{pubkeyOther}ac635f006c766b51c36121" \
+                     "{pubkeyOther}ac642f006c766b52c36121{pubkeySelf}ac62040000620400516c766b55527ac4620e00006c" \
+                     "766b55527ac46203006c766b55c3616c75665ec56b6c766b00527ac46c766b51527ac4616c766b00c36168174" \
+                     "e656f2e426c6f636b636861696e2e476574426c6f636b6c766b52527ac46c766b52c36168194e656f2e426c6f" \
+                     "636b2e4765745472616e73616374696f6e736c766b53527ac46c766b51c361681d4e656f2e5472616e7361637" \
+                     "4696f6e2e476574417474726962757465736c766b54527ac4616c766b54c36c766b55527ac4006c766b56527a" \
+                     "c462d1006c766b55c36c766b56c3c36c766b57527ac4616c766b57c36168154e656f2e4174747269627574652" \
+                     "e476574446174616c766b58527ac4616c766b53c36c766b59527ac4006c766b5a527ac46264006c766b59c36c" \
+                     "766b5ac3c36c766b5b527ac4616c766b5bc36168174e656f2e5472616e73616374696f6e2e476574486173686" \
+                     "c766b58c39c6c766b5c527ac46c766b5cc3640e00516c766b5d527ac4624a00616c766b5ac351936c766b5a52" \
+                     "7ac46c766b5ac36c766b59c3c09f6393ff616c766b56c351936c766b56527ac46c766b56c36c766b55c3c09f6" \
+                     "326ff006c766b5d527ac46203006c766b5dc3616c7566"
+    RSMCContract=contractTemplate.format(hashOther=hashOther,pubkeySelf=pubkeySelf,hashSelf=hashSelf,
+                                         pubkeyOther=pubkeyOther,magicTimestamp=magicTimestamp)
 
     return  {
         "script":RSMCContract,
         "address":createMultiSigAddress(RSMCContract)
     }
 
-def createHTLCContract(futureTimestamp,pubkeyA,pubkeyB,hashR):
+
+
+
+def createHTLCContract(futureTimestamp,pubkeySelf,pubkeyOther,hashR):
     futureTimestamp=hex_reverse(hex(int(futureTimestamp)))
-    contractTemplate="57c56b6c766b00527ac46c766b51527ac46c766b52527ac4616c766b52c3a76c766b53527ac46168184e656f2e426c6" \
-                     "f636b636861696e2e4765744865696768746168184e656f2e426c6f636b636861696e2e4765744865616465726c766b" \
-                     "54527ac46c766b54c36168174e656f2e4865616465722e47657454696d657374616d7004{futureTimestamp}9f6c76" \
-                     "6b55527ac46c766b55c3648600616c766b00c36121{pubkeyA}ac644e006c766b51c36121{pubkeyB}ac6422006c766b5" \
-                     "3c36114{hashR}9c620400006c766b56527ac46266006c766b00c36121{pubkeyA}ac642f006c766b51c36121{pubkeyB}" \
-                     "ac620400006c766b56527ac46203006c766b56c3616c7566"
+    contractTemplate="58c56b6c766b00527ac46c766b51527ac46c766b52527ac4616c766b52c3a76c766b53527ac46168184e656f2e4" \
+                     "26c6f636b636861696e2e4765744865696768746168184e656f2e426c6f636b636861696e2e4765744865616465" \
+                     "726c766b54527ac46c766b00c36121{pubkeyA}ac642f006c766b51c36121{pubkeyB}ac635f006c766b00c3612" \
+                     "1{pubkeyB}ac642f006c766b51c36121{pubkeyA}ac62040000620400516c766b55527ac46c766b54c36168174e" \
+                     "656f2e4865616465722e47657454696d657374616d7004{futureTimestamp}9f6c766b56527ac46c766b56c364" \
+                     "3600616c766b55c36422006c766b53c36114{hashR}9c620400006c766b57527ac46212006c766b55c36c766b57" \
+                     "527ac46203006c766b57c3616c7566"
 
-    HTLCContract=contractTemplate.format(futureTimestamp=futureTimestamp,pubkeyA=pubkeyA,pubkeyB=pubkeyB,hashR=hashR)
-
-    return  HTLCContract
-
-
-def createMultiSigContract(publicKeyList):
-    script="52"
-    for item in publicKeyList:
-        script+="21"
-        script+=item
-    script+="52"
-    script+="ae"
+    HTLCContract=contractTemplate.format(futureTimestamp=futureTimestamp,pubkeyA=pubkeySelf,pubkeyB=pubkeyOther,hashR=hashR)
 
 
+    return  {
+        "script":HTLCContract,
+        "address":createMultiSigAddress(HTLCContract)
+    }
+
+
+
+def createMultiSigContract(pubkeySelf,pubkeyOther):
+    contractTemplate = "53c56b6c766b00527ac46c766b51527ac4616c766b00c36121{pubkeySelf}ac642f006c766b51c361" \
+                       "21{pubkeyOther}ac635f006c766b00c36121{pubkeyOther}ac642f006c766b51c36121{pubkeySelf}" \
+                       "ac62040000620400516c766b52527ac46203006c766b52c3616c7566"
+
+    script=contractTemplate.format(pubkeySelf=pubkeySelf,pubkeyOther=pubkeyOther)
     address=createMultiSigAddress(script)
 
 
@@ -161,3 +174,69 @@ def createMultiSigContract(publicKeyList):
         "script":script,
         "address":address
     }
+
+def blockheight_to_script(input):
+    input=hex(input)[2:]
+
+    if len(input) % 2 == 1:
+        input = "0" + input
+    be=bytearray (binascii.unhexlify(input))
+    be.reverse()
+    revese_hex=binascii.hexlify(be).decode()
+    revese_hex_len=binascii.hexlify(bytes([int(len(revese_hex)/2)])).decode()
+    len_all=str(83+int(revese_hex_len))
+    output="".join([len_all,revese_hex_len, revese_hex])
+    return output
+
+
+def R_to_script(input):
+
+    hex_R=binascii.hexlify(input.encode()).decode()
+    hex_R_len=binascii.hexlify(bytes([int(len(hex_R)/2)])).decode()
+
+    len_all="c3"
+    output="".join([len_all,hex_R_len, hex_R])
+    return output
+
+def privtkey_sign(txData,privteKey):
+    return binascii.hexlify(Crypto.Sign(message=txData, private_key=privteKey)).decode()
+
+def privtKey_to_publicKey(privtKey):
+
+    pk=binascii.unhexlify(privtKey)
+    keypair = KeyPair(pk)
+    vk=keypair.PublicKey.encode_point(True).decode()
+    return vk
+
+
+def sign(txData,privtKey):
+    signature = privtkey_sign(txData,privtKey)
+    publicKey=privtKey_to_publicKey(privtKey)
+    rawData=txData+"01"+"41"+"40"+signature+"23"+"21"+publicKey+"ac"
+    return rawData
+
+def get_neovout_by_address(address,amount):
+    data = {
+        "jsonrpc": "2.0",
+        "method": "getNeoVout",
+        "params": [address,amount],
+        "id": 1
+    }
+
+    res = requests.post(setting.NEOCLIURL, json=data).json()
+    return res["result"]
+
+def get_gasvout_by_address(address,amount):
+    data = {
+        "jsonrpc": "2.0",
+        "method": "getGasVout",
+        "params": [address,amount],
+        "id": 1
+    }
+
+    res = requests.post(setting.NEOCLIURL, json=data).json()
+    return res["result"]
+
+
+
+
