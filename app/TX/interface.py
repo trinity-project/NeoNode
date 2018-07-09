@@ -13,118 +13,156 @@ from app.utils import ToScriptHash
 from config import setting
 from app.TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSigContract, create_opdata, \
     createRSMCContract, str_reverse
-
+from app.TX.adapter import neo_factory,gas_factory,tnc_factory
 
 #RSMC
-def createFundingTx(walletSelf,walletOther): #qian ming shi A de qian min zai hou
+
+
+def createFundingTx(walletSelf, walletOther, asset_id):
+
     '''
 
     :param walletSelf: dict {
             "pubkey":"",
-            "address":"",
             "deposit":0
     }
     :param walletOhter: dict {
             "pubkey":"",
-            "address":"",
             "deposit":0
     :return:
     '''
 
-    multi_contract = createMultiSigContract([walletSelf["pubkey"],walletOther["pubkey"]])
-    contractAddress = multi_contract["address"]
-    time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
-                                      data=bytearray.fromhex(hex(int(time.time()))[2:]))
-    address_hash_self = TransactionAttribute(usage=TransactionAttributeUsage.Script,
-                                         data=ToAddresstHash(walletSelf["address"]).Data)
-    address_hash_other = TransactionAttribute(usage=TransactionAttributeUsage.Script,
-                                         data=ToAddresstHash(walletOther["address"]).Data)
-    txAttributes = [address_hash_self, address_hash_other, time_stamp]
+    if asset_id not in [setting.NEO_ASSETID, setting.GAS_ASSETID]:
+        return tnc_factory.createFundingTx(walletSelf, walletOther, asset_id)
 
-    op_dataSelf = create_opdata(address_from=walletSelf["address"], address_to=contractAddress, value=walletSelf["deposit"],
-                             contract_hash=setting.CONTRACTHASH)
-    op_dataOther = create_opdata(address_from=walletOther["address"], address_to=contractAddress, value=walletOther["deposit"],
-                             contract_hash=setting.CONTRACTHASH)
+    elif asset_id == setting.NEO_ASSETID:
+        return neo_factory.createFundingTx(walletSelf, walletOther, asset_id)
 
-    tx = InvocationTransaction()
-    tx.Version = 1
-    tx.Attributes = txAttributes
-    tx.Script = binascii.unhexlify(op_dataSelf + op_dataOther)
-
-    return {
-        "txData":tx.get_tx_data(),
-        "addressFunding":contractAddress,
-        "script":multi_contract["script"],
-        "txId": createTxid(tx.get_tx_data())
-    }
+    elif asset_id == setting.GAS_ASSETID:
+        return gas_factory.createFundingTx(walletSelf, walletOther, asset_id)
 
 
-def createCTX(addressFunding,addressSelf,balanceSelf,addressOther,balanceOther,pubkeySelf,pubkeyOther):
-    RSMCContract=createRSMCContract(hashSelf=ToAddresstHash(addressSelf).ToString2(),pubkeySelf=pubkeySelf,
-                       hashOther=ToAddresstHash(addressOther).ToString2(),pubkeyOther=pubkeyOther,magicTimestamp=time.time())
-    time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
-                                      data=bytearray.fromhex(hex(int(time.time()))[2:]))
-    address_hash_funding = TransactionAttribute(usage=TransactionAttributeUsage.Script,
-                                         data=ToAddresstHash(addressFunding).Data)
-    txAttributes = [address_hash_funding, time_stamp]
+def createCTX(
+        addressFunding,
+        balanceSelf,
+        balanceOther,
+        pubkeySelf,
+        pubkeyOther,
+        fundingScript,
+        asset_id,
+        fundingTxId):
+    if asset_id == setting.NEO_ASSETID:
+        return neo_factory.createCTX(
+            balanceSelf,
+            balanceOther,
+            pubkeySelf,
+            pubkeyOther,
+            fundingScript,
+            asset_id,
+            fundingTxId)
 
-    op_data_to_RSMC = create_opdata(address_from=addressFunding, address_to=RSMCContract["address"], value=balanceSelf,contract_hash=TNC)
-    op_data_to_other = create_opdata(address_from=addressFunding, address_to=addressOther, value=balanceOther,contract_hash=TNC)
-
-    tx = InvocationTransaction()
-    tx.Version = 1
-    tx.Attributes = txAttributes
-    tx.Script = binascii.unhexlify(op_data_to_RSMC+op_data_to_other)
-
-    return {
-        "txData":tx.get_tx_data(),
-        "addressRSMC":RSMCContract["address"],
-        "script":RSMCContract["script"],
-        "txid":createTxid(tx.get_tx_data())
-    }
-
-def createRDTX(addressRSMC,addressSelf,balanceSelf,CTxId):
-
-    time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
-                                      data=bytearray.fromhex(hex(int(time.time()))[2:]))
-    address_hash_RSMC = TransactionAttribute(usage=TransactionAttributeUsage.Script,
-                                         data=ToAddresstHash(addressRSMC).Data)
-    pre_txid = TransactionAttribute(usage=TransactionAttributeUsage.Remark1, data=bytearray.fromhex(
-        hex_reverse(CTxId)))
-
-    outputTo= TransactionAttribute(usage=TransactionAttributeUsage.Remark2, data=ToAddresstHash(addressSelf).Data)
-
-    txAttributes = [address_hash_RSMC, time_stamp,pre_txid,outputTo]
-
-    op_data_to_self = create_opdata(address_from=addressRSMC, address_to=addressSelf, value=balanceSelf,contract_hash=TNC)
-
-
-    tx = InvocationTransaction()
-    tx.Version = 1
-    tx.Attributes = txAttributes
-    tx.Script = binascii.unhexlify(op_data_to_self)
-
-    return tx.get_tx_data()
+    elif asset_id == setting.GAS_ASSETID:
+        return gas_factory.createCTX(
+            balanceSelf,
+            balanceOther,
+            pubkeySelf,
+            pubkeyOther,
+            fundingScript,
+            asset_id,
+            fundingTxId)
+    else:
+        # default operations tokens like TNC
+        return tnc_factory.createCTX(
+            addressFunding,
+            balanceSelf,
+            balanceOther,
+            pubkeySelf,
+            pubkeyOther,
+            fundingScript,
+            asset_id)
 
 
-def createBRTX(addressRSMC,addressOther,balanceSelf):
+def createRDTX(
+        addressRSMC,
+        addressSelf,
+        balanceSelf,
+        CTxId,
+        RSMCScript,
+        asset_id):
 
-    time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
-                                      data=bytearray.fromhex(hex(int(time.time()))[2:]))
-    address_hash_RSMC = TransactionAttribute(usage=TransactionAttributeUsage.Script,
-                                         data=ToAddresstHash(addressRSMC).Data)
-    outputTo = TransactionAttribute(usage=TransactionAttributeUsage.Remark1, data=ToAddresstHash(addressOther).Data)
-    txAttributes = [address_hash_RSMC, time_stamp,outputTo]
+    if asset_id == NEO:
+        return neo_factory.createRDTX(
+            addressSelf, balanceSelf, CTxId, RSMCScript, asset_id)
 
-    op_data_to_other = create_opdata(address_from=addressRSMC, address_to=addressOther, value=balanceSelf,contract_hash=TNC)
+    elif asset_id == GAS:
+        return gas_factory.createRDTX(
+            addressSelf, balanceSelf, CTxId, RSMCScript, asset_id)
+    else:
+        return tnc_factory.createRDTX(
+            addressRSMC,
+            addressSelf,
+            balanceSelf,
+            CTxId,
+            RSMCScript,
+            asset_id)
 
 
-    tx = InvocationTransaction()
-    tx.Version = 1
-    tx.Attributes = txAttributes
-    tx.Script = binascii.unhexlify(op_data_to_other)
+def createBRTX(addressRSMC, addressOther, balanceSelf, RSMCScript, CTxId, asset_id):
 
-    return tx.get_tx_data()
+    if asset_id == NEO:
+        return neo_factory.createBRTX(
+            addressOther, balanceSelf, RSMCScript, CTxId, asset_id)
+
+    elif asset_id == GAS:
+        return gas_factory.createBRTX(
+            addressOther, balanceSelf, RSMCScript, CTxId, asset_id)
+    else:
+        return tnc_factory.createBRTX(
+            addressRSMC,
+            addressOther,
+            balanceSelf,
+            RSMCScript,
+            asset_id)
+
+
+def createRefundTX(
+        addressFunding,
+        balanceSelf,
+        balanceOther,
+        pubkeySelf,
+        pubkeyOther,
+        fundingScript,
+        asset_id):
+
+    if asset_id == NEO:
+        return neo_factory.createRefundTX(
+            addressFunding,
+            balanceSelf,
+            balanceOther,
+            pubkeySelf,
+            pubkeyOther,
+            fundingScript,
+            asset_id)
+
+    elif asset_id == GAS:
+        return gas_factory.createRefundTX(
+            addressFunding,
+            balanceSelf,
+            balanceOther,
+            pubkeySelf,
+            pubkeyOther,
+            fundingScript,
+            asset_id)
+    else:
+        return tnc_factory.createRefundTX(
+            addressFunding,
+            balanceSelf,
+            balanceOther,
+            pubkeySelf,
+            pubkeyOther,
+            fundingScript,
+            asset_id)
+
 
 #COMMON
 def createTx(addressFrom,addressTo,value,assetId):

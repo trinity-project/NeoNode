@@ -72,3 +72,13 @@ def transfer_tnc(addressTo,value):
     if remote_ip==setting.REMOTE_ADDR and res:
         return service.transfer_tnc(address_from,addressTo,value,privt_key)
     return {}
+
+# about channel
+
+@jsonrpc.method("FunderCreate")
+def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
+    return service.create_funder(pubkeySelf,pubkeyOther,depoist,assetType)
+
+@jsonrpc.method("RefoundTrans")
+def refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding):
+    return service.refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding)

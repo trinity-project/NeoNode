@@ -3,7 +3,7 @@ import time
 
 import requests
 
-from app.TX.interface import createTx, createMultiTx
+from app.TX.interface import createTx, createMultiTx,createFundingTx,createCTX,createRDTX,createBRTX
 from app.utils import  ToScriptHash, int_to_hex, privtkey_sign, hex_reverse,privtKey_to_publicKey
 from app.model import Balance, InvokeTx, ContractTx, Vout
 from decimal import Decimal
@@ -235,3 +235,15 @@ def verify_signature(message,signature,pubkey):
         "result":result
     }
 
+
+def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
+    walletSelf= {
+        "pubkey":pubkeySelf,
+        "address":"ASm37KDVtgNQRqd4eefYGKCGn8fQH3mHw2",
+        "deposit":10
+    }
+    walletOther= {
+        "pubkey":"03d8f667ff2068751e117cd6dbe3ebe286dbbc7fbb7b1ef0fbf5eb068e8b783a94",
+        "address":"AJAd9ZaZCwLvdktHc1Rs7w3hmpVSBuTKzs",
+        "deposit":10
+    }
