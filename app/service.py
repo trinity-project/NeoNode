@@ -3,7 +3,7 @@ import time
 
 import requests
 
-from app.TX.interface import createTx, createMultiTx,createFundingTx,createCTX,createRDTX,createBRTX
+from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, createRefundTX
 from app.TX.utils import pubkeyToAddress
 from app.utils import  ToScriptHash, int_to_hex, privtkey_sign, hex_reverse,privtKey_to_publicKey
 from app.model import Balance, InvokeTx, ContractTx, Vout
@@ -263,3 +263,18 @@ def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
                                    commitment.get("txId"),
                                    commitment.get("scriptRSMC"), assertId)
     return {"Founder": founder, "C_TX": commitment, "R_TX": revocabledelivery}
+
+
+def refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding,assetType):
+
+    if assetType=="NEO":
+        assertId=setting.NEO_ASSETID
+    elif assetType=="GAS":
+        assertId=setting.GAS_ASSETID
+    else:
+        assertId=setting.CONTRACTHASH
+    refund_tx = createRefundTX(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding,assertId)
+
+    return {
+        "Settlement":refund_tx
+    }
