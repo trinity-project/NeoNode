@@ -90,11 +90,11 @@ def createRDTX(
         RSMCScript,
         asset_id):
 
-    if asset_id == NEO:
+    if asset_id == setting.NEO_ASSETID:
         return neo_factory.createRDTX(
             addressSelf, balanceSelf, CTxId, RSMCScript, asset_id)
 
-    elif asset_id == GAS:
+    elif asset_id == setting.GAS_ASSETID:
         return gas_factory.createRDTX(
             addressSelf, balanceSelf, CTxId, RSMCScript, asset_id)
     else:
@@ -109,11 +109,11 @@ def createRDTX(
 
 def createBRTX(addressRSMC, addressOther, balanceSelf, RSMCScript, CTxId, asset_id):
 
-    if asset_id == NEO:
+    if asset_id == setting.NEO_ASSETID:
         return neo_factory.createBRTX(
             addressOther, balanceSelf, RSMCScript, CTxId, asset_id)
 
-    elif asset_id == GAS:
+    elif asset_id == setting.GAS_ASSETID:
         return gas_factory.createBRTX(
             addressOther, balanceSelf, RSMCScript, CTxId, asset_id)
     else:
