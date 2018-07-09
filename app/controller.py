@@ -80,5 +80,5 @@ def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
     return service.create_funder(pubkeySelf,pubkeyOther,depoist,assetType)
 
 @jsonrpc.method("RefoundTrans")
-def refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding):
-    return service.refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding)
+def refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding,assetType):
+    return service.refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding,assetType)
