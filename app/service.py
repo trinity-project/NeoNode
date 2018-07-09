@@ -259,7 +259,7 @@ def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
     commitment = createCTX(founder.get("addressFunding"), float(depoist), float(depoist), pubkeySelf,
                            pubkeyOther, founder.get("scriptFunding"), assertId, founder.get('txId'))
     address_self = pubkeyToAddress(pubkeySelf)
-    revocabledelivery = createRDTX(commitment.get("addressRSMC"), address_self, float(params[2]),
+    revocabledelivery = createRDTX(commitment.get("addressRSMC"), address_self, float(depoist),
                                    commitment.get("txId"),
                                    commitment.get("scriptRSMC"), assertId)
     return {"Founder": founder, "C_TX": commitment, "R_TX": revocabledelivery}
