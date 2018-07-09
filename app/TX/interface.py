@@ -134,7 +134,7 @@ def createRefundTX(
         fundingScript,
         asset_id):
 
-    if asset_id == NEO:
+    if asset_id == setting.NEO_ASSETID:
         return neo_factory.createRefundTX(
             addressFunding,
             balanceSelf,
@@ -144,7 +144,7 @@ def createRefundTX(
             fundingScript,
             asset_id)
 
-    elif asset_id == GAS:
+    elif asset_id == setting.GAS_ASSETID:
         return gas_factory.createRefundTX(
             addressFunding,
             balanceSelf,
