@@ -42,6 +42,13 @@ def ToAddresstHash(address):
     return UInt160(data=data[1:21])
 
 
+def pubkeyToAddress(pubkey):
+    pubkey = "21" + pubkey + "ac"
+    sc =pubkey.encode()
+    address=Crypto.ToAddress(Crypto.ToScriptHash(sc))
+    return address
+
+
 def createVerifyScript(script):
     tmp = hex(int(len(script)/2))[2:]
     if len(tmp) % 2 == 1:

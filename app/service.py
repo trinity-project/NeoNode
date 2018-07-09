@@ -4,6 +4,7 @@ import time
 import requests
 
 from app.TX.interface import createTx, createMultiTx,createFundingTx,createCTX,createRDTX,createBRTX
+from app.TX.utils import pubkeyToAddress
 from app.utils import  ToScriptHash, int_to_hex, privtkey_sign, hex_reverse,privtKey_to_publicKey
 from app.model import Balance, InvokeTx, ContractTx, Vout
 from decimal import Decimal
@@ -239,11 +240,26 @@ def verify_signature(message,signature,pubkey):
 def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
     walletSelf= {
         "pubkey":pubkeySelf,
-        "address":"ASm37KDVtgNQRqd4eefYGKCGn8fQH3mHw2",
-        "deposit":10
+        "deposit":depoist
     }
     walletOther= {
-        "pubkey":"03d8f667ff2068751e117cd6dbe3ebe286dbbc7fbb7b1ef0fbf5eb068e8b783a94",
-        "address":"AJAd9ZaZCwLvdktHc1Rs7w3hmpVSBuTKzs",
-        "deposit":10
+        "pubkey":pubkeyOther,
+        "deposit":depoist
     }
+
+    if assetType=="NEO":
+        assertId=setting.NEO_ASSETID
+    elif assetType=="GAS":
+        assertId=setting.GAS_ASSETID
+    else:
+        assertId=setting.CONTRACTHASH
+
+
+    founder=createFundingTx(walletSelf,walletOther,assertId)
+    commitment = createCTX(founder.get("addressFunding"), float(depoist), float(depoist), pubkeySelf,
+                           pubkeyOther, founder.get("scriptFunding"), assertId, founder.get('txId'))
+    address_self = pubkeyToAddress(pubkeySelf)
+    revocabledelivery = createRDTX(commitment.get("addressRSMC"), address_self, float(params[2]),
+                                   commitment.get("txId"),
+                                   commitment.get("scriptRSMC"), assertId)
+    return {"Founder": founder, "C_TX": commitment, "R_TX": revocabledelivery}
