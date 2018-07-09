@@ -48,6 +48,11 @@ def pubkeyToAddress(pubkey):
     address=Crypto.ToAddress(Crypto.ToScriptHash(sc))
     return address
 
+def pubkeyToAddressHash(pubkey):
+    pubkey="21"+pubkey+"ac"
+    sc =pubkey.encode()
+    sc_hash=Crypto.ToScriptHash(sc).ToString2()
+    return sc_hash
 
 def createVerifyScript(script):
     tmp = hex(int(len(script)/2))[2:]
