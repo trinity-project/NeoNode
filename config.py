@@ -40,7 +40,8 @@ class SettingHolder(object):
     def setup_privtnet(self):
         self.CONTRACTHASH = "0x0c34a8fd0109df360c7cf7ca454404901db77f5e"
         self.NEOCLIURL = "http://localhost:10332"
-
+        self.REDIS_IP="localhost"
+        self.REDIS_PORT=6379
 
 setting=SettingHolder()
 
