@@ -278,3 +278,25 @@ def refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scri
     return {
         "Settlement":refund_tx
     }
+
+
+
+
+def create_rsmc(pubkeySelf, pubkeyOther, addressFunding, scriptFunding, deposit, foundingTxId, assetType):
+
+    if assetType=="NEO":
+        assertId=setting.NEO_ASSETID
+    elif assetType=="GAS":
+        assertId=setting.GAS_ASSETID
+    else:
+        assertId=setting.CONTRACTHASH
+
+    C_tx = createCTX(addressFunding=addressFunding, balanceSelf=deposit,
+                          balanceOther=deposit, pubkeySelf=pubkeySelf,
+                          pubkeyOther=pubkeyOther, fundingScript=scriptFunding, asset_id=assertId,fundingTxId=foundingTxId)
+
+    RD_tx = createRDTX(addressRSMC=C_tx["addressRSMC"], addressSelf=pubkeyToAddress(pubkeySelf),
+                            balanceSelf=deposit, CTxId=C_tx["txId"],
+                            RSMCScript=C_tx["scriptRSMC"], asset_id=assertId)
+
+    return {"C_TX":C_tx,"R_TX":RD_tx}

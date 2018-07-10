@@ -82,3 +82,8 @@ def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
 @jsonrpc.method("RefoundTrans")
 def refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding,assetType):
     return service.refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding,assetType)
+
+
+@jsonrpc.method("FunderTransaction")
+def create_rsmc(pubkeySelf,pubkeyOther,addressFunding,scriptFunding,deposit,foundingTxId,assetType):
+    return service.create_rsmc(pubkeySelf,pubkeyOther,addressFunding,scriptFunding,deposit,foundingTxId,assetType)
