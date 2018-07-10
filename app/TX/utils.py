@@ -236,7 +236,3 @@ def get_gasvout_by_address(address,amount):
 
     res = requests.post(setting.NEOCLIURL, json=data).json()
     return res["result"]
-
-
-
-

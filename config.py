@@ -36,7 +36,7 @@ class SettingHolder(object):
         self.FUNDING_ADDRESS=ENVIRON.get("FUNDING_ADDRESS")
         self.WEBAPI=ENVIRON.get("WEB_API")
         self.REDIS_IP="47.104.81.20"
-        self.REDIS_PORT=9000
+        self.REDIS_PORT=9001
     def setup_privtnet(self):
         self.CONTRACTHASH = "0x0c34a8fd0109df360c7cf7ca454404901db77f5e"
         self.NEOCLIURL = "http://localhost:10332"
