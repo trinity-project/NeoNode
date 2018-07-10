@@ -85,5 +85,9 @@ def refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scri
 
 
 @jsonrpc.method("FunderTransaction")
-def create_rsmc(pubkeySelf,pubkeyOther,addressFunding,scriptFunding,deposit,foundingTxId,assetType):
-    return service.create_rsmc(pubkeySelf,pubkeyOther,addressFunding,scriptFunding,deposit,foundingTxId,assetType)
+def create_rsmc(pubkeySelf,pubkeyOther,addressFunding,scriptFunding,balanceSelf,balanceOther,foundingTxId,assetType):
+    return service.create_rsmc(pubkeySelf,pubkeyOther,addressFunding,scriptFunding,balanceSelf,balanceOther,foundingTxId,assetType)
+
+@jsonrpc.method("HTLCTransaction")
+def create_htlc(pubkeySelf,pubkeyOther,htlcValue,balanceSelf,balanceOther,hash_R,addressFunding,scriptFunding,assetType):
+    return service.create_htlc(pubkeySelf,pubkeyOther,htlcValue,balanceSelf,balanceOther,hash_R,addressFunding,scriptFunding,assetType)

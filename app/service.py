@@ -3,7 +3,8 @@ import time
 
 import requests
 
-from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, createRefundTX
+from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, \
+    createRefundTX, create_sender_HTLC_TXS
 from app.TX.utils import pubkeyToAddress
 from app.utils import  ToScriptHash, int_to_hex, privtkey_sign, hex_reverse,privtKey_to_publicKey
 from app.model import Balance, InvokeTx, ContractTx, Vout
@@ -256,10 +257,10 @@ def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
 
 
     founder=createFundingTx(walletSelf,walletOther,assertId)
-    commitment = createCTX(founder.get("addressFunding"), float(depoist), float(depoist), pubkeySelf,
-                           pubkeyOther, founder.get("scriptFunding"), assertId, founder.get('txId'))
-    address_self = pubkeyToAddress(pubkeySelf)
-    revocabledelivery = createRDTX(commitment.get("addressRSMC"), address_self, float(depoist),
+    commitment = createCTX(founder.get("addressFunding"), float(walletSelf[depoist]), float(walletOther[depoist]),walletSelf["pubkey"],
+                           walletOther["pubkey"], founder.get("scriptFunding"), assertId, founder.get('txId'))
+    address_self = pubkeyToAddress(walletSelf["pubkey"])
+    revocabledelivery = createRDTX(commitment.get("addressRSMC"), address_self, float(walletSelf[depoist]),
                                    commitment.get("txId"),
                                    commitment.get("scriptRSMC"), assertId)
     return {"Founder": founder, "C_TX": commitment, "R_TX": revocabledelivery}
@@ -282,7 +283,7 @@ def refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scri
 
 
 
-def create_rsmc(pubkeySelf, pubkeyOther, addressFunding, scriptFunding, deposit, foundingTxId, assetType):
+def create_rsmc(pubkeySelf, pubkeyOther, addressFunding, scriptFunding, balanceSelf,balanceOther, foundingTxId, assetType):
 
     if assetType=="NEO":
         assertId=setting.NEO_ASSETID
@@ -291,12 +292,29 @@ def create_rsmc(pubkeySelf, pubkeyOther, addressFunding, scriptFunding, deposit,
     else:
         assertId=setting.CONTRACTHASH
 
-    C_tx = createCTX(addressFunding=addressFunding, balanceSelf=deposit,
-                          balanceOther=deposit, pubkeySelf=pubkeySelf,
+    C_tx = createCTX(addressFunding=addressFunding, balanceSelf=balanceSelf,
+                          balanceOther=balanceOther, pubkeySelf=pubkeySelf,
                           pubkeyOther=pubkeyOther, fundingScript=scriptFunding, asset_id=assertId,fundingTxId=foundingTxId)
 
     RD_tx = createRDTX(addressRSMC=C_tx["addressRSMC"], addressSelf=pubkeyToAddress(pubkeySelf),
-                            balanceSelf=deposit, CTxId=C_tx["txId"],
+                            balanceSelf=balanceSelf, CTxId=C_tx["txId"],
                             RSMCScript=C_tx["scriptRSMC"], asset_id=assertId)
 
     return {"C_TX":C_tx,"R_TX":RD_tx}
+
+
+
+def create_htlc(pubkeySelf,pubkeyOther,htlcValue,balanceSelf,balanceOther,hash_R,addressFunding,scriptFunding,assetType):
+
+    if assetType=="NEO":
+        assertId=setting.NEO_ASSETID
+    elif assetType=="GAS":
+        assertId=setting.GAS_ASSETID
+    else:
+        assertId=setting.CONTRACTHASH
+
+    return create_sender_HTLC_TXS(pubkeySelf, pubkeyOther, htlcValue, balanceSelf,
+                              balanceOther, hash_R, addressFunding,
+                              scriptFunding, assertId)
+
+
