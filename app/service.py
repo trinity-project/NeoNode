@@ -257,7 +257,7 @@ def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
 
 
     founder=createFundingTx(walletSelf,walletOther,assertId)
-    commitment = createCTX(founder.get("addressFunding"), float(walletSelf["depositt"]), float(walletOther["deposit"]),walletSelf["pubkey"],
+    commitment = createCTX(founder.get("addressFunding"), float(walletSelf["deposit"]), float(walletOther["deposit"]),walletSelf["pubkey"],
                            walletOther["pubkey"], founder.get("scriptFunding"), assertId, founder.get('txId'))
     address_self = pubkeyToAddress(walletSelf["pubkey"])
     revocabledelivery = createRDTX(commitment.get("addressRSMC"), address_self, float(walletSelf[depoist]),
