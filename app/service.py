@@ -238,14 +238,14 @@ def verify_signature(message,signature,pubkey):
     }
 
 
-def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
+def create_funder(pubkeySelf,pubkeyOther,deposit,assetType):
     walletSelf= {
         "pubkey":pubkeySelf,
-        "deposit":depoist
+        "deposit":deposit
     }
     walletOther= {
         "pubkey":pubkeyOther,
-        "deposit":depoist
+        "deposit":deposit
     }
 
     if assetType=="NEO":
@@ -260,7 +260,7 @@ def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
     commitment = createCTX(founder.get("addressFunding"), float(walletSelf["deposit"]), float(walletOther["deposit"]),walletSelf["pubkey"],
                            walletOther["pubkey"], founder.get("scriptFunding"), assertId, founder.get('txId'))
     address_self = pubkeyToAddress(walletSelf["pubkey"])
-    revocabledelivery = createRDTX(commitment.get("addressRSMC"), address_self, float(walletSelf[depoist]),
+    revocabledelivery = createRDTX(commitment.get("addressRSMC"), address_self, float(walletSelf["deposit"]),
                                    commitment.get("txId"),
                                    commitment.get("scriptRSMC"), assertId)
     return {"Founder": founder, "C_TX": commitment, "R_TX": revocabledelivery}

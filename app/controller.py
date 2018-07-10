@@ -76,8 +76,8 @@ def transfer_tnc(addressTo,value):
 # about channel
 
 @jsonrpc.method("FunderCreate")
-def create_funder(pubkeySelf,pubkeyOther,depoist,assetType):
-    return service.create_funder(pubkeySelf,pubkeyOther,depoist,assetType)
+def create_funder(pubkeySelf,pubkeyOther,deposit,assetType):
+    return service.create_funder(pubkeySelf,pubkeyOther,deposit,assetType)
 
 @jsonrpc.method("RefoundTrans")
 def refunder(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOther,scriptFunding,assetType):
