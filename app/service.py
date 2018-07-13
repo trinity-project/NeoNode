@@ -4,7 +4,7 @@ import time
 import requests
 
 from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, \
-    createRefundTX, create_sender_HTLC_TXS
+    createRefundTX, create_sender_HTLC_TXS,create_receiver_HTLC_TXS
 from app.TX.utils import pubkeyToAddress
 from app.utils import  ToScriptHash, int_to_hex, privtkey_sign, hex_reverse,privtKey_to_publicKey
 from app.model import Balance, InvokeTx, ContractTx, Vout
@@ -313,8 +313,22 @@ def create_htlc(pubkeySelf,pubkeyOther,htlcValue,balanceSelf,balanceOther,hash_R
     else:
         assertId=setting.CONTRACTHASH
 
-    return create_sender_HTLC_TXS(pubkeySelf, pubkeyOther, htlcValue, balanceSelf,
+    sender_htlc_txs=create_sender_HTLC_TXS(pubkeySelf, pubkeyOther, htlcValue, balanceSelf,
                               balanceOther, hash_R, addressFunding,
                               scriptFunding, assertId)
 
+    receiver_htlc_tx=create_receiver_HTLC_TXS( pubkeySelf,
+                                               pubkeyOther,
+                                               htlcValue,
+                                               balanceSelf,
+                                               balanceOther,
+                                               hash_R,
+                                               addressFunding,
+                                               scriptFunding,
+                                               assertId)
 
+    both_side_txs={}
+    both_side_txs.update(sender_htlc_txs)
+    both_side_txs.update(receiver_htlc_tx)
+
+    return both_side_txs
