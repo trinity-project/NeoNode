@@ -300,7 +300,9 @@ def create_rsmc(pubkeySelf, pubkeyOther, addressFunding, scriptFunding, balanceS
                             balanceSelf=balanceSelf, CTxId=C_tx["txId"],
                             RSMCScript=C_tx["scriptRSMC"], asset_id=assertId)
 
-    return {"C_TX":C_tx,"R_TX":RD_tx}
+    BR_tx = createBRTX(C_tx["addressRSMC"], pubkeyToAddress(pubkeyOther), balanceSelf, C_tx["scriptRSMC"], C_tx["txId"], assertId)
+
+    return {"C_TX":C_tx,"R_TX":RD_tx,"BR_TX":BR_tx}
 
 
 
