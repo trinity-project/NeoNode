@@ -3,19 +3,19 @@ import time
 from neocore.BigInteger import BigInteger
 from neocore.Cryptography.Crypto import Crypto
 
+from TX.adapter.tnc_factory import createFundingTx
 
+walletSelf= {
+    "pubkey": "0338f92d2dbb3a5ff1f2bd47b5aefdcd61020525b2f6d6e0bb524f5ea8c88cea19",
+    "address": "AZgssA2LbcFfsrba5WsKx3Rzx1wmVqpb6r",
+    "deposit": 1
+}
+walletOther= {
 
-
-# walletSelf= {
-#     "pubkey":"03ed45d1fdf6dbd5a6e5567b50d2b36b8ae5c1cd0123f26aba000fd3a72d6fbd28",
-#     "address":"ASm37KDVtgNQRqd4eefYGKCGn8fQH3mHw2",
-#     "deposit":10
-# }
-# walletOther= {
-#     "pubkey":"03d8f667ff2068751e117cd6dbe3ebe286dbbc7fbb7b1ef0fbf5eb068e8b783a94",
-#     "address":"AJAd9ZaZCwLvdktHc1Rs7w3hmpVSBuTKzs",
-#     "deposit":10
-# }
+    "pubkey": "026f0eaeed68e9b630bf5541d05aef78330403349bd6a3ad5567fcbc689ff7c414",
+    "address": "AMxCb9gDqwC6hhP1D4G4ERy8FWtavvVkEb",
+    "deposit": 1
+}
 
 
 
@@ -34,7 +34,8 @@ from neocore.Cryptography.Crypto import Crypto
 
 
 
-# funding_tx = createFundingTx(walletSelf=walletSelf,walletOther=walletOther)
+funding_tx = createFundingTx(walletSelf=walletSelf,walletOther=walletOther,asset_id= "0x0c34a8fd0109df360c7cf7ca454404901db77f5e")
+print(funding_tx)
 
 # C_tx = createCTX(addressFunding=funding_tx["addressFunding"],addressSelf=walletSelf["address"],
 #                  balanceSelf=walletSelf["deposit"],addressOther=walletOther["address"],
