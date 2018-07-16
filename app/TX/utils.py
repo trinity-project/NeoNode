@@ -162,11 +162,14 @@ def createHTLCContract(futureTimestamp,pubkeySelf,pubkeyOther,hashR):
 
 
 def createMultiSigContract(pubkeySelf,pubkeyOther):
+    pubkey_large = max(pubkeySelf,pubkeyOther)
+    pubkey_small = min(pubkeySelf,pubkeyOther)
+
     contractTemplate = "53c56b6c766b00527ac46c766b51527ac4616c766b00c36121{pubkeySelf}ac642f006c766b51c361" \
                        "21{pubkeyOther}ac635f006c766b00c36121{pubkeyOther}ac642f006c766b51c36121{pubkeySelf}" \
                        "ac62040000620400516c766b52527ac46203006c766b52c3616c7566"
 
-    script=contractTemplate.format(pubkeySelf=pubkeySelf,pubkeyOther=pubkeyOther)
+    script=contractTemplate.format(pubkeySelf=pubkey_small,pubkeyOther=pubkey_large)
     address=createMultiSigAddress(script)
 
 

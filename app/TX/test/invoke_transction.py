@@ -9,6 +9,8 @@ walletSelf= {
     "pubkey": "0338f92d2dbb3a5ff1f2bd47b5aefdcd61020525b2f6d6e0bb524f5ea8c88cea19",
     "address": "AZgssA2LbcFfsrba5WsKx3Rzx1wmVqpb6r",
     "deposit": 1
+
+
 }
 walletOther= {
 
