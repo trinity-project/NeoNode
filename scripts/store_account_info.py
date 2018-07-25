@@ -84,10 +84,10 @@ while True:
     block_h=BlockHeight.query()
     if not block_h:
         continue
-    try:
-        redis_client.publish("monitor", json.dumps({"playload": block_h.height, "messageType": "monitorBlockHeight"}))
-    except Exception as e:
-        logger.error("connect redis fail")
+    # try:
+    #     redis_client.publish("monitor", json.dumps({"playload": block_h.height, "messageType": "monitorBlockHeight"}))
+    # except Exception as e:
+    #     logger.error("connect redis fail")
     if local_block_count<=block_h.height-1:
         exist_instance=Tx.query(local_block_count)
         if  exist_instance:
@@ -204,11 +204,11 @@ while True:
                         value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
                         block_height=block_height)
                     # send to redis subpub
-                    try:
-                        redis_client.publish("monitor", json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
-
-                    except:
-                        logger.error("connect redis fail")
+                    # try:
+                    #     redis_client.publish("monitor", json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
+                    #
+                    # except:
+                    #     logger.error("connect redis fail")
         local_block_count+=1
         localBlockCount.height=local_block_count
         LocalBlockCout.update(localBlockCount)
