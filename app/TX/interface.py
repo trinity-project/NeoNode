@@ -618,8 +618,8 @@ def createTx(addressFrom,addressTo,value,assetId):
         }
 
     elif assetId == setting.NEO_ASSETID or assetId == setting.GAS_ASSETID:
-        if not _check_balance(address=addressFrom,assetId=assetId,value=value):
-            return {}
+        # if not _check_balance(address=addressFrom,assetId=assetId,value=value):
+        #     return {}
 
 
 
