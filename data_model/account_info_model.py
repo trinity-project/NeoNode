@@ -170,6 +170,7 @@ class Vout(AccountInfoBase):
 
     __table_args__ = (
         UniqueConstraint('tx_id', 'vout_number'),
+        Index('address'),
     )
 
 
