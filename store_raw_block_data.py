@@ -64,7 +64,7 @@ while True:
             scripts=""
             attributes=json.dumps(tx["attributes"])
             script=tx.get("script")
-            Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,script,attributes,scripts)
+            Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,script)
 
     else:
         if block_info["tx"][0]["vout"]:
@@ -77,7 +77,7 @@ while True:
             scripts=""
             attributes=json.dumps(tx["attributes"])
             script=tx.get("script")
-            Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,script,attributes,scripts)
+            Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,script)
 
     local_block_count+=1
     localBlockCount.height=local_block_count

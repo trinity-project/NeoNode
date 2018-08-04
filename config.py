@@ -12,14 +12,13 @@ class SettingHolder(object):
         "host": "127.0.0.1",
         "user": ENVIRON.get("DATABASE_USERNAME"),
         "passwd": ENVIRON.get("DATABASE_PASSWORD"),
-        "db": ENVIRON.get("DATABASE_DB"),
         "db_block_info": ENVIRON.get("DATABASE_DB_BLOCK_INFO"),
         "db_account_info": ENVIRON.get("DATABASE_DB_ACCOUNT_INFO"),
     }
 
     def setup_mainnet(self):
         self.CONTRACTHASH="0x08e8c4400f1af2c20c28e0018f29535eb85d15b6"
-        self.NEOCLIURL = "http://127.0.0.1:10332"
+        self.NEOCLIURL = "http://47.96.175.193:10332"
         self.APPLICATIONLOGDIR = "/root/neo/neo-cli/ApplicationLogs_00746E41"
         self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
         self.PASSWD_HASH="$2b$10$F7GVmj.eahbHMIUjOxooYuLBMqZaIGcJZ7KxufGfbxwGTErKCzNQm"

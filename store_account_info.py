@@ -101,53 +101,55 @@ while True:
 
 
                 #store contract tx
-                # if tx_type == TRANSACTION_TYPE.CONTRACT and len(vout) <=2:
-                #     asset_set=set()
-                #     for item in vout:
-                #         asset_set.add(item["asset"])
-                #     if len(asset_set)==1 and asset_set.pop() in [setting.NEO_ASSETID, setting.GAS_ASSETID]:
-                #         tmp_set=set()
-                #         address_from=None
-                #         for _vin in vin:
-                #             exist_instance = Vout.query(_vin["txid"], _vin["vout"])
-                #             if exist_instance:
-                #                 tmp_set.add(exist_instance.address)
-                #                 if len(tmp_set)==2:
-                #                     break
-                #                 else:
-                #                     address_from=tmp_set.pop()
-                #
-                #
-                #         if address_from:
-                #             for _vout in vout:
-                #                 if _vout["address"] == address_from:
-                #                     address_to=None
-                #                     value=None
-                #                     asset=None
-                #                     continue
-                #                 address_to=_vout["address"]
-                #                 value=_vout["value"]
-                #                 asset=_vout["asset"]
-                #
-                #             if address_to and value and asset:
-                #                 ContractTx.save(
-                #                     tx_id=tx_id, asset=asset, address_from=address_from, address_to=address_to,
-                #                     value=Decimal(str(value)), block_timestamp=block_time,
-                #                     block_height=block_height)
-                #
-                #                 try:
-                #                     redis_client.publish("monitor",
-                #                                          json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
-                #
-                #                 except:
-                #                     logger.error("connect redis fail")
+                if tx_type == TRANSACTION_TYPE.CONTRACT and len(vout) <=2:
+                    asset_set=set()
+                    for item in vout:
+                        asset_set.add(item["asset"])
+                    if len(asset_set)==1 and asset_set.pop() in [setting.NEO_ASSETID, setting.GAS_ASSETID]:
+                        tmp_set=set()
+                        address_from=None
+                        for _vin in vin:
+                            exist_instance = Vout.query(_vin["txid"], _vin["vout"])
+                            if exist_instance:
+                                tmp_set.add(exist_instance.address)
+                                if len(tmp_set)==2:
+                                    break
+                                else:
+                                    address_from=tmp_set.pop()
+
+
+                        if address_from:
+                            for _vout in vout:
+                                if _vout["address"] == address_from:
+                                    address_to=None
+                                    value=None
+                                    asset=None
+                                    continue
+                                address_to=_vout["address"]
+                                value=_vout["value"]
+                                asset=_vout["asset"]
+
+                            if address_to and value and asset:
+                                ContractTx.save(
+                                    tx_id=tx_id, asset=asset, address_from=address_from, address_to=address_to,
+                                    value=Decimal(str(value)), block_timestamp=block_time,
+                                    block_height=block_height)
+
+                                # try:
+                                #     redis_client.publish("monitor",
+                                #                          json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
+                                #
+                                # except:
+                                #     logger.error("connect redis fail")
 
                 #store vout and calculate balance
                 if vout:
                     for _vout in vout:
                         if _vout["asset"] in [setting.NEO_ASSETID, setting.GAS_ASSETID]:
-                            Vout.save(tx_id=tx_id, address=_vout["address"], asset_id=_vout["asset"],
+                            saved = Vout.save(tx_id=tx_id, address=_vout["address"], asset_id=_vout["asset"],
                                          vout_number=_vout["n"], value=Decimal(_vout["value"]))
+                            if not saved:
+                                continue
                             exist_instance = Balance.query(address=_vout["address"])
                             if exist_instance:
                                 if _vout["asset"]==setting.NEO_ASSETID:

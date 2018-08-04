@@ -14,6 +14,21 @@ logger=setup_mylogger(logfile="log/store_account_info.log")
 
 
 pymysql.install_as_MySQLdb()
+
+def _check_database(database_name):
+    conn = pymysql.connect(host=setting.MYSQLDATABASE["host"], user=setting.MYSQLDATABASE["user"],
+                           passwd=setting.MYSQLDATABASE["passwd"])
+    cursor = conn.cursor()
+    cursor.execute("""create database if not exists {} """.format(database_name))
+    cursor.close()
+    conn.commit()
+    conn.close()
+
+
+_check_database("block_info")
+_check_database("account_info")
+
+
 block_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                                                setting.MYSQLDATABASE["passwd"],
                                                setting.MYSQLDATABASE["host"],
@@ -25,7 +40,7 @@ account_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABAS
                                                setting.MYSQLDATABASE["host"],
                                                setting.MYSQLDATABASE["db_account_info"]
                                                             ),
-                                    pool_recycle=3600,pool_size=100)
+                                   pool_recycle=3600,pool_size=100)
 
 
 
@@ -41,9 +56,11 @@ AccountInfoBase = declarative_base()
 class Balance(AccountInfoBase):
     __tablename__ = 'balance'
     id = Column(Integer, primary_key=True)
-    address = Column(String(40),index=True)
+    address = Column(String(40),unique=True)
     neo_balance = Column(DECIMAL(17,8),default=0)
     gas_balance =Column(DECIMAL(17,8),default=0)
+
+
 
     @staticmethod
     def query(address):
@@ -131,26 +148,7 @@ class Tx(BlockInfoBase):
     vin = Column(LONGTEXT)
     vout = Column(LONGTEXT)
     script=Column(Text)
-    attributes = Column(Text)
-    scripts = Column(Text)
 
-
-    @staticmethod
-    def save(tx_id,tx_type,block_height,block_time,vin,vout,script,attributes,scripts):
-        session=BlockInfoSession()
-        new_instance = Tx(tx_id=tx_id, tx_type=tx_type,block_height=block_height,
-                          block_time=block_time,vin =vin,vout=vout,attributes=attributes,
-                          scripts=scripts,script=script)
-
-
-        session.add(new_instance)
-        try:
-            session.commit()
-        except Exception as e:
-            logger.error(e)
-            session.rollback()
-        finally:
-            session.close()
 
     @staticmethod
     def query(block_height):
@@ -170,7 +168,6 @@ class Vout(AccountInfoBase):
 
     __table_args__ = (
         UniqueConstraint('tx_id', 'vout_number'),
-        Index('address'),
     )
 
 
@@ -190,19 +187,23 @@ class Vout(AccountInfoBase):
         session.add(new_instance)
         try:
             session.commit()
+            saved = True
         except Exception as e:
             logger.error(e)
             session.rollback()
+            saved = False
         finally:
             session.close()
+        return saved
     @staticmethod
     def delete(instanse):
         session=AccountInfoSession()
         session.delete(instanse)
         try:
             session.commit()
-            logger.info("delete vout tx_id:{0} ".format(instanse.tx_id))
+
         except:
+            logger.error("delete vout fail > tx_id:{0} ".format(instanse.tx_id))
             session.rollback()
         finally:
             session.close()
@@ -249,9 +250,8 @@ class InvokeTx(AccountInfoBase):
         session.add(new_instance)
         try:
             session.commit()
-            logger.info("txid:{},addressFrom:{},addressTo:{},value:{}".format(tx_id, address_from, address_to, value))
-        except:
-            logger.error("store error txid:{},addressFrom:{},addressTo:{},value:{}".format(tx_id, address_from, address_to, value))
+        except Exception as e:
+            logger.error("store nep5 tx error >txid:{},addressFrom:{},addressTo:{},value:{}\n{}".format(tx_id, address_from, address_to, value,e))
             session.rollback()
         finally:
             session.close()
@@ -291,8 +291,8 @@ class ContractTx(AccountInfoBase):
         session.add(new_instance)
         try:
             session.commit()
-        except:
-            logger.error("store error txid:{},addressFrom:{},addressTo:{},value:{}".format(tx_id, address_from, address_to, value))
+        except Exception as e:
+            logger.error("store contract tx error > txid:{},addressFrom:{},addressTo:{},value:{}\n{}".format(tx_id, address_from, address_to, value,e))
             session.rollback()
         finally:
             session.close()

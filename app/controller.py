@@ -64,7 +64,6 @@ def verify_signature(message,signature,pubkey):
 def transfer_tnc(addressTo,value):
     passwd=request.headers.get("Password")
     remote_ip=request.remote_addr
-    print(remote_ip)
     passwd_hash=setting.PASSWD_HASH
     address_from=setting.FUNDING_ADDRESS
     privt_key=setting.PRIVTKEY

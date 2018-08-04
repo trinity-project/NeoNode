@@ -12,8 +12,19 @@ logger=setup_mylogger(logfile="log/store_block_info.log")
 
 
 
-
 pymysql.install_as_MySQLdb()
+
+def _check_database(database_name):
+    conn = pymysql.connect(host=setting.MYSQLDATABASE["host"], user=setting.MYSQLDATABASE["user"],
+                           passwd=setting.MYSQLDATABASE["passwd"])
+    cursor = conn.cursor()
+    cursor.execute("""create database if not exists {} """.format(database_name))
+    cursor.close()
+    conn.commit()
+    conn.close()
+
+
+_check_database("block_info")
 
 engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                                                setting.MYSQLDATABASE["passwd"],
@@ -24,6 +35,7 @@ engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
 
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
+
 
 
 class LocalBlockCout(Base):
@@ -70,17 +82,13 @@ class Tx(Base):
     vin = Column(LONGTEXT)
     vout = Column(LONGTEXT)
     script=Column(Text)
-    attributes = Column(Text)
-    scripts = Column(LONGTEXT)
-
 
 
     @staticmethod
-    def save(tx_id,tx_type,block_height,block_time,vin,vout,script,attributes,scripts):
+    def save(tx_id,tx_type,block_height,block_time,vin,vout,script):
         session=Session()
         new_instance = Tx(tx_id=tx_id, tx_type=tx_type,block_height=block_height,
-                          block_time=block_time,vin =vin,vout=vout,attributes=attributes,
-                          scripts=scripts,script=script)
+                          block_time=block_time,vin =vin,vout=vout,script=script)
 
 
         session.add(new_instance)
@@ -94,3 +102,5 @@ class Tx(Base):
 
 
 Base.metadata.create_all(engine)
+
+
