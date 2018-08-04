@@ -8,7 +8,7 @@ from neocore.UInt160 import UInt160
 
 from config import setting
 from data_model.account_info_model import Tx, LocalBlockCout, Vout, Balance, BlockHeight, InvokeTx, ContractTx,logger
-from plugin.redis_client import redis_client
+# from plugin.redis_client import redis_client
 
 
 def hex_reverse(input):
