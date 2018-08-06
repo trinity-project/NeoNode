@@ -1,8 +1,8 @@
 import time
 
-from TX.MyTransaction import ContractTransaction
-from TX.TransactionAttribute import TransactionAttribute, TransactionAttributeUsage
-from TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSigContract,\
+from app.TX.MyTransaction import ContractTransaction
+from app.TX.TransactionAttribute import TransactionAttribute, TransactionAttributeUsage
+from app.TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSigContract,\
     createRSMCContract, createHTLCContract, createVerifyScript, pubkeyToAddress, pubkeyToAddressHash,\
     get_neovout_by_address
 

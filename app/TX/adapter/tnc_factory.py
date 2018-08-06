@@ -1,9 +1,9 @@
 import binascii
 import time
 
-from TX.MyTransaction import InvocationTransaction
-from TX.TransactionAttribute import TransactionAttribute, TransactionAttributeUsage
-from TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSigContract, create_opdata, \
+from app.TX.MyTransaction import InvocationTransaction
+from app.TX.TransactionAttribute import TransactionAttribute, TransactionAttributeUsage
+from app.TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSigContract, create_opdata, \
     createRSMCContract, createHTLCContract, createVerifyScript, pubkeyToAddress, pubkeyToAddressHash, privtkey_sign, \
     privtKey_to_publicKey
 

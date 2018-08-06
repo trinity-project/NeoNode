@@ -213,17 +213,17 @@ class InvokeTx(AccountInfoBase):
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66),unique=True)
     contract = Column(String(42))
-    address_from = Column(String(40))
-    address_to = Column(String(40))
+    address_from = Column(String(40),index=True)
+    address_to = Column(String(40),index=True)
     value = Column(DECIMAL(17,8))
     vm_state = Column(String(16))
     has_pushed=Column(Boolean,default=False)
-    block_timestamp=Column(Integer)
+    block_timestamp=Column(Integer,index=True)
     block_height=Column(Integer)
 
 
     __table_args__ = (
-        Index('address_from', 'address_to','vm_state','has_pushed'),
+        Index("multi_index",'address_from', 'address_to','vm_state','has_pushed'),
     )
 
 
@@ -273,10 +273,10 @@ class ContractTx(AccountInfoBase):
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66),unique=True)
     asset = Column(String(66))
-    address_from = Column(String(40))
-    address_to = Column(String(40))
+    address_from = Column(String(40),index=True)
+    address_to = Column(String(40),index=True)
     value = Column(DECIMAL(17,8))
-    block_timestamp=Column(Integer)
+    block_timestamp=Column(Integer,index=True)
     block_height=Column(Integer)
 
 
