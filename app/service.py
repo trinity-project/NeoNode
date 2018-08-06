@@ -77,8 +77,8 @@ def get_balance(address):
         ],
         "id": 1
     }
-    res = requests.post(setting.NEOCLIURL, json=data).json()
     try:
+        res = requests.post(setting.NEOCLIURL, json=data).json()
         value=res["result"]["stack"][0]["value"]
     except:
         value=0
