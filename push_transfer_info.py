@@ -35,18 +35,17 @@ def TransferMonitor():
     while True:
         exist_instance = InvokeTx.query()
         if exist_instance:
-            logger.info(exist_instance.tx_id)
-            # res=push_transfer(exist_instance.tx_id,exist_instance.address_from,
-            #                   exist_instance.address_to,exist_instance.value,int(time.time()))
-            # if res==0:
-            #     exist_instance.has_pushed=1
-            #     logger.info("push tx:{} sucess addressFrom:{},addressTo:{},value:{}".format(exist_instance.tx_id,exist_instance.address_from,
-            #                                                                                 exist_instance.address_to,exist_instance.value))
-            #     InvokeTx.update(exist_instance)
-            # else:
-            #     logger.error("push tx:{} falil addressFrom:{},addressTo:{},value:{}".format(exist_instance.tx_id,exist_instance.address_from,
-            #                                                                                 exist_instance.address_to,exist_instance.value))
-            #     time.sleep(3)
+            res=push_transfer(exist_instance.tx_id,exist_instance.address_from,
+                              exist_instance.address_to,exist_instance.value,int(time.time()))
+            if res==0:
+                exist_instance.has_pushed=1
+                logger.info("push tx:{} sucess addressFrom:{},addressTo:{},value:{}".format(exist_instance.tx_id,exist_instance.address_from,
+                                                                                            exist_instance.address_to,exist_instance.value))
+                InvokeTx.update(exist_instance)
+            else:
+                logger.error("push tx:{} falil addressFrom:{},addressTo:{},value:{}".format(exist_instance.tx_id,exist_instance.address_from,
+                                                                                            exist_instance.address_to,exist_instance.value))
+                time.sleep(3)
         else:
             time.sleep(10)
 

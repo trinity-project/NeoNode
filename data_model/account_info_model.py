@@ -230,17 +230,13 @@ class InvokeTx(AccountInfoBase):
     @staticmethod
     def query():
         session = AccountInfoSession()
-        # exist_instance = session.query(InvokeTx).filter(
-        #     or_(InvokeTx.address_from == setting.FUNDING_ADDRESS,
-        #         InvokeTx.address_to == setting.FUNDING_ADDRESS),
-        #     InvokeTx.vm_state == "HALT, BREAK",
-        #     InvokeTx.has_pushed==0
-        # ).first()
-        logger.info(setting.FUNDING_ADDRESS)
         exist_instance = session.query(InvokeTx).filter(
-InvokeTx.address_from == setting.FUNDING_ADDRESS,
+            or_(InvokeTx.address_from == setting.FUNDING_ADDRESS,
+                InvokeTx.address_to == setting.FUNDING_ADDRESS),
+            InvokeTx.vm_state == "HALT, BREAK",
             InvokeTx.has_pushed==0
         ).first()
+
         session.close()
 
         return exist_instance
