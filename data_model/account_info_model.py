@@ -238,6 +238,7 @@ class InvokeTx(AccountInfoBase):
         # ).first()
         exist_instance = session.query(InvokeTx).filter(
 InvokeTx.address_from == setting.FUNDING_ADDRESS,
+            InvokeTx.has_pushed==0
         ).first()
         session.close()
 
