@@ -24,7 +24,7 @@ def _check_database(database_name):
     conn.close()
 
 
-# _check_database("block_info")
+_check_database("block_info")
 
 engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                                                setting.MYSQLDATABASE["passwd"],
