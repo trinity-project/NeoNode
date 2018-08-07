@@ -34,9 +34,8 @@ def TransferMonitor():
 
     while True:
         exist_instance = InvokeTx.query()
-        logger.info(exist_instance.tx_id)
         if exist_instance:
-            pass
+            logger.info(exist_instance.tx_id)
             # res=push_transfer(exist_instance.tx_id,exist_instance.address_from,
             #                   exist_instance.address_to,exist_instance.value,int(time.time()))
             # if res==0:

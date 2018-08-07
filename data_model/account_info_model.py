@@ -236,6 +236,7 @@ class InvokeTx(AccountInfoBase):
         #     InvokeTx.vm_state == "HALT, BREAK",
         #     InvokeTx.has_pushed==0
         # ).first()
+        logger.info(setting.FUNDING_ADDRESS)
         exist_instance = session.query(InvokeTx).filter(
 InvokeTx.address_from == setting.FUNDING_ADDRESS,
             InvokeTx.has_pushed==0
