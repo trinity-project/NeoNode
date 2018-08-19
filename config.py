@@ -18,7 +18,8 @@ class SettingHolder(object):
 
     def setup_mainnet(self):
         self.CONTRACTHASH="0x08e8c4400f1af2c20c28e0018f29535eb85d15b6"
-        self.NEOCLIURL = "http://127.0.0.1:10332"
+        # self.NEOCLIURL = "http://127.0.0.1:10332"
+        self.NEOCLIURL = "http://seed4.neo.org:10332"
         self.APPLICATIONLOGDIR = "/root/neo/neo-cli/ApplicationLogs_00746E41"
         self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
         self.PASSWD_HASH="$2b$10$F7GVmj.eahbHMIUjOxooYuLBMqZaIGcJZ7KxufGfbxwGTErKCzNQm"
