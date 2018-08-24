@@ -4,25 +4,12 @@ import os
 ENVIRON=os.environ
 
 NEO_RPC_POOL=[
-    "https://seed2.switcheo.network:10331",
-    "https://seed4.switcheo.network:10331",
-    "https://seed3.switcheo.network:10331",
-    "https://seed5.switcheo.network:10331",
     "http://api.otcgo.cn:10332",
-    "http://seed3.neo.org:10332",
-    "https://seed1.neo.org:10331",
     "http://seed10.ngd.network:10332",
     "http://seed9.ngd.network:10332",
     "http://seed8.ngd.network:10332",
     "http://seed7.ngd.network:10332",
     "http://seed6.ngd.network:10332",
-    "http://seed3.ngd.network:10332",
-    "http://seed2.ngd.network:10332",
-    "http://seed1.ngd.network:10332",
-    "https://seed8.cityofzion.io",
-    "https://seed7.cityofzion.io",
-    "https://seed6.cityofzion.io",
-    "https://seed0.cityofzion.io"
     "http://47.97.96.192:10332"
     # "http://127.0.0.1:10332"
 ]
