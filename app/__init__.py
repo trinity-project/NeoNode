@@ -2,7 +2,6 @@
 
 from flask import Flask
 from flask_jsonrpc import JSONRPC
-from flask_socketio import SocketIO, emit,join_room
 from flask_sqlalchemy import SQLAlchemy
 import pymysql
 from flask_cors import CORS
@@ -19,7 +18,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://%s:%s@%s/%s' %(setting.MYSQLDAT
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=True
 db = SQLAlchemy(app)
 jsonrpc = JSONRPC(app, "/")
-socketio = SocketIO(app)
 
 
 
