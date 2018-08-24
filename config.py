@@ -8,22 +8,6 @@ NEO_RPC_POOL=[
     "https://seed4.switcheo.network:10331",
     "https://seed3.switcheo.network:10331",
     "https://seed5.switcheo.network:10331",
-    "http://node1.nyc3.bridgeprotocol.io:10332",
-    "http://node1.sgp1.bridgeprotocol.io:10332",
-    "http://node1.ams2.bridgeprotocol.io:10332",
-    "http://seed1.aphelion-neo.com:10332",
-    "http://seed4.aphelion-neo.com:10332",
-    "http://seed3.aphelion-neo.com:10332",
-    "http://seed8.bridgeprotocol.io:10332",
-    "http://seed9.bridgeprotocol.io:10332",
-    "http://seed7.bridgeprotocol.io:10332",
-    "http://seed6.bridgeprotocol.io:10332",
-    "http://seed5.bridgeprotocol.io:10332",
-    "http://seed4.bridgeprotocol.io:10332",
-    "http://seed3.bridgeprotocol.io:10332",
-    "http://seed2.bridgeprotocol.io:10332",
-    "http://seed1.bridgeprotocol.io:10332",
-    "http://seed0.bridgeprotocol.io:10332",
     "http://api.otcgo.cn:10332",
     "http://seed3.neo.org:10332",
     "https://seed1.neo.org:10331",
@@ -39,6 +23,8 @@ NEO_RPC_POOL=[
     "https://seed7.cityofzion.io",
     "https://seed6.cityofzion.io",
     "https://seed0.cityofzion.io"
+    "http://47.97.96.192:10332"
+    # "http://127.0.0.1:10332"
 ]
 
 NEO_RPC_APPLICATION_LOG_POOL=[
@@ -47,6 +33,7 @@ NEO_RPC_APPLICATION_LOG_POOL=[
     "http://seed8.ngd.network:10332",
     "http://seed7.ngd.network:10332",
     "http://seed6.ngd.network:10332",
+    "http://47.97.96.192:10332"
     # "http://127.0.0.1:10332"
 ]
 
