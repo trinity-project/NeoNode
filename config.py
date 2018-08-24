@@ -60,8 +60,8 @@ class SettingHolder(object):
         "host": "127.0.0.1",
         "user": ENVIRON.get("DATABASE_USERNAME"),
         "passwd": ENVIRON.get("DATABASE_PASSWORD"),
-        "db_block_info": ENVIRON.get("DATABASE_DB_BLOCK_INFO"),
-        "db_account_info": ENVIRON.get("DATABASE_DB_ACCOUNT_INFO"),
+        "db_block_info": "block_info",
+        "db_account_info": "account_info",
     }
 
     def setup_mainnet(self):
