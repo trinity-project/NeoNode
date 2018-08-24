@@ -4,7 +4,7 @@ from app.TX.MyTransaction import ContractTransaction
 from app.TX.TransactionAttribute import TransactionAttribute, TransactionAttributeUsage
 from app.TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSigContract,  \
     createRSMCContract, createHTLCContract, createVerifyScript, pubkeyToAddress, pubkeyToAddressHash, \
-    get_gasvout_by_address
+    # get_gasvout_by_address
 
 
 #RSMC

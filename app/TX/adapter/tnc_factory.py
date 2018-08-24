@@ -13,7 +13,7 @@ from app.TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSig
 def createFundingTx(walletSelf,walletOther,asset_id):
     '''
 
-    :param walletSelf: dict {
+    :param walletSelf: dict {git
             "pubkey":"",
             "deposit":0
     }
