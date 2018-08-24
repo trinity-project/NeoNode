@@ -1,5 +1,4 @@
 import binascii
-import requests
 from base58 import b58decode
 from decimal import Decimal
 from neocore.KeyPair import KeyPair
@@ -8,7 +7,6 @@ from neocore.UInt256 import UInt256
 from neocore.BigInteger import BigInteger
 from neocore.Cryptography.Crypto import Crypto
 
-from config import setting
 
 
 def str_reverse(input):
@@ -218,24 +216,5 @@ def sign(txData,privtKey):
     rawData=txData+"01"+"41"+"40"+signature+"23"+"21"+publicKey+"ac"
     return rawData
 
-def get_neovout_by_address(address,amount):
-    data = {
-        "jsonrpc": "2.0",
-        "method": "getNeoVout",
-        "params": [address,amount],
-        "id": 1
-    }
 
-    res = requests.post(setting.NEOCLIURL, json=data).json()
-    return res["result"]
 
-def get_gasvout_by_address(address,amount):
-    data = {
-        "jsonrpc": "2.0",
-        "method": "getGasVout",
-        "params": [address,amount],
-        "id": 1
-    }
-
-    res = requests.post(setting.NEOCLIURL, json=data).json()
-    return res["result"]

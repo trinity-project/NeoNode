@@ -1,5 +1,7 @@
 
 import json
+import random
+
 import requests
 import time
 
@@ -9,12 +11,6 @@ from data_model.block_info_model import LocalBlockCout,Tx,logger
 
 
 
-
-class TRANSACTION_TYPE(object):
-    CONTRACT="ContractTransaction"
-    CLAIM="ClaimTransaction"
-    INVOKECONTRACT="InvocationTransaction"
-    ISSUE="IssueTransaction"
 
 
 def getblock(index,retry_num=3):
@@ -28,7 +24,7 @@ def getblock(index,retry_num=3):
 
 
     try:
-        res = requests.post(setting.NEOCLIURL,json=data).json()
+        res = requests.post(random.choice(setting.NEOCLIURL),json=data).json()
         return res["result"]
     except Exception as e:
         retry_num-=1

@@ -1,4 +1,5 @@
 import binascii
+import random
 import time
 
 import requests
@@ -715,7 +716,7 @@ def _get_tnc_balance(address):
         ],
         "id": 1
     }
-    res = requests.post(setting.NEOCLIURL, json=data).json()
+    res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
     try:
         value=res["result"]["stack"][0]["value"]
     except:

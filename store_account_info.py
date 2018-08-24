@@ -1,4 +1,5 @@
 import json
+import random
 import time
 import binascii
 import requests
@@ -37,7 +38,7 @@ def hex2interger(input):
 
     return output
 
-def get_application_log(txid,retry_num=3):
+def get_application_log(txid):
 
     data = {
           "jsonrpc": "2.0",
@@ -46,22 +47,13 @@ def get_application_log(txid,retry_num=3):
           "id": 1
 }
 
-    # try:
-    #     res = requests.post(setting.NEOCLIURL,json=data).json()
-    #     return res["result"]
-    # except Exception as e:
-    #     retry_num-=1
-    #     if retry_num==0:
-    #         logger.error("txid:{} get application log   fail \n {}".format(txid, e))
-    #         return None
-    #     return get_application_log(txid,retry_num)
     while True:
         try:
-            res = requests.post(setting.NEOCLIURL,json=data).json()
+            res = requests.post(random.choice(setting.NEO_RPC_APPLICATION_LOG),json=data).json()
             if res.get("result"):
                 return res.get("result")
             else:
-                logger.error("txid:{} get application log   fail".format(txid))
+                logger.error("txid:{} get application log is null".format(txid))
                 return None
         except Exception as e:
             logger.error(e)

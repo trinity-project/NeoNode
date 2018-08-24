@@ -1,4 +1,5 @@
 import json
+import random
 import time
 
 import requests
@@ -34,7 +35,7 @@ def send_raw_tx(rawTx):
         "params": [rawTx],
         "id": 1
     }
-    res = requests.post(setting.NEOCLIURL,json=data).json()
+    res = requests.post(random.choice(setting.NEOCLIURL),json=data).json()
     if res["result"]:
         return "success"
     return "fail"
@@ -78,7 +79,7 @@ def get_balance(address):
         "id": 1
     }
     try:
-        res = requests.post(setting.NEOCLIURL, json=data).json()
+        res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
         value=res["result"]["stack"][0]["value"]
     except:
         value=0
@@ -104,7 +105,7 @@ def get_block_height():
         "params": [],
         "id": 1
     }
-    res = requests.post(setting.NEOCLIURL, json=data).json()
+    res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
     try:
         return res["result"]-1
     except:
@@ -121,21 +122,17 @@ def get_transaction(txid):
     return None
 
 
-def get_transaction_by_address(address,asset,timestamp=None,page=1):
+def get_transaction_by_address(address,asset,page=1):
     if asset==setting.NEO_ASSETID or asset==setting.GAS_ASSETID:
-        timestamp_filter=ContractTx.block_timestamp >=timestamp if timestamp else ""
 
         query_tx=ContractTx.query.filter(
             or_(ContractTx.address_from==address,ContractTx.address_to==address),
             ContractTx.asset==asset,
-            timestamp_filter
             ).order_by(ContractTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
     elif asset==setting.CONTRACTHASH:
-        timestamp_filter=InvokeTx.block_timestamp >=timestamp if timestamp else ""
 
         query_tx = InvokeTx.query.filter(
             or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
-            timestamp_filter
         ).order_by(InvokeTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
 
 

@@ -3,6 +3,54 @@ import os
 
 ENVIRON=os.environ
 
+NEO_RPC_POOL=[
+    "https://seed2.switcheo.network:10331",
+    "https://seed4.switcheo.network:10331",
+    "https://seed3.switcheo.network:10331",
+    "https://seed5.switcheo.network:10331",
+    "http://node1.nyc3.bridgeprotocol.io:10332",
+    "http://node1.sgp1.bridgeprotocol.io:10332",
+    "http://node1.ams2.bridgeprotocol.io:10332",
+    "http://seed1.aphelion-neo.com:10332",
+    "http://seed4.aphelion-neo.com:10332",
+    "http://seed3.aphelion-neo.com:10332",
+    "http://seed8.bridgeprotocol.io:10332",
+    "http://seed9.bridgeprotocol.io:10332",
+    "http://seed7.bridgeprotocol.io:10332",
+    "http://seed6.bridgeprotocol.io:10332",
+    "http://seed5.bridgeprotocol.io:10332",
+    "http://seed4.bridgeprotocol.io:10332",
+    "http://seed3.bridgeprotocol.io:10332",
+    "http://seed2.bridgeprotocol.io:10332",
+    "http://seed1.bridgeprotocol.io:10332",
+    "http://seed0.bridgeprotocol.io:10332",
+    "http://api.otcgo.cn:10332",
+    "http://seed3.neo.org:10332",
+    "https://seed1.neo.org:10331",
+    "http://seed10.ngd.network:10332",
+    "http://seed9.ngd.network:10332",
+    "http://seed8.ngd.network:10332",
+    "http://seed7.ngd.network:10332",
+    "http://seed6.ngd.network:10332",
+    "http://seed3.ngd.network:10332",
+    "http://seed2.ngd.network:10332",
+    "http://seed1.ngd.network:10332",
+    "https://seed8.cityofzion.io",
+    "https://seed7.cityofzion.io",
+    "https://seed6.cityofzion.io",
+    "https://seed0.cityofzion.io"
+]
+
+NEO_RPC_APPLICATION_LOG_POOL=[
+    "http://seed10.ngd.network:10332",
+    "http://seed9.ngd.network:10332",
+    "http://seed8.ngd.network:10332",
+    "http://seed7.ngd.network:10332",
+    "http://seed6.ngd.network:10332",
+    # "http://127.0.0.1:10332"
+]
+
+
 class SettingHolder(object):
 
     NEO_ASSETID = "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b"
@@ -18,24 +66,25 @@ class SettingHolder(object):
 
     def setup_mainnet(self):
         self.CONTRACTHASH="0x08e8c4400f1af2c20c28e0018f29535eb85d15b6"
-        # self.NEOCLIURL = "http://127.0.0.1:10332"
-        self.NEOCLIURL = "http://seed4.neo.org:10332"
-        self.APPLICATIONLOGDIR = "/root/neo/neo-cli/ApplicationLogs_00746E41"
+        self.NEOCLIURL = NEO_RPC_POOL
+        self.NEO_RPC_APPLICATION_LOG = NEO_RPC_APPLICATION_LOG_POOL
         self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
         self.PASSWD_HASH="$2b$10$F7GVmj.eahbHMIUjOxooYuLBMqZaIGcJZ7KxufGfbxwGTErKCzNQm"
         self.REMOTE_ADDR=ENVIRON.get("REMOTE_ADDR")
         self.FUNDING_ADDRESS=ENVIRON.get("FUNDING_ADDRESS")
         self.WEBAPI=ENVIRON.get("WEB_API")
-        self.REDIS_IP="47.104.81.20"
-        self.REDIS_PORT=9001
+
+        self.REDIS_IP="47.97.96.192"
+        self.REDIS_PORT=6379
+
     def setup_testnet(self):
         self.CONTRACTHASH = "0x849d095d07950b9e56d0c895ec48ec5100cfdff1"
-        self.NEOCLIURL = "http://127.0.0.1:20332"
-        self.APPLICATIONLOGDIR="/root/neo-cli-274/ApplicationLogs_74746E41"
+        self.NEOCLIURL = ["http://127.0.0.1:20332"]
+        self.NEO_RPC_APPLICATION_LOG = ["http://127.0.0.1:20332"]
         self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
         self.PASSWD_HASH=ENVIRON.get("PASSWORD_HASH")
         self.REMOTE_ADDR=ENVIRON.get("REMOTE_ADDR")
-        self.FUNDING_ADDRESS=ENVIRON.get("FUNDING_ADDRESS")
+        self.FUNDING_ADDRESS=""
         self.WEBAPI=ENVIRON.get("WEB_API")
         self.REDIS_IP="47.104.81.20"
         self.REDIS_PORT=9001
@@ -52,4 +101,4 @@ if ENVIRON.get("CURRENT_ENVIRON") == "testnet":
 elif ENVIRON.get("CURRENT_ENVIRON") == "mainnet":
     setting.setup_mainnet()
 else:
-    setting.setup_privtnet()
+    setting.setup_testnet()
