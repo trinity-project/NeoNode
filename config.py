@@ -45,7 +45,7 @@ class SettingHolder(object):
         self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
         self.PASSWD_HASH="$2b$10$F7GVmj.eahbHMIUjOxooYuLBMqZaIGcJZ7KxufGfbxwGTErKCzNQm"
         self.REMOTE_ADDR=ENVIRON.get("REMOTE_ADDR")
-        self.FUNDING_ADDRESS=ENVIRON.get("FUNDING_ADDRESS")
+        self.FUNDING_ADDRESS="AQvEy2G42YfNhA69A9hiDoR6k3RUYA4H6x"
         self.WEBAPI=ENVIRON.get("WEB_API")
 
         self.REDIS_IP="47.97.96.192"
@@ -58,7 +58,7 @@ class SettingHolder(object):
         self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
         self.PASSWD_HASH=ENVIRON.get("PASSWORD_HASH")
         self.REMOTE_ADDR=ENVIRON.get("REMOTE_ADDR")
-        self.FUNDING_ADDRESS=""
+        self.FUNDING_ADDRESS="AQvEy2G42YfNhA69A9hiDoR6k3RUYA4H6x"
         self.WEBAPI=ENVIRON.get("WEB_API")
         self.REDIS_IP="47.104.81.20"
         self.REDIS_PORT=9001
