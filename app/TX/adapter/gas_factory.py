@@ -2,8 +2,10 @@ import time
 
 from app.TX.MyTransaction import ContractTransaction
 from app.TX.TransactionAttribute import TransactionAttribute, TransactionAttributeUsage
-from app.TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSigContract,  \
-    createRSMCContract, createHTLCContract, createVerifyScript, pubkeyToAddress, pubkeyToAddressHash
+from app.TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSigContract, \
+    createRSMCContract, createHTLCContract, createVerifyScript, pubkeyToAddress, pubkeyToAddressHash, \
+    get_vout_by_address
+
 
 #RSMC
 
@@ -31,13 +33,13 @@ def createFundingTx(walletSelf,walletOther,asset_id):
 
     tx = ContractTransaction()
 
-    walletSelf_vouts=get_gasvout_by_address(pubkeyToAddress(walletSelf["pubkey"]),walletSelf["deposit"])
+    walletSelf_vouts=get_vout_by_address(pubkeyToAddress(walletSelf["pubkey"]),walletSelf["deposit"],asset_id)
     if not walletSelf_vouts:
-        return {"message":"{0} no enough balance".format(pubkeyToAddress(walletSelf["pubkey"]))}
+        return None
 
-    walletOther_vouts=get_gasvout_by_address(pubkeyToAddress(walletOther["pubkey"]),walletOther["deposit"])
+    walletOther_vouts=get_vout_by_address(pubkeyToAddress(walletOther["pubkey"]),walletOther["deposit"],asset_id)
     if not walletOther_vouts:
-        return {"message":"{0} no enough balance".format(pubkeyToAddress(walletOther["pubkey"]))}
+        return None
 
     self_inputs=[tx.createInput(preHash=item[0], preIndex=item[2]) for item in walletSelf_vouts ]
     other_inputs=[tx.createInput(preHash=item[0], preIndex=item[2]) for item in walletOther_vouts ]
@@ -174,9 +176,9 @@ def createRefundTX(addressFunding,balanceSelf,balanceOther,pubkeySelf,pubkeyOthe
     txAttributes = [time_stamp]
     tx = ContractTransaction()
 
-    funding_vouts=get_gasvout_by_address(addressFunding,balanceSelf+balanceOther)
+    funding_vouts=get_vout_by_address(addressFunding,balanceSelf+balanceOther,asset_id)
     if not funding_vouts:
-        return {"message":"{0} no enough balance".format(addressFunding)}
+        return None
 
 
 
@@ -214,9 +216,9 @@ def create_sender_HCTX(pubkeySender, pubkeyReceiver, HTLCValue, balanceSender, b
     txAttributes = [time_stamp]
     tx = ContractTransaction()
 
-    funding_vouts=get_gasvout_by_address(addressFunding,balanceSender+balanceReceiver+HTLCValue)
+    funding_vouts=get_vout_by_address(addressFunding,balanceSender+balanceReceiver+HTLCValue,asset_id)
     if not funding_vouts:
-        return {"message":"{0} no enough balance".format(addressFunding)}
+        return None
 
     funding_inputs=[tx.createInput(preHash=item[0], preIndex=item[2]) for item in funding_vouts ]
 
@@ -359,9 +361,9 @@ def create_receiver_HCTX(pubkeySender, pubkeyReceiver, HTLCValue, balanceSender,
     txAttributes = [time_stamp]
     tx = ContractTransaction()
 
-    funding_vouts = get_gasvout_by_address(addressFunding, balanceSender + balanceReceiver + HTLCValue)
+    funding_vouts = get_vout_by_address(addressFunding, balanceSender + balanceReceiver + HTLCValue,asset_id)
     if not funding_vouts:
-        return {"message": "{0} no enough balance".format(addressFunding)}
+        return None
 
     funding_inputs = [tx.createInput(preHash=item[0], preIndex=item[2]) for item in funding_vouts]
 

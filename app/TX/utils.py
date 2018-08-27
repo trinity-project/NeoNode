@@ -7,6 +7,8 @@ from neocore.UInt256 import UInt256
 from neocore.BigInteger import BigInteger
 from neocore.Cryptography.Crypto import Crypto
 
+from app.model import Vout
+from config import setting
 
 
 def str_reverse(input):
@@ -217,4 +219,24 @@ def sign(txData,privtKey):
     return rawData
 
 
+def get_vout_by_address(address,value,assetId):
+    inputs_total=0
+    inputs=[]
+    if assetId == setting.GAS_ASSETID or assetId == setting.NEO_ASSETID:
+        vouts = Vout.query.filter_by(address=address,asset_id=assetId).order_by(Vout.value.desc()).all()
+
+        for item in vouts:
+            if float(item.value) >= value:
+                input =(item.tx_id,item.value,item.vout_number)
+                inputs.append(input)
+                inputs_total+=float(item.value)
+                return inputs,inputs_total
+            else:
+                input = (item.tx_id, item.value, item.vout_number)
+                inputs.append(input)
+                inputs_total+=float(item.value)
+                if inputs_total>=value:
+                    return inputs,inputs_total
+
+    return inputs,inputs_total
 

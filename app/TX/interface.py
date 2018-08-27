@@ -33,15 +33,14 @@ def createFundingTx(walletSelf, walletOther, asset_id):
     :return:
     '''
 
-    if asset_id not in [setting.NEO_ASSETID, setting.GAS_ASSETID]:
-        return tnc_factory.createFundingTx(walletSelf, walletOther, asset_id)
-
-    elif asset_id == setting.NEO_ASSETID:
+    if asset_id == setting.NEO_ASSETID:
         return neo_factory.createFundingTx(walletSelf, walletOther, asset_id)
 
     elif asset_id == setting.GAS_ASSETID:
         return gas_factory.createFundingTx(walletSelf, walletOther, asset_id)
 
+    else:
+        return tnc_factory.createFundingTx(walletSelf, walletOther, asset_id)
 
 def createCTX(
         addressFunding,
@@ -675,7 +674,7 @@ def createMultiTx(addressFrom,addressTo,value,assetId):
         }
 
     else:
-        return {"message":"asset not exist"}
+        return None
 
 
 def _check_balance(address,assetId,value):
