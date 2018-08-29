@@ -182,7 +182,7 @@ while True:
                 content = get_application_log(tx_id)
                 if not content:
                     continue
-                if not content["notifications"]:
+                if not content.get("notifications"):
                     continue
                 for notification in content["notifications"]:
                     contract = notification["contract"]
