@@ -108,10 +108,12 @@ def get_balance(address,assetId):
         elif assetId == setting.GAS_ASSETID:
             return gas_balance
         else:
-            res = _get_nep5_balance(address,assetId)
-            value = int(hex_reverse(res), 16) / 100000000 if res else 0,
-            return value
-
+            try:
+                res = _get_nep5_balance(address,assetId)
+                value = int(hex_reverse(res), 16) / 100000000 if res else 0,
+                return value
+            except:
+                return 0
 
 def get_block_height():
     data = {
