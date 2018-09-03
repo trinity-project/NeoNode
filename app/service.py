@@ -111,6 +111,7 @@ def get_balance(address,assetId):
             try:
                 res = _get_nep5_balance(address,assetId)
                 value = int(hex_reverse(res), 16) / 100000000 if res else 0,
+                print(value)
                 return value
             except:
                 return 0
