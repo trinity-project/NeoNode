@@ -97,7 +97,7 @@ def get_balance(address,assetId):
         response={
             "gasBalance":gas_balance,
             "neoBalance":neo_balance,
-            "tncBalance":Decimal(int(hex_reverse(value), 16)) / (10**8) if value else 0
+            "tncBalance":float(Decimal(int(hex_reverse(value), 16)) / (10**8)) if value else 0
         }
 
         return response
@@ -110,7 +110,7 @@ def get_balance(address,assetId):
         else:
             try:
                 res = _get_nep5_balance(address,assetId)
-                value = Decimal(int(hex_reverse(res), 16)) / (10**8) if res else 0,
+                value = float(Decimal(int(hex_reverse(res), 16)) / (10**8)) if res else 0,
                 print(value)
                 return value
             except:
