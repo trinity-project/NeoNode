@@ -33,8 +33,8 @@ def get_transaction_by_address(address,asset,page=1):
 
 
 @jsonrpc.method("getBalance")
-def get_balance(address):
-    return service.get_balance(address)
+def get_balance(address,assetId=None):
+    return service.get_balance(address,assetId)
 
 
 @jsonrpc.method("getBlockHeight")

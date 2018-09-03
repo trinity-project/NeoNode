@@ -595,29 +595,9 @@ def create_receiver_HTLC_TXS(
 
 
 def createTx(addressFrom,addressTo,value,assetId):
-    if assetId == setting.CONTRACTHASH:
 
-        time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
-                                          data=bytearray.fromhex(hex(int(time.time()))[2:]))
-        address_hash = TransactionAttribute(usage=TransactionAttributeUsage.Script,
-                                             data=ToAddresstHash(addressFrom).Data)
 
-        txAttributes = [address_hash,time_stamp]
-
-        op_data = create_opdata(address_from=addressFrom, address_to=addressTo, value=value,
-                                 contract_hash=assetId)
-        tx = InvocationTransaction()
-        tx.Version = 1
-        tx.Attributes = txAttributes
-        tx.Script = binascii.unhexlify(op_data)
-
-        return {
-            "txData": tx.get_tx_data(),
-            "txid": createTxid(tx.get_tx_data()),
-            "witness":"014140{signature}2321{pubkey}ac"
-        }
-
-    elif assetId == setting.NEO_ASSETID or assetId == setting.GAS_ASSETID:
+    if assetId == setting.NEO_ASSETID or assetId == setting.GAS_ASSETID:
         # if not _check_balance(address=addressFrom,assetId=assetId,value=value):
         #     return {}
 
@@ -645,9 +625,30 @@ def createTx(addressFrom,addressTo,value,assetId):
             "witness": "014140{signature}2321{pubkey}ac"
         }
 
-    else:
+    else :
 
-        return {}
+        if len(assetId) != 42:
+            return {}
+
+        time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
+                                          data=bytearray.fromhex(hex(int(time.time()))[2:]))
+        address_hash = TransactionAttribute(usage=TransactionAttributeUsage.Script,
+                                             data=ToAddresstHash(addressFrom).Data)
+
+        txAttributes = [address_hash,time_stamp]
+
+        op_data = create_opdata(address_from=addressFrom, address_to=addressTo, value=value,
+                                 contract_hash=assetId)
+        tx = InvocationTransaction()
+        tx.Version = 1
+        tx.Attributes = txAttributes
+        tx.Script = binascii.unhexlify(op_data)
+
+        return {
+            "txData": tx.get_tx_data(),
+            "txid": createTxid(tx.get_tx_data()),
+            "witness":"014140{signature}2321{pubkey}ac"
+        }
 
 
 def createMultiTx(addressFrom,addressTo,value,assetId):

@@ -60,19 +60,18 @@ def multi_sign(txData,privtKey1,privtKey2,verificationScript):
     raw_data=txData
     return raw_data
 
-def get_balance(address):
-    balance=Balance.query.filter_by(address=address).first()
 
+def _get_nep5_balance(address,assetId):
     data = {
         "jsonrpc": "2.0",
         "method": "invokefunction",
         "params": [
-            setting.CONTRACTHASH,
+            assetId,
             "balanceOf",
             [
                 {
-                    "type":"Hash160",
-                    "value":ToScriptHash(address).ToString()
+                    "type": "Hash160",
+                    "value": ToScriptHash(address).ToString()
                 }
             ]
         ],
@@ -80,23 +79,39 @@ def get_balance(address):
     }
     try:
         res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
-        value=res["result"]["stack"][0]["value"]
+        value = res["result"]["stack"][0]["value"]
     except:
-        value=0
-    if balance:
+        value = 0
+
+    return value
+
+def get_balance(address,assetId):
+    balance=Balance.query.filter_by(address=address).first()
+    neo_balance = int(balance.neo_balance) if balance else 0
+    gas_balance = float(balance.gas_balance) if balance else 0
+
+    if not assetId:
+        value = _get_nep5_balance(assetId,setting.CONTRACTHASH)
+
+
         response={
-            "gasBalance":float(balance.gas_balance),
-            "neoBalance":float(balance.neo_balance),
+            "gasBalance":gas_balance,
+            "neoBalance":neo_balance,
             "tncBalance":int(hex_reverse(value),16)/100000000 if value else 0
         }
-    else:
-        response={
-            "tncBalance":int(hex_reverse(value),16)/100000000 if value else 0,
-            "gasBalance":0,
-            "neoBalance":0
-        }
 
-    return response
+        return response
+
+    else:
+        if assetId ==setting.NEO_ASSETID:
+            return neo_balance
+        elif assetId == setting.GAS_ASSETID:
+            return gas_balance
+        else:
+            res = _get_nep5_balance(assetId,assetId)
+            value = int(hex_reverse(res), 16) / 100000000 if res else 0,
+            return value
+
 
 def get_block_height():
     data = {
