@@ -91,7 +91,7 @@ def get_balance(address,assetId):
     gas_balance = float(balance.gas_balance) if balance else 0
 
     if not assetId:
-        value = _get_nep5_balance(assetId,setting.CONTRACTHASH)
+        value = _get_nep5_balance(address,setting.CONTRACTHASH)
 
 
         response={
