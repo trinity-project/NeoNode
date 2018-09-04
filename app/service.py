@@ -35,10 +35,13 @@ def send_raw_tx(rawTx):
         "params": [rawTx],
         "id": 1
     }
-    res = requests.post(random.choice(setting.NEOCLIURL),json=data).json()
-    if res["result"]:
-        return "success"
-    return "fail"
+    try:
+        res = requests.post(random.choice(setting.NEOCLIURL),json=data).json()
+        if res["result"]:
+            return True
+        return False
+    except:
+        return False
 
 def sign(txData,privtKey):
     signature = privtkey_sign(txData,privtKey)
