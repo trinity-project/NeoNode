@@ -62,7 +62,7 @@ class InvokeTx(db.Model):
             "addressFrom":self.address_from,
             "addressTo":self.address_to,
             "value":str(float(self.value)),
-            "vmState":"1" if self.vm_state=="HALT, BREAK" else "0",
+            "vmState":True if self.vm_state=="HALT, BREAK" else False,
             "blockTime":self.block_timestamp,
             "blockHeight":self.block_height
         }

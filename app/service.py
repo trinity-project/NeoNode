@@ -248,9 +248,8 @@ def verify_signature(message,signature,pubkey):
     signature=binascii.unhexlify(signature.encode())
     pubkey=binascii.unhexlify(pubkey.encode())
     result = Crypto.VerifySignature(message, signature, pubkey)
-    return {
-        "result":result
-    }
+    return result
+
 
 
 def create_funder(pubkeySelf,pubkeyOther,deposit,assetType):
