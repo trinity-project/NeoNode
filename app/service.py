@@ -165,11 +165,10 @@ def faucet(addressFrom,addressTo):
     tx_data=construct_tx(addressFrom=addressFrom,addressTo=addressTo,
                          value=10,assetId="0x849d095d07950b9e56d0c895ec48ec5100cfdff1")
     tx_id = tx_data["txid"]
-    print(tx_data['txData'])
     raw_data=sign(txData=tx_data["txData"],
                   privtKey="0d94b060fe4a5f382174f75f3dca384ebc59c729cef92d553084c7c660a4c08f")
     response=send_raw_tx(raw_data)
-    if response=="success":
+    if response:
         return tx_id
     else:
         return None
@@ -179,7 +178,7 @@ def transfer_tnc(addressFrom,addressTo,value,privtKey):
     tx_id = tx_data["txid"]
     raw_data=sign(txData=tx_data["txData"],privtKey=privtKey)
     response=send_raw_tx(raw_data)
-    if response=="success":
+    if response:
         return {
             "txId":tx_id
         }
