@@ -42,10 +42,8 @@ def send_raw_tx(rawTx):
 
 def sign(txData,privtKey):
     signature = privtkey_sign(txData,privtKey)
-    print("signature:",signature)
-    publicKey=privtKey_to_publicKey(privtKey)
-    rawData=txData+"01"+"41"+"40"+signature+"23"+"21"+publicKey+"ac"
-    return rawData
+
+    return signature
 
 def multi_sign(txData,privtKey1,privtKey2,verificationScript):
     signature1 = privtkey_sign(txData, privtKey1)
