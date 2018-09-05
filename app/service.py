@@ -41,7 +41,7 @@ def send_raw_tx(rawTx):
             return True
         return False
     except:
-        return False
+        return send_raw_tx(rawTx)
 
 def sign(txData,privtKey):
     signature = privtkey_sign(txData,privtKey)
