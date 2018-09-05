@@ -181,7 +181,9 @@ def faucet(addressFrom,addressTo):
 def token_swap(addressFrom,addressTo,value,privtKey):
     tx_data=construct_tx(addressFrom=addressFrom,addressTo=addressTo,value=value,assetId=setting.CONTRACTHASH)
     tx_id = tx_data["txid"]
-    raw_data=sign(txData=tx_data["txData"],privtKey=privtKey)
+    signature=sign(txData=tx_data["txData"],privtKey=privtKey)
+    publicKey = privtKey_to_publicKey(privtKey)
+    raw_data=tx_data+"01"+"41"+"40"+signature+"23"+"21"+publicKey+"ac"
     response=send_raw_tx(raw_data)
     if response:
         return {
@@ -189,7 +191,6 @@ def token_swap(addressFrom,addressTo,value,privtKey):
         }
     else:
         return None
-
 
 
 
