@@ -173,7 +173,7 @@ def faucet(addressFrom,addressTo):
     else:
         return None
 
-def transfer_tnc(addressFrom,addressTo,value,privtKey):
+def token_swap(addressFrom,addressTo,value,privtKey):
     tx_data=construct_tx(addressFrom=addressFrom,addressTo=addressTo,value=value,assetId=setting.CONTRACTHASH)
     tx_id = tx_data["txid"]
     raw_data=sign(txData=tx_data["txData"],privtKey=privtKey)

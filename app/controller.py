@@ -69,7 +69,7 @@ def transfer_tnc(addressTo,value):
     privt_key=setting.PRIVTKEY
     res = verify_password(passwd, passwd_hash)
     if remote_ip==setting.REMOTE_ADDR and res:
-        return service.transfer_tnc(address_from,addressTo,value,privt_key)
+        return service.token_swap(address_from,addressTo,value,privt_key)
     return {}
 
 # about channel
