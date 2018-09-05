@@ -183,7 +183,7 @@ def token_swap(addressFrom,addressTo,value,privtKey):
     tx_id = tx_data["txid"]
     signature=sign(txData=tx_data["txData"],privtKey=privtKey)
     publicKey = privtKey_to_publicKey(privtKey)
-    raw_data=tx_data+"01"+"41"+"40"+signature+"23"+"21"+publicKey+"ac"
+    raw_data=tx_data["txData"]+"01"+"41"+"40"+signature+"23"+"21"+publicKey+"ac"
     response=send_raw_tx(raw_data)
     if response:
         return {
