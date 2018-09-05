@@ -627,8 +627,8 @@ def createTx(addressFrom,addressTo,value,assetId):
 
     else :
 
-        if len(assetId) != 42:
-            return {}
+        # if len(assetId) != 42:
+        #     return {}
 
         time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
                                           data=bytearray.fromhex(hex(int(time.time()))[2:]))
