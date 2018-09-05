@@ -21,7 +21,7 @@ from neocore.Cryptography.Crypto import Crypto
 
 from project_log.my_log import setup_mylogger
 
-runserver_logger = setup_mylogger(logfile="log/runserver.log")
+runserver_logger = setup_mylogger(logfile="runserver.log")
 
 def construct_raw_tx(txData,signature,publicKey):
     rawData=txData+"01"+"41"+"40"+signature+"23"+"21"+publicKey+"ac"
