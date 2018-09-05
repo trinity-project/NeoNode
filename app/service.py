@@ -1,7 +1,6 @@
 import json
 import random
 import time
-
 import requests
 
 from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, \
@@ -20,7 +19,9 @@ from neo.IO import Helper
 from neo.Core import Helper as CoreHelper
 from neocore.Cryptography.Crypto import Crypto
 
+from project_log.my_log import setup_mylogger
 
+runserver_logger = setup_mylogger(logfile="log/runserver.log")
 
 def construct_raw_tx(txData,signature,publicKey):
     rawData=txData+"01"+"41"+"40"+signature+"23"+"21"+publicKey+"ac"
@@ -40,7 +41,8 @@ def send_raw_tx(rawTx):
         if res["result"]:
             return True
         return False
-    except:
+    except Exception as e:
+        runserver_logger.exception(e)
         return False
 
 def sign(txData,privtKey):
