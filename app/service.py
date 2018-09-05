@@ -37,7 +37,10 @@ def send_raw_tx(rawTx):
         "id": 1
     }
     try:
-        res = requests.post(random.choice(setting.NEOCLIURL),json=data).json()
+        url = random.choice(setting.NEOCLIURL)
+        runserver_logger.exception(url)
+        runserver_logger.exception(data)
+        res = requests.post(url,json=data).json()
         if res["result"]:
             return True
         return False
