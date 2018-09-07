@@ -263,11 +263,12 @@ def verify_signature(message,signature,pubkey):
 
 def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
     res = createTx(addressFrom, addressTo, value, assetId)
-    txData = res.get("txData")
-    signature = privtkey_sign(txData,privtKey)
+    tx_data = res.get("txData")
+    tx_id = res.get("txId")
+    signature = privtkey_sign(tx_data,privtKey)
     publicKey = privtKey_to_publicKey(privtKey)
-    raw_data = txData + "01" + "41" + "40" + signature + "23" + "21" + publicKey + "ac"
-    return send_raw_tx(raw_data)
+    raw_data = tx_data + "01" + "41" + "40" + signature + "23" + "21" + publicKey + "ac"
+    return tx_id,send_raw_tx(raw_data)
 
 
 def create_funder(pubkeySelf,pubkeyOther,deposit,assetType):
