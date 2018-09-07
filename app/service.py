@@ -170,8 +170,10 @@ def faucet(addressFrom,addressTo):
     tx_data=construct_tx(addressFrom=addressFrom,addressTo=addressTo,
                          value=10,assetId="0x849d095d07950b9e56d0c895ec48ec5100cfdff1")
     tx_id = tx_data["txid"]
-    raw_data=sign(txData=tx_data["txData"],
+    signature=sign(txData=tx_data["txData"],
                   privtKey="0d94b060fe4a5f382174f75f3dca384ebc59c729cef92d553084c7c660a4c08f")
+    publicKey = "023886d5529481223f94d422bb6a1e05b0f831e2628c3200373a986b8208ff1c26"
+    raw_data = tx_data["txData"] + "01" + "41" + "40" + signature + "23" + "21" + publicKey + "ac"
     response=send_raw_tx(raw_data)
     if response:
         return tx_id
