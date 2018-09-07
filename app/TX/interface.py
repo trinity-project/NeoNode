@@ -681,23 +681,24 @@ def createMultiTx(addressFrom,addressTo,value,assetId):
 def _check_balance(address,assetId,value):
     balance = Balance.query.filter_by(address=address).first()
     if balance:
-        if assetId == setting.GAS_ASSETID or assetId == setting.NEO_ASSETID:
+        if assetId == setting.GAS_ASSETID :
             gas=balance.gas_balance
             if gas < Decimal(str(value)):
                 return False
             return True
-
 
         elif assetId == setting.NEO_ASSETID:
             neo=balance.neo_balance
             if neo < Decimal(str(value)):
                 return False
             return True
+
         elif assetId == setting.CONTRACTHASH:
             tnc=_get_tnc_balance(address)
             if tnc < value:
                 return False
             return True
+
     return False
 
 def _get_tnc_balance(address):
