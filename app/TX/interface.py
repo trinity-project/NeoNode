@@ -621,7 +621,7 @@ def createTx(addressFrom,addressTo,value,assetId):
 
         return {
             "txData":tx.get_tx_data(),
-            "txId": createTxid(tx.get_tx_data()),
+            "txid": createTxid(tx.get_tx_data()),
             "witness": "014140{signature}2321{pubkey}ac"
         }
 
