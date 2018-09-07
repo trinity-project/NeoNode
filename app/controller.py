@@ -9,6 +9,8 @@ from config import setting
 
 @jsonrpc.method("constructTx")
 def construct_tx(addressFrom,addressTo,value,assetId):
+    if type(value)==str:
+        value=float(value)
     return service.construct_tx(addressFrom,addressTo,value,assetId)
 
 
