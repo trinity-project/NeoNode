@@ -74,6 +74,14 @@ def transfer_tnc(addressTo,value):
         return service.token_swap(address_from,addressTo,value,privt_key)
     return {}
 
+
+
+@jsonrpc.method("autoTransfer")
+def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
+        return service.auto_transfer(addressFrom,addressTo,value,assetId,privtKey)
+
+
+
 # about channel
 
 @jsonrpc.method("FunderCreate")
