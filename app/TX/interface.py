@@ -660,7 +660,7 @@ def createClaimTx(address,value,claims):
     tx = ClaimTransaction()
     tx.inputs = claims
     tx.outputs = [output]
-    tx.Attributes = txAttributes
+    # tx.Attributes = txAttributes
 
     return {
         "txData": tx.get_tx_data(),
