@@ -54,6 +54,14 @@ def sign(txData,privtKey):
 
     return signature
 
+
+def sign_and_broadcast(txData,privtKey):
+    signature = privtkey_sign(txData, privtKey)
+    pubkey = privtKey_to_publicKey(privtKey)
+    raw_tx = construct_raw_tx(txData,signature,pubkey)
+    return send_raw_tx(raw_tx)
+
+
 def multi_sign(txData,privtKey1,privtKey2,verificationScript):
     signature1 = privtkey_sign(txData, privtKey1)
     signature2 = privtkey_sign(txData, privtKey2)

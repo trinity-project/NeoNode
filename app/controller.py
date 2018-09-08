@@ -25,6 +25,12 @@ def sign(txData,privtKey):
 def send_raw_tx(rawTx):
     return service.send_raw_tx(rawTx)
 
+
+@jsonrpc.method("signAndBroadcast")
+def sign_and_broadcast(txData,privtKey):
+    return service.sign_and_broadcast(txData,privtKey)
+
+
 @jsonrpc.method("getTransaction")
 def get_transaction(txid):
     return service.get_transaction(txid)
