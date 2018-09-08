@@ -4,9 +4,10 @@ import time
 import requests
 
 from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, \
-    createRefundTX, create_sender_HTLC_TXS,create_receiver_HTLC_TXS
+    createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx
 from app.TX.utils import pubkeyToAddress
-from app.utils import  ToScriptHash, int_to_hex, privtkey_sign, hex_reverse,privtKey_to_publicKey
+from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
+    get_claimable_from_neoscan
 from app.model import Balance, InvokeTx, ContractTx, Vout
 from decimal import Decimal
 
@@ -269,6 +270,13 @@ def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
     publicKey = privtKey_to_publicKey(privtKey)
     raw_data = tx_data + "01" + "41" + "40" + signature + "23" + "21" + publicKey + "ac"
     return tx_id,send_raw_tx(raw_data)
+
+
+def extract_gas(address):
+    res = get_claimable_from_neoscan(address)
+    if res[0] ==0 and res[1] ==[]:
+        raise Exception("no claimble gas")
+    return createClaimTx(address=address,value=res[0],claims=res[1])
 
 
 def create_funder(pubkeySelf,pubkeyOther,deposit,assetType):

@@ -14,6 +14,7 @@ from neocore.UInt256 import UInt256
 class TransactionType(object):
     ContractTransaction = b'\x80'
     InvocationTransaction = b'\xd1'
+    ClaimTransaction = b'\x02'
 
 
 class TransactionOutput():
@@ -321,4 +322,21 @@ class InvocationTransaction(Transaction):
 
 
 
+
+class ClaimTransaction(Transaction):
+    Claims = set()
+
+
+
+    def __init__(self, *args, **kwargs):
+        """
+        Create an instance.
+
+        Args:
+            *args:
+            **kwargs:
+        """
+        super(ClaimTransaction, self).__init__(*args, **kwargs)
+
+        self.Type = TransactionType.ClaimTransaction
 

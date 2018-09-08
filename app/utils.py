@@ -1,11 +1,14 @@
 import binascii
 
+import requests
 from base58 import b58decode
 from neocore.Cryptography.Crypto import Crypto
 from neocore.UInt160 import UInt160
 from neocore.BigInteger import BigInteger
 from neocore.KeyPair import KeyPair
 from neocore.UInt256 import UInt256
+
+from config import setting
 
 
 def createMultiSigAddress(script):
@@ -95,3 +98,11 @@ def verify_password(password, hashed):
     except Exception:
         result = False
     return result
+
+
+def get_claimable_from_neoscan(address):
+    try:
+        res = requests.get(setting.NEO_SCAN_API + "/get_claimable/" + address).json()
+        return res.get("unclaimed"),res.get("claimable")
+    except Exception as e:
+        raise e

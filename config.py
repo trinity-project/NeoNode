@@ -51,6 +51,8 @@ class SettingHolder(object):
         self.REDIS_IP="47.97.96.192"
         self.REDIS_PORT=6379
 
+        self.NEO_SCAN_API = "https://api.neoscan.io/api/main_net/v1"
+
     def setup_testnet(self):
         self.CONTRACTHASH = "0x849d095d07950b9e56d0c895ec48ec5100cfdff1"
         self.NEOCLIURL = ["http://127.0.0.1:20332"]
@@ -62,6 +64,9 @@ class SettingHolder(object):
         self.WEBAPI=ENVIRON.get("WEB_API")
         self.REDIS_IP="47.104.81.20"
         self.REDIS_PORT=9001
+
+        self.NEO_SCAN_API = "https://neoscan-testnet.io/api/test_net/v1"
+
     def setup_privtnet(self):
         self.CONTRACTHASH = "0x0c34a8fd0109df360c7cf7ca454404901db77f5e"
         self.NEOCLIURL = "http://localhost:10332"

@@ -7,7 +7,7 @@ from decimal import Decimal
 from neocore.Fixed8 import Fixed8
 from neocore.UInt256 import UInt256
 
-from app.TX.MyTransaction import InvocationTransaction, ContractTransaction, TransactionInput, TransactionOutput
+from app.TX.MyTransaction import InvocationTransaction, ContractTransaction, TransactionInput, TransactionOutput,ClaimTransaction
 from app.TX.TransactionAttribute import TransactionAttribute, TransactionAttributeUsage
 from app.model import Balance, Vout
 from app.utils import ToScriptHash
@@ -600,9 +600,6 @@ def createTx(addressFrom,addressTo,value,assetId):
     if assetId == setting.NEO_ASSETID or assetId == setting.GAS_ASSETID:
         if not _check_balance(address=addressFrom,assetId=assetId,value=value):
             raise Exception("no enough balance")
-
-
-
         time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
                                           data=bytearray.fromhex(hex(int(time.time()))[2:]))
         address_hash = TransactionAttribute(usage=TransactionAttributeUsage.Script,
@@ -650,6 +647,26 @@ def createTx(addressFrom,addressTo,value,assetId):
             "witness":"014140{signature}2321{pubkey}ac"
         }
 
+
+def createClaimTx(address,value,claims):
+    time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
+                                      data=bytearray.fromhex(hex(int(time.time()))[2:]))
+
+    txAttributes = [time_stamp]
+
+    claims  ={_createInput(preHash="0x"+item.get("txid"),preIndex=item.get("n")) for item in claims}
+    output = _createOutput(assetId=setting.GAS_ASSETID,amount=value,address=address)
+
+    tx = ClaimTransaction()
+    tx.Claims = claims
+    tx.outputs = [output]
+    tx.Attributes = txAttributes
+
+    return {
+        "txData": tx.get_tx_data(),
+        "txid": createTxid(tx.get_tx_data()),
+        "witness": "014140{signature}2321{pubkey}ac"
+    }
 
 def createMultiTx(addressFrom,addressTo,value,assetId):
     if assetId == setting.CONTRACTHASH:

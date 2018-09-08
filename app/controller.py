@@ -82,6 +82,12 @@ def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
 
 
 
+@jsonrpc.method("extractGas")
+def extract_gas(address):
+        return service.extract_gas(address)
+
+
+
 # about channel
 
 @jsonrpc.method("FunderCreate")
