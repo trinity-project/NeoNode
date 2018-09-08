@@ -86,7 +86,9 @@ def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
 def extract_gas(address):
         return service.extract_gas(address)
 
-
+@jsonrpc.method("transferAllNeoToSelf")
+def transfer_all_neo_to_self(address,balance):
+        return service.transfer_all_neo_to_self(address,balance)
 
 # about channel
 

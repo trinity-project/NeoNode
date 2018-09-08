@@ -279,6 +279,12 @@ def extract_gas(address):
     return createClaimTx(address=address,value=res[0],claims=res[1])
 
 
+def transfer_all_neo_to_self(address,balance):
+    res=createTx(address,address,balance,setting.NEO_ASSETID)
+    return res
+
+
+
 def create_funder(pubkeySelf,pubkeyOther,deposit,assetType):
     walletSelf= {
         "pubkey":pubkeySelf,
