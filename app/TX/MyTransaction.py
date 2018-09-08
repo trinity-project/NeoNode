@@ -324,7 +324,7 @@ class InvocationTransaction(Transaction):
 
 
 class ClaimTransaction(Transaction):
-    Claims = set()
+    # Claims = set()
 
 
 
@@ -339,4 +339,5 @@ class ClaimTransaction(Transaction):
         super(ClaimTransaction, self).__init__(*args, **kwargs)
 
         self.Type = TransactionType.ClaimTransaction
+        self.Claims = set()
 
