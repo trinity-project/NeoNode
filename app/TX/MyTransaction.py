@@ -236,6 +236,8 @@ class Transaction():
         writer.WriteSerializableArray(self.inputs)
         writer.WriteSerializableArray(self.outputs)
 
+
+
     def SerializeExclusiveData(self, writer):
         pass
 
@@ -324,7 +326,7 @@ class InvocationTransaction(Transaction):
 
 
 class ClaimTransaction(Transaction):
-    # Claims = set()
+    Claims = set()
 
 
 
@@ -339,5 +341,23 @@ class ClaimTransaction(Transaction):
         super(ClaimTransaction, self).__init__(*args, **kwargs)
 
         self.Type = TransactionType.ClaimTransaction
-        self.Claims = set()
 
+
+    def SerializeUnsigned(self, writer):
+        """
+        Serialize object.
+
+        Args:
+            writer (neo.IO.BinaryWriter):
+        """
+        writer.WriteByte(self.Type)
+        writer.WriteByte(self.Version)
+        self.SerializeExclusiveData(writer)
+
+        if len(self.Attributes) > self.MAX_TX_ATTRIBUTES:
+            raise Exception("Cannot have more than %s transaction attributes" % self.MAX_TX_ATTRIBUTES)
+
+        writer.WriteSerializableArray(self.Attributes)
+        writer.WriteSerializableArray(self.inputs)
+        writer.WriteSerializableArray(self.outputs)
+        writer.WriteSerializableArray(self.Claims)
