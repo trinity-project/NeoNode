@@ -658,7 +658,7 @@ def createClaimTx(address,value,claims):
     output = _createOutput(assetId=setting.GAS_ASSETID,amount=value,address=address)
 
     tx = ClaimTransaction()
-    tx.inputs = claims
+    tx.Claims = claims
     tx.outputs = [output]
     # tx.Attributes = txAttributes
 
