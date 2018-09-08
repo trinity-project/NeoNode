@@ -357,7 +357,7 @@ class ClaimTransaction(Transaction):
         if len(self.Attributes) > self.MAX_TX_ATTRIBUTES:
             raise Exception("Cannot have more than %s transaction attributes" % self.MAX_TX_ATTRIBUTES)
 
+        writer.WriteSerializableArray(self.Claims)
         writer.WriteSerializableArray(self.Attributes)
         writer.WriteSerializableArray(self.inputs)
         writer.WriteSerializableArray(self.outputs)
-        writer.WriteSerializableArray(self.Claims)
