@@ -282,7 +282,7 @@ def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
 
 def get_claimable_gas(address):
     res = get_claimable_from_neoscan(address)
-    return res[0].get("unclaimed")
+    return res[0]
 
 
 
