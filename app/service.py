@@ -7,7 +7,7 @@ from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX
     createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
-    get_claimable_from_neoscan
+    get_claimable_from_neoscan, get_unclaimed_from_neoscan
 from app.model import Balance, InvokeTx, ContractTx, Vout
 from decimal import Decimal
 
@@ -284,6 +284,10 @@ def get_claimable_gas(address):
     res = get_claimable_from_neoscan(address)
     return res[0]
 
+
+def get_unclaimed_gas(address):
+    res = get_unclaimed_from_neoscan(address)
+    return res
 
 
 def extract_gas(address):

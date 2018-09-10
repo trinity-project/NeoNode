@@ -106,3 +106,11 @@ def get_claimable_from_neoscan(address):
         return res.get("unclaimed"),res.get("claimable")
     except Exception as e:
         raise e
+
+
+def get_unclaimed_from_neoscan(address):
+    try:
+        res = requests.get(setting.NEO_SCAN_API + "/get_unclaimed/" + address).json()
+        return res.get("unclaimed")
+    except Exception as e:
+        raise e

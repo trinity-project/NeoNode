@@ -91,7 +91,9 @@ def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
 def get_claimable_gas(address):
         return service.get_claimable_gas(address)
 
-
+@jsonrpc.method("getUnClaimedGas")
+def get_unclaimed_gas(address):
+        return service.get_unclaimed_gas(address)
 
 @jsonrpc.method("extractGas")
 def extract_gas(address):
