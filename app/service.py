@@ -280,6 +280,12 @@ def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
     return tx_id,send_raw_tx(raw_data)
 
 
+def get_claimable_gas(address):
+    res = get_claimable_from_neoscan(address)
+    return res.get("unclaimed")
+
+
+
 def extract_gas(address):
     res = get_claimable_from_neoscan(address)
     if res[0] ==0 and res[1] ==[]:
