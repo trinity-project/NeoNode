@@ -20,7 +20,9 @@ db = SQLAlchemy(app)
 jsonrpc = JSONRPC(app, "/")
 
 
+from project_log.my_log import setup_mylogger
 
+app_logger = setup_mylogger(logfile="log/runserver.log")
 
 from .controller import *
 
