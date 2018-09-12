@@ -10,7 +10,7 @@ NEO_RPC_POOL=[
     # "http://seed8.ngd.network:10332",
     # "http://seed7.ngd.network:10332",
     # "http://seed6.ngd.network:10332",
-    "http://47.97.96.192:10332",
+    "http://47.254.64.251:10332",
     "http://127.0.0.1:10332"
 ]
 
@@ -20,7 +20,7 @@ NEO_RPC_APPLICATION_LOG_POOL=[
     # "http://seed8.ngd.network:10332",
     # "http://seed7.ngd.network:10332",
     # "http://seed6.ngd.network:10332",
-    "http://47.97.96.192:10332",
+    "http://47.254.64.251:10332",
     "http://127.0.0.1:10332"
 ]
 
@@ -48,7 +48,7 @@ class SettingHolder(object):
         self.FUNDING_ADDRESS="AQvEy2G42YfNhA69A9hiDoR6k3RUYA4H6x"
         self.WEBAPI=ENVIRON.get("WEB_API")
 
-        self.REDIS_IP="47.97.96.192"
+        self.REDIS_IP="47.254.64.251"
         self.REDIS_PORT=6379
 
         self.NEO_SCAN_API = "https://api.neoscan.io/api/main_net/v1"
