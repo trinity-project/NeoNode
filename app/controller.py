@@ -71,7 +71,7 @@ def verify_signature(message,signature,pubkey):
 @jsonrpc.method("autoTransferTNC")
 def transfer_tnc(addressTo,value):
     passwd=request.headers.get("Password")
-    remote_ip=request.remote_addr
+    remote_ip = request.headers.get("X-Real-IP")
     passwd_hash=setting.PASSWD_HASH
     address_from=setting.FUNDING_ADDRESS
     privt_key=setting.PRIVTKEY
