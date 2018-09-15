@@ -166,16 +166,16 @@ def get_transaction_by_address(address,asset,page=1):
             query_tx = []
 
 
-    elif asset==setting.CONTRACTHASH:
-        try:
-            query_tx = InvokeTx.query.filter(
-                or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
-            ).order_by(InvokeTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
-        except:
-            query_tx = []
+    # elif asset==setting.CONTRACTHASH:
+    try:
+        query_tx = InvokeTx.query.filter(
+            or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
+        ).order_by(InvokeTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
+    except:
+        query_tx = []
 
-    else:
-        query_tx=[]
+    # else:
+    #     query_tx=[]
 
 
     return [item.to_json() for item in query_tx]
