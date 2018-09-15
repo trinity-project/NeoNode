@@ -186,8 +186,8 @@ while True:
                     continue
                 for notification in content["notifications"]:
                     contract = notification["contract"]
-                    if contract != setting.CONTRACTHASH:
-                        continue
+                    # if contract != setting.CONTRACTHASH:
+                    #     continue
                     if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode()!="transfer":
                         continue
                     address_from = hex2address(notification["state"]["value"][1]["value"])
