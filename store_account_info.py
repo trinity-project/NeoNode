@@ -188,15 +188,18 @@ while True:
                     contract = notification["contract"]
                     # if contract != setting.CONTRACTHASH:
                     #     continue
-                    if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode()!="transfer":
-                        continue
-                    address_from = hex2address(notification["state"]["value"][1]["value"])
-                    address_to = hex2address(notification["state"]["value"][2]["value"])
-                    value = hex2interger(notification["state"]["value"][3]["value"])
-                    InvokeTx.save(
-                        tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
-                        value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
-                        block_height=block_height)
+                    try:
+                        if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode()!="transfer":
+                            continue
+                        address_from = hex2address(notification["state"]["value"][1]["value"])
+                        address_to = hex2address(notification["state"]["value"][2]["value"])
+                        value = hex2interger(notification["state"]["value"][3]["value"])
+                        InvokeTx.save(
+                            tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
+                            value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
+                            block_height=block_height)
+                    except Exception as e:
+                        logger.error(e)
                     # send to redis subpub
                     # try:
                     #     redis_client.publish("monitor", json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
