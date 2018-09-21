@@ -61,7 +61,6 @@ def get_application_log(txid):
 
 
 def push_event(to_push_message):
-    logger.info(8888888)
     while True:
         try:
             redis_client.publish("monitor", json.dumps( to_push_message))
