@@ -215,7 +215,7 @@ while True:
                         # send to redis subpub
                         push_event({"messageType": "monitorTx", "chainType": "NEO",
                                     "playload": tx_id, "blockNumber": local_block_count,
-                                    "blockTimeStamp": block_time})
+                                    "blockTimeStamp": block_time,"txId":tx_id})
 
                         push_event({"messageType": "monitorAddress", "chainType": "NEO",
                                     "playload": address_to, "blockNumber": local_block_count,
