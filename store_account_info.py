@@ -63,7 +63,7 @@ def get_application_log(txid):
 def push_event(to_push_message):
     while True:
         try:
-            redis_client.publish("monitor", to_push_message)
+            redis_client.publish("monitor", json.dumps( to_push_message))
             return True
         except Exception as e:
             logger.error("connect redis fail lead to push fail:{}".format(to_push_message))
