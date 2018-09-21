@@ -9,7 +9,7 @@ from neocore.UInt160 import UInt160
 
 from config import setting
 from data_model.account_info_model import Tx, LocalBlockCout, Vout, Balance, BlockHeight, InvokeTx, ContractTx,logger
-# from plugin.redis_client import redis_client
+from plugin.redis_client import redis_client
 
 
 def hex_reverse(input):
@@ -58,6 +58,17 @@ def get_application_log(txid):
         except Exception as e:
             logger.error(e)
             time.sleep(10)
+
+
+def push_event(to_push_message):
+    while True:
+        try:
+            redis_client.publish("monitor", to_push_message)
+            return True
+        except Exception as e:
+            logger.error("connect redis fail lead to push fail:{}".format(to_push_message))
+            time.sleep(3)
+
 
 class TRANSACTION_TYPE(object):
     CONTRACT="ContractTransaction"
@@ -127,12 +138,13 @@ while True:
                                     value=Decimal(str(value)), block_timestamp=block_time,
                                     block_height=block_height)
 
-                                # try:
-                                #     redis_client.publish("monitor",
-                                #                          json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
-                                #
-                                # except:
-                                #     logger.error("connect redis fail")
+                                push_event({"messageType":"monitorTx","chainType":"NEO",
+                                            "playload":tx_id,"blockNumber":local_block_count,
+                                            "blockTimeStamp":block_time})
+
+                                # push_event({"messageType":"monitorAddress","chainType":"NEO",
+                                #             "playload":address_to,"blockNumber":local_block_count,
+                                #             "blockTimeStamp":block_time})
 
                 #store vout and calculate balance
                 if vout:
@@ -198,14 +210,21 @@ while True:
                             tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
                             value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
                             block_height=block_height)
+
+                        # send to redis subpub
+                        push_event({"messageType": "monitorTx", "chainType": "NEO",
+                                    "playload": tx_id, "blockNumber": local_block_count,
+                                    "blockTimeStamp": block_time})
+
+                        push_event({"messageType": "monitorAddress", "chainType": "NEO",
+                                    "playload": address_to, "blockNumber": local_block_count,
+                                    "blockTimeStamp": block_time,"addressFrom":address_from,
+                                    "addressTo":address_to,"amount":str(value)})
+
                     except Exception as e:
                         logger.error(e)
-                    # send to redis subpub
-                    # try:
-                    #     redis_client.publish("monitor", json.dumps({"playload": tx_id, "messageType": "monitorTx"}))
-                    #
-                    # except:
-                    #     logger.error("connect redis fail")
+
+
         local_block_count+=1
         localBlockCount.height=local_block_count
         LocalBlockCout.update(localBlockCount)
