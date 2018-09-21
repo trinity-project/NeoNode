@@ -219,7 +219,7 @@ while True:
                         push_event({"messageType": "monitorAddress", "chainType": "NEO",
                                     "playload": address_to, "blockNumber": local_block_count,
                                     "blockTimeStamp": block_time,"addressFrom":address_from,
-                                    "addressTo":address_to,"amount":str(value)})
+                                    "addressTo":address_to,"amount":str(value),"assetId":contract})
 
                     except Exception as e:
                         logger.error(e)
