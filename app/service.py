@@ -125,7 +125,7 @@ def get_balance(address,assetId):
         else:
             try:
                 res = _get_nep5_balance(address,assetId)
-                value = float(Decimal(int(hex_reverse(res), 16)) / (10**8)) if res else 0
+                value = float(int(hex_reverse(res), 16))  if res else 0
                 return value
             except:
                 return 0
