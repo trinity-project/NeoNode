@@ -121,7 +121,7 @@ def get_balance(address,assetId):
         if assetId ==setting.NEO_ASSETID:
             return neo_balance
         elif assetId == setting.GAS_ASSETID:
-            return gas_balance
+            return gas_balance*(10**8)
         else:
             try:
                 res = _get_nep5_balance(address,assetId)
