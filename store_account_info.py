@@ -206,6 +206,8 @@ while True:
                         address_from = hex2address(notification["state"]["value"][1]["value"])
                         address_to = hex2address(notification["state"]["value"][2]["value"])
                         value = hex2interger(notification["state"]["value"][3]["value"])
+                        if contract == "0xfc732edee1efdf968c23c20a9628eaa5a6ccb934":
+                            value = value * (10**6)
                         InvokeTx.save(
                             tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
                             value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
