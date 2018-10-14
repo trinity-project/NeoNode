@@ -33,7 +33,7 @@ class SettingHolder(object):
     GAS_ASSETID = "0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7"
 
     MYSQLDATABASE = {
-        "host": "127.0.0.1",
+        "host": "192.168.28.139",
         "user": ENVIRON.get("DATABASE_USERNAME"),
         "passwd": ENVIRON.get("DATABASE_PASSWORD"),
         "db_block_info": "block_info",
