@@ -8,8 +8,8 @@ from neocore.Cryptography.Crypto import Crypto
 from neocore.UInt160 import UInt160
 
 from config import setting
-from data_model.account_info_model import Tx, LocalBlockCout, Vout, Balance, \
-    BlockHeight, logger, AccountInfoSession, HandledTx, Vin, ContractTx, InvokeTx
+from data_model.account_info_model import Tx, LocalBlockCout, Vout, Balance, BlockHeight, InvokeTx, ContractTx,logger
+from plugin.redis_client import redis_client
 
 
 def hex_reverse(input):
@@ -54,7 +54,7 @@ def get_application_log(txid):
                 return res.get("result")
             else:
                 logger.error("txid:{} get application log is null".format(txid))
-                return None
+                
         except Exception as e:
             logger.error(e)
             time.sleep(10)
@@ -82,137 +82,6 @@ if localBlockCount:
 else:
     local_block_count=0
     localBlockCount=LocalBlockCout.save(local_block_count)
-
-
-
-
-def calculate_balance(session,tx_id,vin,vout):
-    for _vout in vout:
-        asset_id = _vout["asset"]
-        address = _vout["address"]
-        vout_number = _vout["n"]
-        value = _vout["value"]
-
-        Vout.save(session=session, tx_id=tx_id, address=address, asset_id=asset_id,
-                  vout_number=vout_number, value=value)
-
-        exist_balance = Balance.query(address, asset_id)
-        if exist_balance:
-            exist_balance.value = str(Decimal(exist_balance.value) + Decimal(value))
-            Balance.update(session, exist_balance)
-        else:
-            Balance.save(session, address, asset_id, value)
-
-    for _vin in vin:
-        vin_txid = _vin["txid"]
-        vin_vout_number = _vin["vout"]
-        exist_vin = Vout.query(vin_txid, vin_vout_number)
-
-        if exist_vin:
-
-            Vout.delete(session, exist_vin)
-            exist_balance = Balance.query(exist_vin.address, exist_vin.asset_id)
-            exist_balance.value = str(Decimal(exist_balance.value) - Decimal(exist_vin.value))
-            Balance.update(session, exist_balance)
-            Vin.save(session, vin_txid, exist_vin.address, exist_vin.asset_id, vin_vout_number, exist_vin.value)
-        else:
-            raise Exception("lost vout->tx_id:{},number:{}".format(vin_txid, vin_vout_number))
-
-
-def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
-    address_from_asset_info = dict()
-    address_to_asset_info = dict()
-
-    for _vin in vin:
-        vin_txid = _vin["txid"]
-        vin_vout_number = _vin["vout"]
-        vin_instance = Vin.query(vin_txid, vin_vout_number)
-
-        if vin_instance:
-            asset_mapping = address_from_asset_info.get(vin_instance.asset_id)
-            if asset_mapping:
-                address_amount = asset_mapping.get(vin_instance.address)
-                if address_amount:
-                    asset_mapping[vin_instance.address] = str(Decimal(address_amount) + Decimal(vin_instance.value))
-                else:
-                    asset_mapping[vin_instance.address] = vin_instance.value
-            else:
-                address_from_asset_info[vin_instance.asset_id] = {vin_instance.address: vin_instance.value}
-
-
-        else:
-            logger.info("lost vin ({},{})".format(vin_txid, vin_vout_number))
-
-    asset_mappings_of_from = list(address_from_asset_info.values())
-    drop_tag = [True if len(am_of_from.keys()) >= 2 else False for am_of_from in asset_mappings_of_from]
-
-    if True not in drop_tag:
-
-        for _vout in vout:
-            asset_id = _vout["asset"]
-            address = _vout["address"]
-            value = _vout["value"]
-
-            asset_mapping = address_to_asset_info.get(asset_id)
-            if asset_mapping:
-                address_amount = asset_mapping.get(address)
-                if address_amount:
-                    asset_mapping[address] = str(Decimal(address_amount) + Decimal(value))
-                else:
-                    asset_mapping[address] = value
-            else:
-                address_to_asset_info[asset_id] = {address: value}
-
-        for asset_type_from, address_mapping_from in address_from_asset_info.items():
-            asset_type_from = asset_type_from
-            address_from = list(address_mapping_from.keys())[0]
-
-            for asset_type_to, address_mapping_to in address_to_asset_info.items():
-                if asset_type_to == asset_type_from:
-                    for address_to, amount in address_mapping_to.items():
-                        address_to = address_to
-                        amount = amount
-                        if address_from != address_to:
-                            ContractTx.save(session,tx_id,asset_type_to,address_from,address_to,amount,block_time,block_height)
-
-
-def store_nep5_tx(session,tx_id):
-    content = get_application_log(tx_id)
-    if not content:
-        return
-    if not content.get("notifications"):
-        return
-
-    print(content.get("notifications"))
-    for notification in content["notifications"]:
-        print(notification)
-        contract = notification["contract"]
-        try:
-            if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
-                continue
-            address_from = hex2address(notification["state"]["value"][1]["value"])
-            address_to = hex2address(notification["state"]["value"][2]["value"])
-            value = hex2interger(notification["state"]["value"][3]["value"])
-            # if contract == "0xfc732edee1efdf968c23c20a9628eaa5a6ccb934":
-            #     value = value * (10 ** 6)
-            InvokeTx.save(session=session,
-                tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
-                value=str(value), vm_state=content["vmstate"], block_timestamp=block_time,
-                block_height=block_height)
-
-            # push_event({"messageType": "monitorTx", "chainType": "NEO",
-            #             "playload": tx_id, "blockNumber": local_block_count,
-            #             "blockTimeStamp": block_time, "txId": tx_id})
-            #
-            # push_event({"messageType": "monitorAddress", "chainType": "NEO",
-            #             "playload": address_to, "blockNumber": local_block_count,
-            #             "blockTimeStamp": block_time, "addressFrom": address_from,
-            #             "addressTo": address_to, "amount": str(value), "assetId": contract})
-
-        except Exception as e:
-            logger.error(e)
-
-
 while True:
     logger.info(local_block_count)
     block_h=BlockHeight.query()
@@ -233,29 +102,130 @@ while True:
                 vin=json.loads(tx.vin)
                 vout=json.loads(tx.vout)
 
-                handled_tx = HandledTx.query(tx_id)
-                if handled_tx:
-                    logger.info("tx {} has been handled".format(tx_id))
+
+                #store contract tx
+                if tx_type == TRANSACTION_TYPE.CONTRACT and len(vout) <=2:
+                    asset_set=set()
+                    for item in vout:
+                        asset_set.add(item["asset"])
+                    if len(asset_set)==1 and asset_set.pop() in [setting.NEO_ASSETID, setting.GAS_ASSETID]:
+                        tmp_set=set()
+                        address_from=None
+                        for _vin in vin:
+                            exist_instance = Vout.query(_vin["txid"], _vin["vout"])
+                            if exist_instance:
+                                tmp_set.add(exist_instance.address)
+                                if len(tmp_set)==2:
+                                    break
+                                else:
+                                    address_from=tmp_set.pop()
+
+
+                        if address_from:
+                            for _vout in vout:
+                                if _vout["address"] == address_from:
+                                    address_to=None
+                                    value=None
+                                    asset=None
+                                    continue
+                                address_to=_vout["address"]
+                                value=_vout["value"]
+                                asset=_vout["asset"]
+
+                            if address_to and value and asset:
+                                ContractTx.save(
+                                    tx_id=tx_id, asset=asset, address_from=address_from, address_to=address_to,
+                                    value=Decimal(str(value)), block_timestamp=block_time,
+                                    block_height=block_height)
+
+                                push_event({"messageType":"monitorTx","chainType":"NEO",
+                                            "playload":tx_id,"blockNumber":local_block_count,
+                                            "blockTimeStamp":block_time})
+
+                                # push_event({"messageType":"monitorAddress","chainType":"NEO",
+                                #             "playload":address_to,"blockNumber":local_block_count,
+                                #             "blockTimeStamp":block_time})
+
+                #store vout and calculate balance
+                if vout:
+                    for _vout in vout:
+                        if _vout["asset"] in [setting.NEO_ASSETID, setting.GAS_ASSETID]:
+                            saved = Vout.save(tx_id=tx_id, address=_vout["address"], asset_id=_vout["asset"],
+                                         vout_number=_vout["n"], value=Decimal(_vout["value"]))
+                            if not saved:
+                                continue
+                            exist_instance = Balance.query(address=_vout["address"])
+                            if exist_instance:
+                                if _vout["asset"]==setting.NEO_ASSETID:
+                                    exist_instance.neo_balance += Decimal(_vout["value"])
+                                else:
+                                    exist_instance.gas_balance += Decimal(_vout["value"])
+                                Balance.update(exist_instance)
+                            else:
+                                if _vout["asset"]==setting.NEO_ASSETID:
+                                    new_instance = Balance(address=_vout["address"], neo_balance=Decimal(_vout["value"]))
+                                else:
+                                    new_instance = Balance(address=_vout["address"], gas_balance=Decimal(_vout["value"]))
+                                Balance.save(new_instance)
+
+
+                    for _vin in vin:
+                        exist_instance = Vout.query(_vin["txid"],_vin["vout"])
+
+                        if exist_instance:
+
+                            Vout.delete(exist_instance)
+                            balance_exist_instance = Balance.query(address=exist_instance.address)
+                            if exist_instance.asset_id == setting.NEO_ASSETID:
+                                balance_exist_instance.neo_balance -= Decimal(exist_instance.value)
+                            else:
+                                balance_exist_instance.gas_balance -= Decimal(exist_instance.value)
+                            Balance.update(balance_exist_instance)
+                        else:
+                            logger.error("lost vout->tx_id:{},number:{}".format(_vin["txid"],_vin["vout"]))
+
+
+
+                #store nep5 tx
+                if tx_type != TRANSACTION_TYPE.INVOKECONTRACT:
                     continue
 
-                session = AccountInfoSession()
 
-                calculate_balance(session,tx_id,vin,vout)
+                content = get_application_log(tx_id)
+                if not content:
+                    continue
+                if not content.get("notifications"):
+                    continue
+                for notification in content["notifications"]:
+                    contract = notification["contract"]
+                    # if contract != setting.CONTRACTHASH:
+                    #     continue
+                    try:
+                        if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode()!="transfer":
+                            continue
+                        address_from = hex2address(notification["state"]["value"][1]["value"])
+                        address_to = hex2address(notification["state"]["value"][2]["value"])
+                        value = hex2interger(notification["state"]["value"][3]["value"])
+                        if contract == "0xfc732edee1efdf968c23c20a9628eaa5a6ccb934":
+                            value = value * (10**6)
+                        InvokeTx.save(
+                            tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
+                            value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
+                            block_height=block_height)
 
-                if tx_type == TRANSACTION_TYPE.CONTRACT:
-                    store_contract_tx(session,tx_id,vin,vout,block_height,block_time)
+                        # send to redis subpub
+                        push_event({"messageType": "monitorTx", "chainType": "NEO",
+                                    "playload": tx_id, "blockNumber": local_block_count,
+                                    "blockTimeStamp": block_time,"txId":tx_id})
 
-                # if tx_type == TRANSACTION_TYPE.INVOKECONTRACT:
-                #     store_nep5_tx(session,tx_id)
+                        push_event({"messageType": "monitorAddress", "chainType": "NEO",
+                                    "playload": address_to, "blockNumber": local_block_count,
+                                    "blockTimeStamp": block_time,"addressFrom":address_from,
+                                    "addressTo":address_to,"amount":str(value),"assetId":contract})
 
-                HandledTx.save(session,tx_id)
-                try:
-                    session.commit()
-                except Exception as e:
-                    logger.error(e)
-                    session.rollback()
-                finally:
-                    session.close()
+                    except Exception as e:
+                        logger.error(e)
+
 
         local_block_count+=1
         localBlockCount.height=local_block_count
@@ -266,6 +236,8 @@ while True:
 
     else:
         time.sleep(10)
+
+
 
 
 
