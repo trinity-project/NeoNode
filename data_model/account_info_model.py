@@ -2,8 +2,8 @@ import pymysql
 
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text, create_engine, SmallInteger, DECIMAL, Index, Boolean, or_,UniqueConstraint
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy import Column, Integer, String, Text, create_engine,UniqueConstraint
+from sqlalchemy.orm import sessionmaker
 
 from config import setting
 from project_log import setup_mylogger
@@ -25,8 +25,7 @@ def _check_database(database_name):
     conn.close()
 
 
-_check_database("block_info")
-_check_database("account_info")
+_check_database("account_info_new")
 
 
 block_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
@@ -233,6 +232,7 @@ class Vin(AccountInfoBase):
         new_instance = Vin(tx_id=tx_id, address=address, asset_id=asset_id,
                                vout_number=vout_number,value=value)
         session.add(new_instance)
+        session.flush()
 
 
 
@@ -243,88 +243,46 @@ class InvokeTx(AccountInfoBase):
     contract = Column(String(42))
     address_from = Column(String(40),index=True)
     address_to = Column(String(40),index=True)
-    value = Column(DECIMAL(17,8))
+    value = Column(String(30))
     vm_state = Column(String(16))
-    has_pushed=Column(Boolean,default=False)
-    block_timestamp=Column(Integer,index=True)
+    block_timestamp=Column(Integer)
     block_height=Column(Integer)
 
 
-    __table_args__ = (
-        Index("multi_index",'address_from', 'address_to','vm_state','has_pushed'),
-    )
-
 
     @staticmethod
-    def query():
-        session = AccountInfoSession()
-        exist_instance = session.query(InvokeTx).filter(
-            or_(InvokeTx.address_from == setting.FUNDING_ADDRESS,
-                InvokeTx.address_to == setting.FUNDING_ADDRESS),
-            InvokeTx.vm_state == "HALT, BREAK",
-            InvokeTx.has_pushed==0
-        ).first()
-
-        session.close()
-
-        return exist_instance
-
-    @staticmethod
-    def save(tx_id,contract,address_from,address_to,value,vm_state,block_timestamp,block_height):
-        session=AccountInfoSession()
+    def save(session,tx_id,contract,address_from,address_to,value,vm_state,block_timestamp,block_height):
         new_instance = InvokeTx(tx_id=tx_id,
                                 contract=contract,address_from=address_from,
                                 address_to=address_to,value=value,vm_state=vm_state,
                                 block_timestamp=block_timestamp,block_height=block_height)
         session.add(new_instance)
-        try:
-            session.commit()
-        except Exception as e:
-            logger.error("store nep5 tx error >txid:{},addressFrom:{},addressTo:{},value:{}\n{}".format(tx_id, address_from, address_to, value,e))
-            session.rollback()
-        finally:
-            session.close()
 
-    @staticmethod
-    def update(exist_instance):
-        session = AccountInfoSession()
-        session.add(exist_instance)
-        try:
-            session.commit()
-        except:
-            session.rollback()
-        finally:
-            session.close()
+
+
 
 
 class ContractTx(AccountInfoBase):
     __tablename__ = 'contract_tx'
     id = Column(Integer, primary_key=True)
-    tx_id = Column(String(66),unique=True)
+    tx_id = Column(String(66))
     asset = Column(String(66))
     address_from = Column(String(40),index=True)
     address_to = Column(String(40),index=True)
-    value = Column(DECIMAL(17,8))
-    block_timestamp=Column(Integer,index=True)
+    value = Column(String(30))
+    block_timestamp=Column(Integer)
     block_height=Column(Integer)
 
 
 
     @staticmethod
-    def save(tx_id,asset,address_from,address_to,value,block_timestamp,block_height):
-        session=AccountInfoSession()
+    def save(session,tx_id,asset,address_from,address_to,value,block_timestamp,block_height):
         new_instance = ContractTx(tx_id=tx_id,
                                 asset=asset,address_from=address_from,
                                 address_to=address_to,value=value,
                                 block_timestamp=block_timestamp,block_height=block_height)
         session.add(new_instance)
-        try:
-            session.commit()
-        except Exception as e:
-            logger.error("store contract tx error > txid:{},addressFrom:{},addressTo:{},value:{}\n{}".format(tx_id, address_from, address_to, value,e))
-            session.rollback()
-        finally:
-            session.close()
+
 
 
 
