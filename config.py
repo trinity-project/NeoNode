@@ -36,7 +36,7 @@ class SettingHolder(object):
         "user": ENVIRON.get("DATABASE_USERNAME"),
         "passwd": ENVIRON.get("DATABASE_PASSWORD"),
         "db_block_info": "block_info",
-        "db_account_info": "account_info_new",
+        "db_account_info": "account_info",
     }
 
     def setup_mainnet(self):
