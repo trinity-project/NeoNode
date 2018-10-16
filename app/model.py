@@ -35,7 +35,56 @@ class Vout(db.Model):
 
 
 
+class Token(db.Model):
+    __tablename__ = 'token'
+    id = db.Column(db.Integer, primary_key=True)
+    address = db.Column(db.String(42),unique=True)
+    name = db.Column(db.String(64),index=True)
+    symbol = db.Column(db.String(64),index=True)
+    decimal = db.Column(db.String(64))
+    token_type = db.Column(db.String(8))
+    chain_type = db.Column(db.String(8))
+    icon = db.Column(db.String(256))
 
+    @staticmethod
+    def query_token(address=None,symbol=None):
+        exist_instance = None
+
+        if address:
+
+            exist_instance = Token.query.filter(Token.address==address).first()
+
+
+        if symbol:
+            exist_instance = Token.query.filter(Token.symbol == symbol).first()
+
+
+        return exist_instance
+
+
+    @staticmethod
+    def save(address,name,symbol,decimal,tokenType,chainType,icon):
+        new_instance = Token(address=address, name=name,symbol=symbol,decimal=decimal,
+                             token_type = tokenType,chain_type=chainType,icon=icon)
+        db.session.add(new_instance)
+        try:
+            db.session.commit()
+            return True
+        except Exception as e:
+            return False
+
+
+
+    def toJson(self):
+        return {
+            "tokenAddress":self.address,
+            "tokenName":self.name,
+            "tokenSynbol":self.symbol,
+            "tokenDecimal":self.decimal,
+            "tokenIcon":self.icon,
+            "tokenType":self.token_type
+
+            }
 
 
 

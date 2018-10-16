@@ -40,6 +40,10 @@ def get_transaction_by_address(address,asset,page=1):
     return service.get_transaction_by_address(address,asset,page)
 
 
+@jsonrpc.method("getTokenInfo")
+def get_token_info(queryWord):
+    return service.get_token_info(queryWord)
+
 @jsonrpc.method("getBalance")
 def get_balance(address,assetId=None):
     return service.get_balance(address,assetId)

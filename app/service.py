@@ -8,7 +8,7 @@ from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
     get_claimable_from_neoscan, get_unclaimed_from_neoscan
-from app.model import Balance, InvokeTx, ContractTx, Vout
+from app.model import Balance, InvokeTx, ContractTx, Vout,Token
 from decimal import Decimal
 
 from sqlalchemy import or_
@@ -181,6 +181,20 @@ def get_transaction_by_address(address,asset,page=1):
 
     return [item.to_json() for item in query_tx]
 
+
+def get_token_info(queryWord):
+    length_of_query_word=len(queryWord)
+
+    if length_of_query_word==42 or length_of_query_word==40:
+        queryWord=queryWord if length_of_query_word ==42 else "0x"+queryWord
+        query_res = Token.query_token(address=queryWord)
+    else:
+        queryWord = queryWord.upper()
+        query_res = Token.query_token(symbol=queryWord)
+
+    if query_res:
+        return [query_res.toJson()]
+    return []
 
 def faucet(addressFrom,addressTo):
     tx_data=construct_tx(addressFrom=addressFrom,addressTo=addressTo,
