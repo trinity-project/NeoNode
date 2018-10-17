@@ -206,22 +206,26 @@ while True:
                         address_from = hex2address(notification["state"]["value"][1]["value"])
                         address_to = hex2address(notification["state"]["value"][2]["value"])
                         value = hex2interger(notification["state"]["value"][3]["value"])
+                        vm_state = content["vmstate"]
                         if contract == "0xfc732edee1efdf968c23c20a9628eaa5a6ccb934":
                             value = value * (10**6)
                         InvokeTx.save(
                             tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
-                            value=Decimal(str(value)), vm_state=content["vmstate"], block_timestamp=block_time,
+                            value=Decimal(str(value)), vm_state=vm_state, block_timestamp=block_time,
                             block_height=block_height)
 
                         # send to redis subpub
+
                         push_event({"messageType": "monitorTx", "chainType": "NEO",
                                     "playload": tx_id, "blockNumber": local_block_count,
-                                    "blockTimeStamp": block_time,"txId":tx_id})
+                                    "blockTimeStamp": block_time,"txId":tx_id,"vmState":True if vm_state =="HALT, BREAK" else False})
 
-                        push_event({"messageType": "monitorAddress", "chainType": "NEO",
+                        if vm_state == "HALT, BREAK":
+                            push_event({"messageType": "monitorAddress", "chainType": "NEO",
                                     "playload": address_to, "blockNumber": local_block_count,
                                     "blockTimeStamp": block_time,"addressFrom":address_from,
-                                    "addressTo":address_to,"amount":str(value),"assetId":contract})
+                                    "addressTo":address_to,"amount":str(value),"assetId":contract,
+                                    "vmState": True if vm_state == "HALT, BREAK" else False})
 
                     except Exception as e:
                         logger.error(e)
