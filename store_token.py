@@ -46,7 +46,7 @@ def get_token_info(tokenAddress):
             value = res.get("result").get("stack")[0].get("value")
             if res.get("result").get("stack")[0].get("type") == "ByteArray":
                 value = bytearray.fromhex(value).decode()
-                token_info.append(value)
+            token_info.append(value)
 
         return token_info
     except Exception as e:
