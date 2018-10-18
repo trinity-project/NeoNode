@@ -105,7 +105,7 @@ while True:
                                        "NEP-5","NEO","https://appserver.trinity.ink/static/icon/{}.png".format(token_info[1]))
 
                     except Exception as e:
-
+                        logger.info(notification)
                         logger.error("contract address:{},error{}".format(contract,e))
 
         local_block_count += 1
