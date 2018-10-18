@@ -141,3 +141,4 @@ class Tx(BlockInfoBase):
         session.close()
         return exist_instance
 
+AccountInfoBase.metadata.create_all(account_info_engine)
