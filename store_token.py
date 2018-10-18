@@ -106,6 +106,7 @@ while True:
 
                     except Exception as e:
                         logger.info(notification)
+                        logger.info(token_info)
                         logger.error("contract address:{},error{}".format(contract,e))
 
         local_block_count += 1
