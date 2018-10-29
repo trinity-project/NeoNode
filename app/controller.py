@@ -39,6 +39,9 @@ def get_transaction(txid):
 def get_transaction_by_address(address,asset,page=1):
     return service.get_transaction_by_address(address,asset,page)
 
+@jsonrpc.method("getApplicationLog")
+def get_application_log(txid):
+    return service.get_application_log(txid)
 
 @jsonrpc.method("getTokenInfo")
 def get_token_info(queryWord):

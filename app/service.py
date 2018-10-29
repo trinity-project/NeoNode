@@ -39,8 +39,6 @@ def send_raw_tx(rawTx):
     }
     try:
         url = random.choice(setting.NEOCLIURL)
-        runserver_logger.exception(url)
-        runserver_logger.exception(rawTx)
         res = requests.post(url,json=data).json()
         if res["result"]:
             return True
@@ -48,6 +46,23 @@ def send_raw_tx(rawTx):
     except Exception as e:
         runserver_logger.exception(e)
         return False
+
+
+def getapplicationlog(txid):
+    data = {
+        "jsonrpc": "2.0",
+        "method": "getapplicationlog",
+        "params": [txid],
+        "id": 1
+    }
+
+    try:
+        res = requests.post(random.choice(setting.NEO_RPC_APPLICATION_LOG), json=data).json()
+        if res.get("result"):
+            return res.get("result")
+    except Exception as e:
+        runserver_logger.error(e)
+
 
 def sign(txData,privtKey):
     signature = privtkey_sign(txData,privtKey)
@@ -181,6 +196,15 @@ def get_transaction_by_address(address,asset,page=1):
 
     return [item.to_json() for item in query_tx]
 
+
+def get_application_log(txid):
+    content = getapplicationlog(txid)
+    if not content:
+        return None
+    if content.get("vmstate") == "HALT, BREAK":
+        return True
+    else:
+        return False
 
 def get_token_info(queryWord):
     length_of_query_word=len(queryWord)
