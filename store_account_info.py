@@ -198,6 +198,7 @@ while True:
                     continue
                 if not content.get("notifications"):
                     try:
+                        logger.info(script)
                         begin = 2
                         end = int(script[:2])*2+2
                         value = script[begin:end]
@@ -216,7 +217,7 @@ while True:
                             value=Decimal(str(value)), vm_state=vm_state, block_timestamp=block_time,
                             block_height=block_height)
                     except Exception as e:
-                        logger.error(e)
+                        logger.error("{}:e".format(tx_id,e))
 
                 for notification in content["notifications"]:
                     contract = notification["contract"]
