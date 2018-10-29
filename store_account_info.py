@@ -54,6 +54,7 @@ def get_application_log(txid):
                 return res.get("result")
             else:
                 logger.error("txid:{} get application log is null".format(txid))
+                time.sleep(3)
                 
         except Exception as e:
             logger.error(e)
