@@ -34,7 +34,7 @@ def hex2interger(input):
     for i in range(0, len(input), 2):
         tmp_list.append(input[i:i + 2])
     hex_str = "".join(list(reversed(tmp_list)))
-    output = int(hex_str, 16) / 100000000
+    output = int(int(hex_str, 16) / 100000000)
 
     return output
 
@@ -101,6 +101,7 @@ while True:
                 block_time=tx.block_time
                 vin=json.loads(tx.vin)
                 vout=json.loads(tx.vout)
+                script = tx.script
 
 
                 #store contract tx
@@ -195,7 +196,27 @@ while True:
                 if not content:
                     continue
                 if not content.get("notifications"):
-                    continue
+                    try:
+                        begin = 2
+                        end = int(script[:2])*2+2
+                        value = script[begin:end]
+                        begin = end + 2
+                        end = begin + 40
+                        address_to = script[begin:end]
+                        begin = end + 2
+                        end = begin + 40
+                        address_from = script[begin:end]
+                        begin = end + 24
+                        end = begin + 40
+                        contract = "0x"+script[begin:end]
+                        vm_state = "FAULT, BREAK"
+                        InvokeTx.save(
+                            tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
+                            value=Decimal(str(value)), vm_state=vm_state, block_timestamp=block_time,
+                            block_height=block_height)
+                    except Exception as e:
+                        logger.error(e)
+
                 for notification in content["notifications"]:
                     contract = notification["contract"]
                     # if contract != setting.CONTRACTHASH:
