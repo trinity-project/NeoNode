@@ -235,7 +235,7 @@ def get_token_holding(address):
             else:
                 res.append(tmp_dict)
 
-    return res
+    return list(res)
 
 
 def faucet(addressFrom,addressTo):
