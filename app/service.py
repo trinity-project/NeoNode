@@ -227,7 +227,7 @@ def get_token_holding(address):
         query_res = Token.query_token(address="0x"+holding.get("asset_hash"))
         if query_res:
             tmp_dict = query_res.toJson()
-            tmp_dict["balance"] = holding.get("amount")*tmp_dict["tokenDecimal"]
+            tmp_dict["balance"] = int(holding.get("amount"))* int(tmp_dict["tokenDecimal"])
             res.append(tmp_dict)
 
     return res
