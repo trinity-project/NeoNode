@@ -217,7 +217,7 @@ while True:
                             value=Decimal(str(value)), vm_state=vm_state, block_timestamp=block_time,
                             block_height=block_height)
                     except Exception as e:
-                        logger.error("{}:e".format(tx_id,e))
+                        logger.error("{}:{}".format(tx_id,e))
 
                 for notification in content["notifications"]:
                     contract = notification["contract"]

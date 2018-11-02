@@ -7,7 +7,7 @@ from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX
     createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
-    get_claimable_from_neoscan, get_unclaimed_from_neoscan
+    get_claimable_from_neoscan, get_unclaimed_from_neoscan, get_tokenholding_from_neoscan
 from app.model import Balance, InvokeTx, ContractTx, Vout,Token
 from decimal import Decimal
 
@@ -219,6 +219,19 @@ def get_token_info(queryWord):
     if query_res:
         return [query_res.toJson()]
     return []
+
+def get_token_holding(address):
+    holding_list = get_tokenholding_from_neoscan(address)
+    res=[]
+    for holding in holding_list:
+        query_res = Token.query_token(address="0x"+holding.get("asset_hash"))
+        if query_res:
+            tmp_dict = query_res.toJson()
+            tmp_dict["balance"] = holding.get("amount")*tmp_dict["tokenDecimal"]
+            res.append(tmp_dict)
+
+    return res
+
 
 def faucet(addressFrom,addressTo):
     tx_data=construct_tx(addressFrom=addressFrom,addressTo=addressTo,

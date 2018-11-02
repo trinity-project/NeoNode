@@ -47,6 +47,10 @@ def get_application_log(txid):
 def get_token_info(queryWord):
     return service.get_token_info(queryWord)
 
+@jsonrpc.method("getTokenHolding")
+def get_token_holding(address):
+    return service.get_token_holding(address)
+
 @jsonrpc.method("getBalance")
 def get_balance(address,assetId=None):
     return service.get_balance(address,assetId)
