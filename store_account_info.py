@@ -192,8 +192,7 @@ while True:
                 if tx_type != TRANSACTION_TYPE.INVOKECONTRACT:
                     continue
 
-                content =None
-                # content = get_application_log(tx_id)
+                content = get_application_log(tx_id)
                 if not content:
                     continue
                 if not content.get("notifications"):
