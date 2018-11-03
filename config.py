@@ -11,8 +11,8 @@ NEO_RPC_POOL=[
     # "http://seed7.ngd.network:10332",
     # "http://seed6.ngd.network:10332",
     # "http://47.254.64.251:10332",
-    # "http://172.20.151.244:10332",
-    "http://127.0.0.1:10332"
+    "http://172.20.151.244:10332"
+    # "http://127.0.0.1:10332"
 ]
 
 NEO_RPC_APPLICATION_LOG_POOL=[
@@ -22,8 +22,8 @@ NEO_RPC_APPLICATION_LOG_POOL=[
     # "http://seed7.ngd.network:10332",
     # "http://seed6.ngd.network:10332",
     # "http://47.254.64.251:10332",
-    # "http://172.20.151.244:10332",
-    "http://127.0.0.1:10332"
+    "http://172.20.151.244:10332"
+    # "http://127.0.0.1:10332"
 ]
 
 
