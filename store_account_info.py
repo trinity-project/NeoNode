@@ -197,27 +197,31 @@ while True:
                 if not content:
                     continue
                 if not content.get("notifications"):
-                    try:
-                        # logger.info(script)
-                        begin = 2
-                        end = int(script[:2])*2+2
-                        value = script[begin:end]
-                        begin = end + 2
-                        end = begin + 40
-                        address_to = script[begin:end]
-                        begin = end + 2
-                        end = begin + 40
-                        address_from = script[begin:end]
-                        begin = end + 24
-                        end = begin + 40
-                        contract = "0x"+script[begin:end]
-                        vm_state = "FAULT, BREAK"
-                        InvokeTx.save(
-                            tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
-                            value=Decimal(str(value)), vm_state=vm_state, block_timestamp=block_time,
-                            block_height=block_height)
-                    except Exception as e:
-                        pass
+
+                    continue
+
+                    # try:
+                    #     # logger.info(script)
+                    #     begin = 2
+                    #     end = int(script[:2])*2+2
+                    #     value = script[begin:end]
+                    #     begin = end + 2
+                    #     end = begin + 40
+                    #     address_to = script[begin:end]
+                    #     begin = end + 2
+                    #     end = begin + 40
+                    #     address_from = script[begin:end]
+                    #     begin = end + 24
+                    #     end = begin + 40
+                    #     contract = "0x"+script[begin:end]
+                    #     vm_state = "FAULT, BREAK"
+                    #     InvokeTx.save(
+                    #         tx_id=tx_id, contract=contract, address_from=address_from, address_to=address_to,
+                    #         value=Decimal(str(value)), vm_state=vm_state, block_timestamp=block_time,
+                    #         block_height=block_height)
+                    #
+                    # except Exception as e:
+                    #     pass
 
                 for notification in content["notifications"]:
                     contract = notification["contract"]
