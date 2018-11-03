@@ -12,12 +12,7 @@ logger=setup_mylogger(logfile="log/store_account_info.log")
 
 pymysql.install_as_MySQLdb()
 
-account_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
-                                               setting.MYSQLDATABASE["passwd"],
-                                               setting.MYSQLDATABASE["host"],
-                                               setting.MYSQLDATABASE["db_account_info"]
-                                                            ),
-                                   echo=True)
+account_info_engine = create_engine("mysql://root:root@10.213.87.119/test",echo=True)
 
 AccountInfoSession = sessionmaker(bind=account_info_engine)
 # AccountInfoSession = sessionmaker(bind=account_info_engine)
@@ -37,7 +32,7 @@ class Balance(AccountInfoBase):
 
     @staticmethod
     def query(address,asset_id):
-        session=AccountInfoSession()
+        # session=AccountInfoSession()
         exist_instance=session.query(Balance).filter(Balance.address==address,Balance.asset_id==asset_id).first()
         return exist_instance
 
@@ -56,8 +51,9 @@ class Balance(AccountInfoBase):
 
     @staticmethod
     def save(address,asset_id,value):
-        session=AccountInfoSession()
+        # session=AccountInfoSession()
         new_instance = Balance(address=address,asset_id=asset_id,value=value)
+        session.begin(subtransactions=True)
         try:
             session.add(new_instance)
             session.commit()
@@ -129,6 +125,7 @@ class Vout(AccountInfoBase):
     @staticmethod
     def save(tx_id,address,asset_id,vout_number,value):
         # session=AccountInfoSession()
+        session.begin(subtransactions=True)
         new_instance = Vout(tx_id=tx_id, address=address, asset_id=asset_id,
                                vout_number=vout_number,value=value)
         try:
@@ -222,28 +219,30 @@ AccountInfoBase.metadata.create_all(account_info_engine)
 
 
 
-session = AccountInfoSession()
+session = AccountInfoSession(autocommit=True)
 try:
     session.begin(subtransactions=True)
     tx_id = "tx1"
-    vout_number = "91"
+    vout_number = "20"
 
-    address = "addr6"
+    address = "addr9"
     asset_id = "asset3"
     value = "2"
 
     vin_txid = "vin_tx11"
     vin_vout_number = "0"
 
-    Vout.save(tx_id=tx_id, address=address, asset_id=asset_id,
-              vout_number=vout_number, value=value)
-
-    Vout.save(tx_id=tx_id, address=address, asset_id=asset_id,
-              vout_number="92", value=value)
-
-
-    Vout.save(tx_id=tx_id, address=address, asset_id=asset_id,
-              vout_number="93", value=value)
+    # Vout.save(tx_id=tx_id, address=address, asset_id=asset_id,
+    #           vout_number=vout_number, value=value)
+    Balance.save(address,asset_id,value)
+    dd=Balance.query(address,asset_id)
+    print(dd.address)
+    # Vout.save(tx_id=tx_id, address=address, asset_id=asset_id,
+    #           vout_number="21", value=value)
+    #
+    #
+    # Vout.save(tx_id=tx_id, address=address, asset_id=asset_id,
+    #           vout_number="23", value=value)
 
 
 
@@ -253,14 +252,14 @@ try:
     # Vin.save(vin_txid, "addr", "asset", "21", "5")
     # Balance.save(address, asset_id, value)
 
-
+#
     session.commit()
 except Exception as e:
     logger.error(e)
     session.rollback()
-
-finally:
-    print(session)
-    if not session:
-        print("not session")
-        session.close()
+#
+# finally:
+#     print(session)
+#     if not session:
+#         print("not session")
+#         session.close()
