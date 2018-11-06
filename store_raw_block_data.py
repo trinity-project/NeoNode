@@ -50,7 +50,7 @@ while True:
         time.sleep(5)
         continue
     if len(block_info["tx"])>1:
-        for tx in block_info["tx"][1:]:
+        for tx in block_info["tx"]:
             tx_type=tx["type"]
             tx_id=tx["txid"]
             block_height=block_info["index"]

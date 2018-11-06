@@ -1,16 +1,14 @@
 import json
 import random
 import time
-from collections import deque
-
 import requests
 
 from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, \
     createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
-    get_claimable_from_neoscan, get_unclaimed_from_neoscan, get_tokenholding_from_neoscan
-from app.model import Balance, InvokeTx, ContractTx, Vout,Token
+    get_claimable_from_neoscan, get_unclaimed_from_neoscan
+from app.model import Balance, InvokeTx, ContractTx, Vout
 from decimal import Decimal
 
 from sqlalchemy import or_
@@ -41,6 +39,8 @@ def send_raw_tx(rawTx):
     }
     try:
         url = random.choice(setting.NEOCLIURL)
+        runserver_logger.exception(url)
+        runserver_logger.exception(rawTx)
         res = requests.post(url,json=data).json()
         if res["result"]:
             return True
@@ -48,23 +48,6 @@ def send_raw_tx(rawTx):
     except Exception as e:
         runserver_logger.exception(e)
         return False
-
-
-def getapplicationlog(txid):
-    data = {
-        "jsonrpc": "2.0",
-        "method": "getapplicationlog",
-        "params": [txid],
-        "id": 1
-    }
-
-    try:
-        res = requests.post(random.choice(setting.NEO_RPC_APPLICATION_LOG), json=data).json()
-        if res.get("result"):
-            return res.get("result")
-    except Exception as e:
-        runserver_logger.error(e)
-
 
 def sign(txData,privtKey):
     signature = privtkey_sign(txData,privtKey)
@@ -197,45 +180,6 @@ def get_transaction_by_address(address,asset,page=1):
 
 
     return [item.to_json() for item in query_tx]
-
-
-def get_application_log(txid):
-    content = getapplicationlog(txid)
-    if not content:
-        return None
-    if content.get("vmstate") == "HALT, BREAK":
-        return True
-    else:
-        return False
-
-def get_token_info(queryWord):
-    length_of_query_word=len(queryWord)
-
-    if length_of_query_word==42 or length_of_query_word==40:
-        queryWord=queryWord if length_of_query_word ==42 else "0x"+queryWord
-        query_res = Token.query_token(address=queryWord)
-    else:
-        queryWord = queryWord.upper()
-        query_res = Token.query_token(symbol=queryWord)
-
-    if query_res:
-        return [query_res.toJson()]
-    return []
-
-def get_token_holding(address):
-    holding_list = get_tokenholding_from_neoscan(address)
-    res = deque([])
-    for holding in holding_list:
-        query_res = Token.query_token(address="0x"+holding.get("asset_hash"))
-        if query_res:
-            tmp_dict = query_res.toJson()
-            tmp_dict["balance"] = int(holding.get("amount")*(10** int(tmp_dict["tokenDecimal"])))
-            if tmp_dict.get("tokenIcon"):
-                res.appendleft(tmp_dict)
-            else:
-                res.append(tmp_dict)
-
-    return list(res)
 
 
 def faucet(addressFrom,addressTo):

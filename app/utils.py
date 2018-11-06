@@ -114,10 +114,3 @@ def get_unclaimed_from_neoscan(address):
         return res.get("unclaimed")
     except Exception as e:
         raise e
-
-def get_tokenholding_from_neoscan(address):
-    try:
-        res = requests.get(setting.NEO_SCAN_API + "/get_balance/" + address).json()
-        return res.get("balance")
-    except Exception as e:
-        raise e

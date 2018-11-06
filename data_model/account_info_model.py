@@ -2,7 +2,7 @@ import pymysql
 
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text, create_engine, SmallInteger, DECIMAL, Index, Boolean, or_,UniqueConstraint
+from sqlalchemy import Column, Integer, String, Text, create_engine,UniqueConstraint
 from sqlalchemy.orm import sessionmaker
 
 from config import setting
@@ -19,13 +19,12 @@ def _check_database(database_name):
     conn = pymysql.connect(host=setting.MYSQLDATABASE["host"], user=setting.MYSQLDATABASE["user"],
                            passwd=setting.MYSQLDATABASE["passwd"])
     cursor = conn.cursor()
-    cursor.execute("""create database if not exists {} """.format(database_name))
+    cursor.execute("""CREATE DATABASE IF NOT EXISTS {} DEFAULT CHARSET utf8 COLLATE utf8_general_ci;""".format(database_name))
     cursor.close()
     conn.commit()
     conn.close()
 
 
-_check_database("block_info")
 _check_database("account_info")
 
 
@@ -56,41 +55,38 @@ AccountInfoBase = declarative_base()
 class Balance(AccountInfoBase):
     __tablename__ = 'balance'
     id = Column(Integer, primary_key=True)
-    address = Column(String(40),unique=True)
-    neo_balance = Column(DECIMAL(17,8),default=0)
-    gas_balance =Column(DECIMAL(17,8),default=0)
+    address = Column(String(40))
+    asset_id = Column(String(66))
+    value =Column(String(30))
 
-
+    __table_args__ = (
+        UniqueConstraint('address', 'asset_id'),
+    )
 
     @staticmethod
-    def query(address):
-        session=AccountInfoSession()
-        exist_instance=session.query(Balance).filter(Balance.address==address).first()
-        session.close()
+    def query(session,address,asset_id):
+        exist_instance=session.query(Balance).filter(Balance.address==address,Balance.asset_id==asset_id).first()
         return exist_instance
 
 
-    @staticmethod
-    def update(self):
-        session=AccountInfoSession()
-        session.add(self)
-        try:
-            session.commit()
-        except:
-            session.rollback()
-        finally:
-            session.close()
+
 
     @staticmethod
-    def save(new_instance):
-        session=AccountInfoSession()
-        session.add(new_instance)
+    def save(session,address,asset_id,value):
+        new_instance = Balance(address=address,asset_id=asset_id,value=value)
+        session.begin(subtransactions=True)
         try:
+            session.add(new_instance)
             session.commit()
-        except:
+        except Exception as e:
+            logger.error(e)
             session.rollback()
-        finally:
-            session.close()
+
+    # @staticmethod
+    # def update(session,exist_instance):
+    #     session.add(exist_instance)
+    #     # session.flush()
+
 
 class LocalBlockCout(AccountInfoBase):
     __tablename__ = 'local_block_count'
@@ -161,10 +157,10 @@ class Vout(AccountInfoBase):
     __tablename__ = 'vout'
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66))
-    address = Column(String(40),index=True)
+    address = Column(String(40))
     asset_id = Column(String(66))
-    vout_number = Column(SmallInteger)
-    value = Column(DECIMAL(17,8))
+    vout_number = Column(String(6))
+    value = Column(String(30))
 
     __table_args__ = (
         UniqueConstraint('tx_id', 'vout_number'),
@@ -172,41 +168,88 @@ class Vout(AccountInfoBase):
 
 
     @staticmethod
-    def query(tx_id,vout_number):
-        session=AccountInfoSession()
+    def query(session,tx_id,vout_number):
         exist_instance=session.query(Vout).filter(Vout.tx_id==tx_id,
                                                   Vout.vout_number==vout_number).first()
-        session.close()
         return exist_instance
 
     @staticmethod
-    def save(tx_id,address,asset_id,vout_number,value):
-        session=AccountInfoSession()
+    def save(session,tx_id,address,asset_id,vout_number,value):
         new_instance = Vout(tx_id=tx_id, address=address, asset_id=asset_id,
                                vout_number=vout_number,value=value)
-        session.add(new_instance)
+
+        session.begin(subtransactions=True)
         try:
+            session.add(new_instance)
             session.commit()
-            saved = True
         except Exception as e:
             logger.error(e)
             session.rollback()
-            saved = False
-        finally:
-            session.close()
-        return saved
-    @staticmethod
-    def delete(instanse):
-        session=AccountInfoSession()
-        session.delete(instanse)
-        try:
-            session.commit()
 
-        except:
-            logger.error("delete vout fail > tx_id:{0} ".format(instanse.tx_id))
+
+    @staticmethod
+    def delete(session,instanse):
+        session.delete(instanse)
+
+
+class HandledTx(AccountInfoBase):
+    __tablename__ = 'handled_tx'
+    id = Column(Integer, primary_key=True)
+    tx_id = Column(String(66),unique=True)
+
+
+    @staticmethod
+    def query(session,tx_id):
+        exist_instance = session.query(HandledTx).filter(HandledTx.tx_id==tx_id).first()
+        return exist_instance
+
+    @staticmethod
+    def save(session,tx_id):
+        new_instance = HandledTx(tx_id=tx_id)
+        session.begin(subtransactions=True)
+        try:
+            session.add(new_instance)
+            session.commit()
+        except Exception as e:
+            logger.error(e)
             session.rollback()
-        finally:
-            session.close()
+
+
+
+
+class Vin(AccountInfoBase):
+    __tablename__ = 'vin'
+    id = Column(Integer, primary_key=True)
+    tx_id = Column(String(66))
+    vout_number = Column(String(6))
+    address = Column(String(40))
+    asset_id = Column(String(66))
+    value = Column(String(30))
+
+    __table_args__ = (
+        UniqueConstraint('tx_id', 'vout_number'),
+    )
+
+
+    @staticmethod
+    def query(session,tx_id,vout_number):
+        exist_instance=session.query(Vin).filter(Vin.tx_id==tx_id,
+                                                  Vin.vout_number==vout_number).first()
+        return exist_instance
+
+    @staticmethod
+    def save(session,tx_id,address,asset_id,vout_number,value):
+        new_instance = Vin(tx_id=tx_id, address=address, asset_id=asset_id,
+                               vout_number=vout_number,value=value)
+        session.begin(subtransactions=True)
+        try:
+            session.add(new_instance)
+            session.commit()
+        except Exception as e:
+            logger.error(e)
+            session.rollback()
+
+
 
 class InvokeTx(AccountInfoBase):
     __tablename__ = 'invoke_tx'
@@ -215,88 +258,46 @@ class InvokeTx(AccountInfoBase):
     contract = Column(String(42))
     address_from = Column(String(40),index=True)
     address_to = Column(String(40),index=True)
-    value = Column(DECIMAL(17,8))
+    value = Column(String(30))
     vm_state = Column(String(16))
-    has_pushed=Column(Boolean,default=False)
-    block_timestamp=Column(Integer,index=True)
+    block_timestamp=Column(Integer)
     block_height=Column(Integer)
 
 
-    __table_args__ = (
-        Index("multi_index",'address_from', 'address_to','vm_state','has_pushed'),
-    )
-
 
     @staticmethod
-    def query():
-        session = AccountInfoSession()
-        exist_instance = session.query(InvokeTx).filter(
-            or_(InvokeTx.address_from == setting.FUNDING_ADDRESS,
-                InvokeTx.address_to == setting.FUNDING_ADDRESS),
-            InvokeTx.vm_state == "HALT, BREAK",
-            InvokeTx.has_pushed==0
-        ).first()
-
-        session.close()
-
-        return exist_instance
-
-    @staticmethod
-    def save(tx_id,contract,address_from,address_to,value,vm_state,block_timestamp,block_height):
-        session=AccountInfoSession()
+    def save(session,tx_id,contract,address_from,address_to,value,vm_state,block_timestamp,block_height):
         new_instance = InvokeTx(tx_id=tx_id,
                                 contract=contract,address_from=address_from,
                                 address_to=address_to,value=value,vm_state=vm_state,
                                 block_timestamp=block_timestamp,block_height=block_height)
         session.add(new_instance)
-        try:
-            session.commit()
-        except Exception as e:
-            logger.error("store nep5 tx error >txid:{},addressFrom:{},addressTo:{},value:{}\n{}".format(tx_id, address_from, address_to, value,e))
-            session.rollback()
-        finally:
-            session.close()
 
-    @staticmethod
-    def update(exist_instance):
-        session = AccountInfoSession()
-        session.add(exist_instance)
-        try:
-            session.commit()
-        except:
-            session.rollback()
-        finally:
-            session.close()
+
+
 
 
 class ContractTx(AccountInfoBase):
     __tablename__ = 'contract_tx'
     id = Column(Integer, primary_key=True)
-    tx_id = Column(String(66),unique=True)
+    tx_id = Column(String(66))
     asset = Column(String(66))
     address_from = Column(String(40),index=True)
     address_to = Column(String(40),index=True)
-    value = Column(DECIMAL(17,8))
-    block_timestamp=Column(Integer,index=True)
+    value = Column(String(30))
+    block_timestamp=Column(Integer)
     block_height=Column(Integer)
 
 
 
     @staticmethod
-    def save(tx_id,asset,address_from,address_to,value,block_timestamp,block_height):
-        session=AccountInfoSession()
+    def save(session,tx_id,asset,address_from,address_to,value,block_timestamp,block_height):
         new_instance = ContractTx(tx_id=tx_id,
                                 asset=asset,address_from=address_from,
                                 address_to=address_to,value=value,
                                 block_timestamp=block_timestamp,block_height=block_height)
         session.add(new_instance)
-        try:
-            session.commit()
-        except Exception as e:
-            logger.error("store contract tx error > txid:{},addressFrom:{},addressTo:{},value:{}\n{}".format(tx_id, address_from, address_to, value,e))
-            session.rollback()
-        finally:
-            session.close()
+
 
 
 

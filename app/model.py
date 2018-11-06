@@ -35,56 +35,7 @@ class Vout(db.Model):
 
 
 
-class Token(db.Model):
-    __tablename__ = 'token'
-    id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(42),unique=True)
-    name = db.Column(db.String(64),index=True)
-    symbol = db.Column(db.String(64),index=True)
-    decimal = db.Column(db.String(64))
-    token_type = db.Column(db.String(8))
-    chain_type = db.Column(db.String(8))
-    icon = db.Column(db.String(256))
 
-    @staticmethod
-    def query_token(address=None,symbol=None):
-        exist_instance = None
-
-        if address:
-
-            exist_instance = Token.query.filter(Token.address==address).first()
-
-
-        if symbol:
-            exist_instance = Token.query.filter(Token.symbol == symbol).first()
-
-
-        return exist_instance
-
-
-    @staticmethod
-    def save(address,name,symbol,decimal,tokenType,chainType,icon):
-        new_instance = Token(address=address, name=name,symbol=symbol,decimal=decimal,
-                             token_type = tokenType,chain_type=chainType,icon=icon)
-        db.session.add(new_instance)
-        try:
-            db.session.commit()
-            return True
-        except Exception as e:
-            return False
-
-
-
-    def toJson(self):
-        return {
-            "tokenAddress":self.address,
-            "tokenName":self.name,
-            "tokenSynbol":self.symbol,
-            "tokenDecimal":self.decimal if self.decimal else 0,
-            "tokenIcon":self.icon,
-            "tokenType":self.token_type
-
-            }
 
 
 
@@ -111,7 +62,7 @@ class InvokeTx(db.Model):
             "addressFrom":self.address_from,
             "addressTo":self.address_to,
             "value":str(float(self.value)),
-            "txReceiptStatus":"1" if self.vm_state=="HALT, BREAK" else "-1",
+            "vmState":True if self.vm_state=="HALT, BREAK" else False,
             "blockTime":self.block_timestamp,
             "blockNumber":self.block_height
         }

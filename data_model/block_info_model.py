@@ -102,5 +102,3 @@ class Tx(Base):
 
 
 Base.metadata.create_all(engine)
-
-
