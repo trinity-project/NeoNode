@@ -127,8 +127,8 @@ while True:
                     HandledTx.save(session,tx_id)
                     session.commit()
                 except Exception as e:
-                    logger.error(e)
                     session.rollback()
+                    raise e
                 finally:
                     session.close()
 
