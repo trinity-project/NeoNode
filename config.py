@@ -36,7 +36,7 @@ class SettingHolder(object):
         "user": "root",
         "passwd": "root",
         "db_block_info": "block_info",
-        "db_account_info": "account_info",
+        "db_neo_table": "neo_table",
     }
 
     def setup_mainnet(self):

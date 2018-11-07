@@ -85,7 +85,7 @@ else:
 
 
 
-def calculate_balance(session,tx_id,vin,vout):
+def store_coin(session,tx_id,vin,vout):
     for _vout in vout:
         asset_id = _vout["asset"]
         address = _vout["address"]
@@ -95,27 +95,17 @@ def calculate_balance(session,tx_id,vin,vout):
         Vout.save(session=session, tx_id=tx_id, address=address, asset_id=asset_id,
                   vout_number=vout_number, value=value)
 
-        exist_balance = Balance.query(session,address, asset_id)
-        if exist_balance:
-            exist_balance.value = str(Decimal(exist_balance.value) + Decimal(value))
-            # Balance.update(session, exist_balance)
-        else:
-            Balance.save(session, address, asset_id, value)
-
     for _vin in vin:
         vin_txid = _vin["txid"]
         vin_vout_number = _vin["vout"]
         exist_vin = Vout.query(session,vin_txid, vin_vout_number)
         if exist_vin:
-
             Vout.delete(session, exist_vin)
-            exist_balance = Balance.query(session,exist_vin.address, exist_vin.asset_id)
-            exist_balance.value = str(Decimal(exist_balance.value) - Decimal(exist_vin.value))
             Vin.save(session, vin_txid, exist_vin.address, exist_vin.asset_id, vin_vout_number, exist_vin.value)
         else:
             raise Exception("lost vout->tx_id:{},number:{}".format(vin_txid, vin_vout_number))
 
-def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
+def store_global_asset_tx(session,tx_id,vin,vout,block_height,block_time):
     address_from_asset_info = dict()
     address_to_asset_info = dict()
 
@@ -238,9 +228,9 @@ while True:
 
                 try:
                     session.begin(subtransactions=True)
-                    calculate_balance(session,tx_id,vin,vout)
+                    store_coin(session,tx_id,vin,vout)
                     if tx_type == TRANSACTION_TYPE.CONTRACT:
-                        store_contract_tx(session,tx_id,vin,vout,block_height,block_time)
+                        store_global_asset_tx(session,tx_id,vin,vout,block_height,block_time)
                     # if tx_type == TRANSACTION_TYPE.INVOKECONTRACT:
                     #     store_nep5_tx(session,tx_id)
 
