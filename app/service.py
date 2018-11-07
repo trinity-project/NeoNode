@@ -334,12 +334,18 @@ def verify_signature(message,signature,pubkey):
 
 
 def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
+    import time
+    t1=time.time()
     res = createTx(addressFrom, addressTo, value, assetId)
+    t2=time.time()
     tx_data = res.get("txData")
     tx_id = res.get("txid")
     signature = privtkey_sign(tx_data,privtKey)
     publicKey = privtKey_to_publicKey(privtKey)
     raw_data = tx_data + "01" + "41" + "40" + signature + "23" + "21" + publicKey + "ac"
+    t3=time.time()
+    runserver_logger.error(t2-t1)
+    runserver_logger.error(t3-t2)
     return tx_id,send_raw_tx(raw_data)
 
 
