@@ -4,7 +4,7 @@ import os
 ENVIRON=os.environ
 
 NEO_RPC_POOL=[
-    "http://api.otcgo.cn:10332",
+    # "http://api.otcgo.cn:10332",
     "http://seed10.ngd.network:10332",
     "http://seed9.ngd.network:10332",
     "http://seed8.ngd.network:10332",
