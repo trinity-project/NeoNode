@@ -11,7 +11,7 @@ NEO_RPC_POOL=[
     # "http://seed7.ngd.network:10332",
     # "http://seed6.ngd.network:10332",
     # "http://47.254.64.251:10332",
-    "http://172.20.151.244:10332",
+    # "http://172.20.151.244:10332",
     "http://127.0.0.1:10332"
 ]
 
@@ -21,7 +21,7 @@ NEO_RPC_APPLICATION_LOG_POOL=[
     # "http://seed8.ngd.network:10332",
     # "http://seed7.ngd.network:10332",
     # "http://seed6.ngd.network:10332",
-    "http://172.20.151.244:10332",
+    # "http://172.20.151.244:10332",
     "http://127.0.0.1:10332"
 ]
 
@@ -32,12 +32,12 @@ class SettingHolder(object):
     GAS_ASSETID = "0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7"
 
     MYSQLDATABASE = {
-        "host": "10.213.87.119",
-        "user": "root",
-        "passwd": "root",
+        "host": "127.0.0.1",
+        "user": ENVIRON.get("DATABASE_USERNAME"),
+        "passwd": ENVIRON.get("DATABASE_PASSWORD"),
         "db_block_info": "block_info",
         "db_neo_table": "neo_table",
-    }
+}
 
     def setup_mainnet(self):
         self.CONTRACTHASH="0x08e8c4400f1af2c20c28e0018f29535eb85d15b6"

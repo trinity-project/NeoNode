@@ -208,7 +208,7 @@ while True:
     #     redis_client.publish("monitor", json.dumps({"playload": block_h.height, "messageType": "monitorBlockHeight"}))
     # except Exception as e:
     #     logger.error("connect redis fail")
-    if local_block_count<=block_h.height-1:
+    if local_block_count<=block_h.height:
         exist_instance=Tx.query(local_block_count)
         if  exist_instance:
             for tx in exist_instance:

@@ -46,28 +46,28 @@ neo_table_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["
 
 
 BlockInfoSession = sessionmaker(bind=block_info_engine)
-AccountInfoSession = sessionmaker(bind=neo_table_engine)
+NeoTableSession = sessionmaker(bind=neo_table_engine)
 
 BlockInfoBase = declarative_base()
-AccountInfoBase = declarative_base()
+NeoTableBase = declarative_base()
 
 
 
 
-class BookmarkForVout(AccountInfoBase):
+class BookmarkForVout(NeoTableBase):
     __tablename__ = 'bookmark_for_vout'
     id = Column(Integer, primary_key=True)
     height = Column(Integer)
 
     @staticmethod
     def query():
-        session=AccountInfoSession()
+        session=NeoTableSession()
         exist_instance=session.query(BookmarkForVout).first()
         session.close()
         return exist_instance
     @staticmethod
     def save(height):
-        session=AccountInfoSession()
+        session=NeoTableSession()
         new_instance = BookmarkForVout(height=height)
         session.add(new_instance)
         try:
@@ -79,7 +79,7 @@ class BookmarkForVout(AccountInfoBase):
         return new_instance
     @staticmethod
     def update(exist_instance):
-        session=AccountInfoSession()
+        session=NeoTableSession()
         session.add(exist_instance)
         try:
             session.commit()
@@ -89,14 +89,14 @@ class BookmarkForVout(AccountInfoBase):
             session.close()
 
 class BookmarkForBlock(BlockInfoBase):
-    __tablename__ = 'bookmark'
+    __tablename__ = 'bookmark_for_block'
     id = Column(Integer, primary_key=True)
     height = Column(Integer)
 
     @staticmethod
     def query():
         session=BlockInfoSession()
-        exist_instance=session.query(BlockHeight).first()
+        exist_instance=session.query(BookmarkForBlock).first()
         session.close()
         return exist_instance
 
@@ -119,7 +119,7 @@ class Tx(BlockInfoBase):
         session.close()
         return exist_instance
 
-class Vout(AccountInfoBase):
+class Vout(NeoTableBase):
     __tablename__ = 'vout'
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66))
@@ -158,7 +158,7 @@ class Vout(AccountInfoBase):
         session.delete(instanse)
 
 
-class HandledTx(AccountInfoBase):
+class HandledTx(NeoTableBase):
     __tablename__ = 'handled_tx'
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66),unique=True)
@@ -180,7 +180,7 @@ class HandledTx(AccountInfoBase):
             logger.error(e)
             session.rollback()
 
-class Vin(AccountInfoBase):
+class Vin(NeoTableBase):
     __tablename__ = 'vin'
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66))
@@ -214,4 +214,4 @@ class Vin(AccountInfoBase):
 
 
 
-AccountInfoBase.metadata.create_all(account_info_engine)
+NeoTableBase.metadata.create_all(neo_table_engine)
