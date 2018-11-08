@@ -21,7 +21,10 @@ def hex_reverse(input):
     return hex_str
 
 def hex2address(input):
-    output = Crypto.ToAddress(UInt160(data=binascii.unhexlify(bytearray(input.encode("utf8")))))
+    try:
+        output = Crypto.ToAddress(UInt160(data=binascii.unhexlify(bytearray(input.encode("utf8")))))
+    except:
+        output = input
     return output
 
 def hex2interger(input):
