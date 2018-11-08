@@ -1,105 +1,59 @@
-# -*- coding:utf-8 -*-
+import pymysql, json
 
-import datetime
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, scoped_session
+def insert_block_info(tx_id,tx_type,block_height,block_time,vin,vout,script):
+    connection = pymysql.connect(host='127.0.0.1',
+                                 port=3306,
+                                 user='root',
+                                 password='maiganne378121',
+                                 db='block_info',
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
 
-engine = create_engine("mysql+pymysql://root:root@10.213.87.111:3306/test", echo=True)
+    with connection.cursor() as cursor:
+        sql = 'insert into tx (tx_id,tx_type,block_height,block_time,vin,vout,script) values (%s,%s,%s,%s,%s,%s,%s)'
 
-# 必须使用scoped_session，域session可以将session进行共享
-DBSession = scoped_session(sessionmaker(bind=engine))
-
-BaseModel = declarative_base()
-
-
-# ----------- Relation Model Object---------------- #
-
-class User(BaseModel):
-
-    __tablename__ = "user"
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+        cursor.execute(sql, (tx_id,tx_type,block_height,block_time,json.dumps(vin),json.dumps(vout),script))
+        connection.commit()
+        connection.close()
 
 
-class UserCredits(BaseModel):
+def insert_vout(tx_id,address,asset_id,vout_number,value):
+    connection = pymysql.connect(host='127.0.0.1',
+                                 port=3306,
+                                 user='root',
+                                 password='maiganne378121',
+                                 db='neo_table',
+                                 charset='utf8mb4',
+                                 cursorclass=pymysql.cursors.DictCursor)
 
-    __tablename__ = "user_credits"
+    with connection.cursor() as cursor:
+        sql = 'insert into vout (tx_id,address,asset_id,vout_number,value) values (%s,%s,%s,%s,%s)'
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer)
-    user_name = Column(String)
-    score = Column(Integer)
-
-# ----------- Service implements---------------- #
-
-
-def add_user(user):
-    " 添加用户 "
-    session = DBSession()
-    try:
-        session.add(user)
-        # session.commit()
-    except Exception as e:
-        session.rollback()
-        print("AddUser: ======={}=======".format(e))
-    # finally:
-    #     if not session:
-    #         session.close()
+        cursor.execute(sql, (tx_id,address,asset_id,vout_number,value))
+        connection.commit()
+        connection.close()
 
 
-def add_user_credits(userCredits, interrupt=True):
-    " 添加用户积分记录 "
-    session = DBSession()
-    try:
-        if interrupt:
-            raise Exception("--- interrupt ---")
+insert_block_info(tx_id="0xc4edefaf13a98d8942a6bce8230d14b80e1b162081e938981810abdb563ee824",
+                  tx_type="MinerTransaction",
+                  block_height=670878,
+                  block_time=1489988232,
+                  vin = [],
+                  vout = [
+            {
+                "n": 0,
+                "asset": "0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+                "value": "10000",
+                "address": "AJeAEsmeD6t279Dx4n2HWdUvUmmXQ4iJvP"
+            }
+        ],
+                  script=None
+                  )
 
-        session.add(userCredits)
-        session.commit()
-    except Exception as e:
-        session.rollback()
-        print("AddUserCredits: ======={}=======".format(e))
-    finally:
-        if not session:
-            session.close()
 
-
-def regist_user():
-
-    session = DBSession()
-    try:
-        # 开启子事务
-        tran=engine.begin()
-
-        # TODO Service
-        user_1 = User(name='a')
-        user_2 = User(name='b')
-        user_3 = User(name='b')
-        user_4 = User(name='b')
-        add_user(user_1)
-        # add_user_credits(UserCredits(
-        #     user_id=3,
-        #     user_name="ff",
-        #     score=10
-        # ), False)
-
-        add_user(user_2)
-        add_user(user_3)
-        add_user(user_4)
-        # add_user_credits(UserCredits(
-        #     user_id=user_2.id,
-        #     user_name=user_2.name,
-        #     score=10
-        # ), False)
-        tran.commit()
-    except Exception as e:
-        session.rollback()
-        print("AddUserCredits: ======={}=======".format(e))
-    finally:
-        if not session:
-            session.close()
-
-# ---------- exec -----------
-regist_user()
+insert_vout(tx_id="0xc4edefaf13a98d8942a6bce8230d14b80e1b162081e938981810abdb563ee824",
+            address="AJeAEsmeD6t279Dx4n2HWdUvUmmXQ4iJvP",
+            asset_id="0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+            vout_number="0",
+            value="10000"
+            )
