@@ -24,7 +24,7 @@ def hex2address(input):
     try:
         output = Crypto.ToAddress(UInt160(data=binascii.unhexlify(bytearray(input.encode("utf8")))))
     except:
-        output = input
+        output = input[:40]
     return output
 
 def hex2interger(input):
