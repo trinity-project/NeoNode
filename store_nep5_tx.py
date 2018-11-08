@@ -22,7 +22,8 @@ def hex2address(input):
     try:
         output = Crypto.ToAddress(UInt160(data=binascii.unhexlify(bytearray(input.encode("utf8")))))
     except Exception as e:
-        logger.exception(e)
+        logger.error(e)
+        logger.error(input)
         output=None
 
 
