@@ -4,6 +4,8 @@ import time
 import binascii
 import requests
 from decimal import Decimal
+
+import sqlalchemy
 from neocore.Cryptography.Crypto import Crypto
 from neocore.UInt160 import UInt160
 
@@ -118,6 +120,9 @@ def store_nep5_tx(executions,txid,block_height,block_time):
                 #             "blockTimeStamp": block_time, "addressFrom": address_from,
                 #             "addressTo": address_to, "amount": str(value), "assetId": contract})
         session.commit()
+    except sqlalchemy.exc.IntegrityError as e:
+        session.rollback()
+        logger.error(e)
     except Exception as e:
         session.rollback()
         raise e
