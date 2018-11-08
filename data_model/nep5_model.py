@@ -119,14 +119,17 @@ class InvokeTx(NeoTableBase):
     vm_state = Column(String(16))
     block_timestamp=Column(Integer)
     block_height=Column(Integer)
+    md5_of_tx = Column(String(32),unique=True)
+
 
 
     @staticmethod
-    def save(session,tx_id,contract,address_from,address_to,value,vm_state,block_timestamp,block_height):
+    def save(session,tx_id,contract,address_from,address_to,value,vm_state,block_timestamp,block_height,md5_of_tx):
         new_instance = InvokeTx(tx_id=tx_id,
                                 contract=contract,address_from=address_from,
                                 address_to=address_to,value=value,vm_state=vm_state,
-                                block_timestamp=block_timestamp,block_height=block_height)
+                                block_timestamp=block_timestamp,block_height=block_height,
+                                md5_of_tx = md5_of_tx)
         session.add(new_instance)
 
 

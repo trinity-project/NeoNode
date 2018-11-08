@@ -59,6 +59,14 @@ def get_application_log(txid):
             time.sleep(10)
 
 
+def md5_for_invoke_tx(tx_id,address_from,address_to,value,contract):
+    import hashlib
+    src = "{}{}{}{}{}".format(tx_id,address_from,address_to,value,contract).encode()
+    m1 = hashlib.md5()
+    m1.update(src)
+    return m1.hexdigest()
+
+
 def push_event(to_push_message):
     while True:
         try:
@@ -101,11 +109,12 @@ def store_nep5_tx(executions,txid,block_height,block_time):
                 address_to = hex2address(notification["state"]["value"][2]["value"])
                 value = hex2interger(notification["state"]["value"][3]["value"]) if notification["state"]["value"][3]["type"] != "Integer"\
                     else notification["state"]["value"][3]["value"]
+                md5_of_tx = md5_for_invoke_tx(tx_id,address_from,address_to,value,contract)
 
                 InvokeTx.save(session=session,
                               tx_id=txid, contract=contract, address_from=address_from, address_to=address_to,
                               value=str(value), vm_state=execution["vmstate"], block_timestamp=block_time,
-                              block_height=block_height)
+                              block_height=block_height,md5_of_tx=md5_of_tx)
 
                 # push_event({"messageType": "monitorTx", "chainType": "NEO",
                 #             "playload": tx_id, "blockNumber": local_block_count,
