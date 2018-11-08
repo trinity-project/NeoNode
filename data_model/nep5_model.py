@@ -111,7 +111,7 @@ class Tx(BlockInfoBase):
 class InvokeTx(NeoTableBase):
     __tablename__ = 'invoke_tx'
     id = Column(Integer, primary_key=True)
-    tx_id = Column(String(66),unique=True)
+    tx_id = Column(String(66))
     contract = Column(String(42))
     address_from = Column(String(40),index=True)
     address_to = Column(String(40),index=True)
