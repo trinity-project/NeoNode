@@ -38,7 +38,7 @@ Base = declarative_base()
 
 
 
-class LocalBlockCout(Base):
+class BookmarkForBlock(Base):
     __tablename__ = 'local_block_count'
     id = Column(Integer, primary_key=True)
     height = Column(Integer)
@@ -46,13 +46,13 @@ class LocalBlockCout(Base):
     @staticmethod
     def query():
         session=Session()
-        exist_instance=session.query(LocalBlockCout).first()
+        exist_instance=session.query(BookmarkForBlock).first()
         session.close()
         return exist_instance
     @staticmethod
     def save(height):
         session=Session()
-        new_instance = LocalBlockCout(height=height)
+        new_instance = BookmarkForBlock(height=height)
         session.add(new_instance)
         try:
             session.commit()
