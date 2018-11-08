@@ -39,7 +39,7 @@ Base = declarative_base()
 
 
 class BookmarkForBlock(Base):
-    __tablename__ = 'local_block_count'
+    __tablename__ = 'bookmark_for_block'
     id = Column(Integer, primary_key=True)
     height = Column(Integer)
 
