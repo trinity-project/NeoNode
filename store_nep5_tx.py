@@ -105,6 +105,7 @@ def store_nep5_tx(executions,txid,block_height,block_time):
                 contract = notification["contract"]
                 if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
                     continue
+                logger.error(notification)
                 address_from = hex2address(notification["state"]["value"][1]["value"])
                 address_to = hex2address(notification["state"]["value"][2]["value"])
                 value = hex2interger(notification["state"]["value"][3]["value"]) if notification["state"]["value"][3]["type"] != "Integer"\
