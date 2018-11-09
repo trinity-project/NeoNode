@@ -89,3 +89,22 @@ class ContractTx(db.Model):
             "blockTime":self.block_timestamp,
             "blockNumber":self.block_height
         }
+
+
+class ClaimTx(db.Model):
+    __tablename__ = 'claim_tx'
+    id = db.Column(db.Integer, primary_key=True)
+    tx_id = db.Column(db.String(66))
+    address_to = db.Column(db.String(40),index=True)
+    value = db.Column(db.String(30))
+    block_timestamp=db.Column(db.Integer)
+
+
+
+    def to_json(self):
+        return {
+            "txId":self.tx_id,
+            "addressTo":self.address_to,
+            "value":self.value,
+            "blockTime":self.block_timestamp,
+        }

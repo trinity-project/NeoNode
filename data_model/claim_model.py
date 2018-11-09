@@ -2,7 +2,7 @@ import pymysql
 
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text, create_engine,UniqueConstraint
+from sqlalchemy import Column, Integer, String, Text, create_engine
 from sqlalchemy.orm import sessionmaker
 
 from config import setting
@@ -101,9 +101,10 @@ class Tx(BlockInfoBase):
 
 
     @staticmethod
-    def query(block_height,tx_type):
+    def query(block_height,block_interval,tx_type):
         session=BlockInfoSession()
-        exist_instance=session.query(Tx).filter(Tx.block_height==block_height,Tx.tx_type==tx_type).all()
+        exist_instance=session.query(Tx).filter(Tx.block_height>=block_height,Tx.block_height<=block_height+block_interval,
+                                                Tx.tx_type==tx_type).all()
         session.close()
         return exist_instance
 
