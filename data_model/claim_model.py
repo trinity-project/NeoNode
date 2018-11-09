@@ -43,7 +43,7 @@ NeoTableBase = declarative_base()
 
 
 class BookmarkForClaim(NeoTableBase):
-    __tablename__ = 'bookmark_for_nep5'
+    __tablename__ = 'bookmark_for_claim'
     id = Column(Integer, primary_key=True)
     height = Column(Integer)
 
