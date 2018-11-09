@@ -31,20 +31,13 @@ class SettingHolder(object):
     NEO_ASSETID = "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b"
     GAS_ASSETID = "0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7"
 
-#     MYSQLDATABASE = {
-#         "host": "127.0.0.1",
-#         "user": ENVIRON.get("DATABASE_USERNAME"),
-#         "passwd": ENVIRON.get("DATABASE_PASSWORD"),
-#         "db_block_info": "block_info",
-#         "db_neo_table": "neo_table",
-# }
-
     MYSQLDATABASE = {
-        "host": "10.213.87.110",
-        "user": "root",
-        "passwd": "root",
+        "host": "127.0.0.1",
+        "user": ENVIRON.get("DATABASE_USERNAME"),
+        "passwd": ENVIRON.get("DATABASE_PASSWORD"),
         "db_block_info": "block_info",
-        "db_neo_table": "neo_table",}
+        "db_neo_table": "neo_table",
+}
 
     def setup_mainnet(self):
         self.CONTRACTHASH="0x08e8c4400f1af2c20c28e0018f29535eb85d15b6"
