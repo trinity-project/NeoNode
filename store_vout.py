@@ -96,14 +96,20 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
                         if address_from != address_to:
                             ContractTx.save(session,tx_id,asset_type_to,address_from,address_to,amount,block_time,block_height)
 
+
+block_interval = 1000
+
 while True:
     bookmark_for_block=BookmarkForBlock.query()
     logger.info("bookmark_vout:{} bookmark_block:{}".format(bookmark_for_vout,bookmark_for_block.height))
     if not bookmark_for_block:
         continue
 
+    if bookmark_for_vout + block_interval > bookmark_for_block.height:
+        block_interval = 0
+
     if bookmark_for_vout<=bookmark_for_block.height:
-        exist_instance=Tx.query(bookmark_for_vout)
+        exist_instance=Tx.query(bookmark_for_vout,block_interval)
         if  exist_instance:
             for tx in exist_instance:
                 tx_id=tx.tx_id
@@ -132,7 +138,7 @@ while True:
                 finally:
                     session.close()
 
-        bookmark_for_vout += 1
+        bookmark_for_vout += block_interval +1
         bookmarkForVout.height = bookmark_for_vout
         BookmarkForVout.update(bookmarkForVout)
 

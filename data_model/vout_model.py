@@ -113,9 +113,9 @@ class Tx(BlockInfoBase):
 
 
     @staticmethod
-    def query(block_height):
+    def query(block_height,block_interval):
         session=BlockInfoSession()
-        exist_instance=session.query(Tx).filter(Tx.block_height==block_height).all()
+        exist_instance=session.query(Tx).filter(Tx.block_height>=block_height,Tx.block_height<=block_height+block_interval).all()
         session.close()
         return exist_instance
 
