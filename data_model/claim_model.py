@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from config import setting
 from project_log import setup_mylogger
 
-logger=setup_mylogger(logfile="log/store_nep5_tx.log")
+logger=setup_mylogger(logfile="log/store_claim_tx.log")
 
 
 
@@ -42,7 +42,7 @@ NeoTableBase = declarative_base()
 
 
 
-class BookmarkForNep5(NeoTableBase):
+class BookmarkForClaim(NeoTableBase):
     __tablename__ = 'bookmark_for_nep5'
     id = Column(Integer, primary_key=True)
     height = Column(Integer)
@@ -50,13 +50,13 @@ class BookmarkForNep5(NeoTableBase):
     @staticmethod
     def query():
         session=NeoTableSession()
-        exist_instance=session.query(BookmarkForNep5).first()
+        exist_instance=session.query(BookmarkForClaim).first()
         session.close()
         return exist_instance
     @staticmethod
     def save(height):
         session=NeoTableSession()
-        new_instance = BookmarkForNep5(height=height)
+        new_instance = BookmarkForClaim(height=height)
         session.add(new_instance)
         try:
             session.commit()
@@ -108,28 +108,20 @@ class Tx(BlockInfoBase):
         return exist_instance
 
 
-class InvokeTx(NeoTableBase):
-    __tablename__ = 'invoke_tx'
+class ClaimTx(NeoTableBase):
+    __tablename__ = 'claim_tx'
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66))
-    contract = Column(String(42))
-    address_from = Column(String(40),index=True)
     address_to = Column(String(40),index=True)
     value = Column(String(30))
-    vm_state = Column(String(16))
     block_timestamp=Column(Integer)
-    block_height=Column(Integer)
-    md5_of_tx = Column(String(32),unique=True)
 
 
 
     @staticmethod
-    def save(session,tx_id,contract,address_from,address_to,value,vm_state,block_timestamp,block_height,md5_of_tx):
-        new_instance = InvokeTx(tx_id=tx_id,
-                                contract=contract,address_from=address_from,
-                                address_to=address_to,value=value,vm_state=vm_state,
-                                block_timestamp=block_timestamp,block_height=block_height,
-                                md5_of_tx = md5_of_tx)
+    def save(session,tx_id,address_to,value,block_timestamp):
+        new_instance = ClaimTx(tx_id=tx_id,address_to=address_to,value=value,
+                                block_timestamp=block_timestamp)
         session.add(new_instance)
 
 

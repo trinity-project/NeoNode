@@ -140,7 +140,7 @@ while True:
         continue
 
     if bookmark_for_nep5 <= bookmark_for_block.height:
-        exist_instance=Tx.query(bookmark_for_nep5)
+        exist_instance=Tx.query(bookmark_for_nep5,TRANSACTION_TYPE.INVOKECONTRACT)
         if exist_instance:
             for tx in exist_instance:
                 tx_id=tx.tx_id
