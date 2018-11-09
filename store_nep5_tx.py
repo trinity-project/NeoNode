@@ -132,6 +132,7 @@ def store_nep5_tx(executions,txid,block_height,block_time):
     finally:
         session.close()
 
+block_interval = 1000
 
 while True:
     bookmark_for_block=BookmarkForBlock.query()
@@ -139,8 +140,11 @@ while True:
     if not bookmark_for_block:
         continue
 
+    if bookmark_for_nep5 + block_interval > bookmark_for_block.height:
+        block_interval = 0
+
     if bookmark_for_nep5 <= bookmark_for_block.height:
-        exist_instance=Tx.query(bookmark_for_nep5,TRANSACTION_TYPE.INVOKECONTRACT)
+        exist_instance=Tx.query(bookmark_for_nep5,block_interval,TRANSACTION_TYPE.INVOKECONTRACT)
         if exist_instance:
             for tx in exist_instance:
                 tx_id=tx.tx_id
@@ -161,7 +165,7 @@ while True:
                 store_nep5_tx(content.get("executions"),content.get("txid"),block_height,block_time)
 
         # break
-        bookmark_for_nep5 += 1
+        bookmark_for_nep5 += block_interval + 1
         bookmarkForNep5.height = bookmark_for_nep5
         BookmarkForNep5.update(bookmarkForNep5)
 
