@@ -32,7 +32,7 @@ block_interval = 1000
 
 while True:
     bookmark_for_block=BookmarkForBlock.query()
-    logger.info("bookmark_nep5:{} bookmark_block:{}".format(bookmark_for_claim,bookmark_for_block.height))
+    logger.info("bookmark_claim_tx:{} bookmark_block:{}".format(bookmark_for_claim,bookmark_for_block.height))
     if not bookmark_for_block:
         continue
 
