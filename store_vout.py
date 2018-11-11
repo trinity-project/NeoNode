@@ -136,7 +136,7 @@ while True:
                 finally:
                     session.close()
 
-        bookmark_for_vout += block_interval +1
+        bookmark_for_vout += 1
         bookmarkForVout.height = bookmark_for_vout
         BookmarkForVout.update(bookmarkForVout)
 
