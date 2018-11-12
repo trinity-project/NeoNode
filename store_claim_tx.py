@@ -34,6 +34,7 @@ while True:
     bookmark_for_block=BookmarkForBlock.query()
     logger.info("bookmark_claim_tx:{} bookmark_block:{}".format(bookmark_for_claim,bookmark_for_block.height))
     if not bookmark_for_block:
+        time.sleep(10)
         continue
 
     if bookmark_for_claim + block_interval > bookmark_for_block.height:
