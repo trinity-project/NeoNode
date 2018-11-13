@@ -152,7 +152,7 @@ def _get_balance(address,assetId):
 def get_balance(address,assetIdList):
     task_list = []
     for assetId in assetIdList:
-        task_list.append(gevent.spawn(get_balance, address,assetId))
+        task_list.append(gevent.spawn(_get_balance, address,assetId))
 
     task_results = gevent.joinall(task_list)
 
