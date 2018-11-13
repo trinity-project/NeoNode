@@ -42,6 +42,7 @@ while True:
 
     if bookmark_for_claim <= bookmark_for_block.height:
         exist_instance=Tx.query(bookmark_for_claim,block_interval,TRANSACTION_TYPE.CLAIM)
+        logger.info(len(exist_instance))
         if exist_instance:
             for tx in exist_instance:
                 tx_id=tx.tx_id
