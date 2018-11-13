@@ -106,7 +106,7 @@ while True:
 
 
 
-    if bookmark_for_vout<=bookmark_for_block.height:
+    if bookmark_for_vout<bookmark_for_block.height:
         exist_instance=Tx.query(bookmark_for_vout)
         if  exist_instance:
             for tx in exist_instance:
