@@ -11,12 +11,21 @@ from app import db
 
 
 
-class Balance(db.Model):
-    __tablename__ = 'balance'
+
+class Token(db.Model):
+    __tablename__ = 'token'
     id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(40),index=True)
-    neo_balance = db.Column(db.DECIMAL(17,8),default=0)
-    gas_balance =db.Column(db.DECIMAL(17,8),default=0)
+    address = db.Column(db.String(42),unique=True)
+    name = db.Column(db.String(32),index=True)
+    symbol = db.Column(db.String(8),index=True)
+    decimal = db.Column(db.String(2))
+    token_type = db.Column(db.String(8))
+    chain_type = db.Column(db.String(8))
+    icon = db.Column(db.String(256))
+
+
+
+
 
 
 

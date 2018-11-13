@@ -102,7 +102,7 @@ class Token(AccountInfoBase):
     @staticmethod
     def query_token(address):
         session = AccountInfoSession()
-        exist_instance = session.query(LocalBlockCout).filter(Token.address==address).first()
+        exist_instance = session.query(Token).filter(Token.address==address).first()
         return exist_instance
 
 

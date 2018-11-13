@@ -44,7 +44,7 @@ def get_claim_tx(address,page=1):
     return service.get_claim_tx(address,page)
 
 @jsonrpc.method("getBalance")
-def get_balance(address,assetId=None):
+def get_balance(address,assetId):
     return service.get_balance(address,assetId)
 
 

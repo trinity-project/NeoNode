@@ -8,7 +8,7 @@ from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
     get_claimable_from_neoscan, get_unclaimed_from_neoscan
-from app.model import Balance, InvokeTx, ContractTx, Vout, ClaimTx
+from app.model import  InvokeTx, ContractTx, Vout, ClaimTx,Token
 from decimal import Decimal
 
 from sqlalchemy import or_
@@ -100,35 +100,39 @@ def _get_nep5_balance(address,assetId):
 
     return value
 
+
+def _get_global_asset(address):
+    data = {
+        "jsonrpc": "2.0",
+        "method": "getaccountstate",
+        "params": [address],
+        "id": 1
+    }
+    try:
+        res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
+        balances = res["result"]["balances"]
+    except:
+        balances = None
+
+    return balances
+
+
 def get_balance(address,assetId):
-    balance=Balance.query.filter_by(address=address).first()
-    neo_balance = int(balance.neo_balance) if balance else 0
-    gas_balance = float(balance.gas_balance) if balance else 0
-
-    if not assetId:
-        value = _get_nep5_balance(address,setting.CONTRACTHASH)
-
-
-        response={
-            "gasBalance":gas_balance,
-            "neoBalance":neo_balance,
-            "tncBalance":float(Decimal(int(hex_reverse(value), 16)) / (10**8)) if value else 0
-        }
-
-        return response
+    token=Token.query.filter(Token.address==assetId).first()
+    if not token:
+        balances = _get_global_asset(address)
+        if balances:
+            for balance in balances:
+                if balance.get("asset") == assetId:
+                    return balance.get("value")
 
     else:
-        if assetId ==setting.NEO_ASSETID:
-            return neo_balance
-        elif assetId == setting.GAS_ASSETID:
-            return gas_balance*(10**8)
-        else:
-            try:
-                res = _get_nep5_balance(address,assetId)
-                value = float(Decimal(int(hex_reverse(res), 16))) if res else 0
-                return value
-            except:
-                return 0
+        try:
+            res = _get_nep5_balance(address,assetId)
+            value = int(hex_reverse(res),16) if res else 0
+            return value
+        except:
+            return 0
 
 def get_block_height():
     data = {
