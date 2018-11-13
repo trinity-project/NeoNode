@@ -40,7 +40,7 @@ while True:
     if bookmark_for_claim + block_interval > bookmark_for_block.height:
         block_interval = 0
 
-    if bookmark_for_claim <= bookmark_for_block.height:
+    if bookmark_for_claim < bookmark_for_block.height:
         exist_instance=Tx.query(bookmark_for_claim,block_interval,TRANSACTION_TYPE.CLAIM)
         logger.info(len(exist_instance))
         if exist_instance:
