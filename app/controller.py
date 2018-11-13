@@ -43,6 +43,13 @@ def get_transaction_by_address(address,asset,page=1):
 def get_claim_tx(address,page=1):
     return service.get_claim_tx(address,page)
 
+@jsonrpc.method("getTokenInfo")
+def get_token_info(queryWord):
+    return service.get_token_info(queryWord)
+
+@jsonrpc.method("getTokenHolding")
+def get_token_holding(address):
+    return service.get_token_holding(address)
 
 
 @jsonrpc.method("getBalance")

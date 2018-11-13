@@ -221,6 +221,37 @@ def get_claim_tx(address,page):
 
     return [item.to_json() for item in query_tx]
 
+
+def get_token_info(queryWord):
+    length_of_query_word=len(queryWord)
+
+    if length_of_query_word==42 or length_of_query_word==40:
+        queryWord=queryWord if length_of_query_word ==42 else "0x"+queryWord
+        query_res = Token.query_token(address=queryWord)
+    else:
+        queryWord = queryWord.upper()
+        query_res = Token.query_token(symbol=queryWord)
+
+    if query_res:
+        return [query_res.toJson()]
+    return []
+
+def get_token_holding(address):
+    holding_list = get_tokenholding_from_neoscan(address)
+    res = deque([])
+    for holding in holding_list:
+        query_res = Token.query_token(address="0x"+holding.get("asset_hash"))
+        if query_res:
+            tmp_dict = query_res.toJson()
+            tmp_dict["balance"] = int(holding.get("amount")*(10** int(tmp_dict["tokenDecimal"])))
+            if tmp_dict.get("tokenIcon"):
+                res.appendleft(tmp_dict)
+            else:
+                res.append(tmp_dict)
+
+    return list(res)
+
+
 def faucet(addressFrom,addressTo):
     tx_data=construct_tx(addressFrom=addressFrom,addressTo=addressTo,
                          value=10,assetId="0x849d095d07950b9e56d0c895ec48ec5100cfdff1")
