@@ -1,6 +1,8 @@
 import json
 import random
 import time
+
+import gevent
 import requests
 
 from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, \
@@ -117,22 +119,48 @@ def _get_global_asset(address):
     return balances
 
 
-def get_balance(address,assetId):
+def _get_balance(address,assetId):
     token=Token.query.filter(Token.address==assetId).first()
     if not token:
         balances = _get_global_asset(address)
         if balances:
             for balance in balances:
                 if balance.get("asset") == assetId:
-                    return balance.get("value")
+                    return {
+                        "assetId":assetId,
+                        "balance":balance.get("value")
+                    }
 
+        return {
+            "assetId": assetId,
+            "balance": "0"
+        }
     else:
         try:
             res = _get_nep5_balance(address,assetId)
             value = int(hex_reverse(res),16) if res else 0
-            return value
+            return {
+                "assetId": assetId,
+                "balance": str(value)
+            }
         except:
-            return 0
+            return {
+                "assetId": assetId,
+                "balance": "0"
+            }
+
+def get_balance(address,assetIdList):
+    task_list = []
+    for assetId in assetIdList:
+        task_list.append(gevent.spawn(get_balance, address,assetId))
+
+    task_results = gevent.joinall(task_list)
+
+    return [task_result.value for task_result in task_results]
+
+
+
+
 
 def get_block_height():
     data = {

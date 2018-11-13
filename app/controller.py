@@ -45,7 +45,15 @@ def get_claim_tx(address,page=1):
 
 @jsonrpc.method("getBalance")
 def get_balance(address,assetId):
-    return service.get_balance(address,assetId)
+    balance = service.get_balance(address,assetId)
+    if not balance:
+        return 0
+    return balance
+
+
+@jsonrpc.method("getBalance_2")
+def get_balance_2(address,assetIdList):
+    return service.get_balance_2(address,assetIdList)
 
 
 @jsonrpc.method("getBlockHeight")
