@@ -45,6 +45,7 @@ while True:
         if exist_instance:
             for tx in exist_instance:
                 tx_id=tx.tx_id
+                logger.info(tx_id)
                 tx_type=tx.tx_type
                 block_time=tx.block_time
                 vout=json.loads(tx.vout)
