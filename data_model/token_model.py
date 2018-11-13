@@ -64,7 +64,16 @@ class BookmarkForToken(NeoTableBase):
             session.close()
         return new_instance
 
-
+    @staticmethod
+    def update(exist_instance):
+        session=NeoTableSession()
+        session.add(exist_instance)
+        try:
+            session.commit()
+        except:
+            session.rollback()
+        finally:
+            session.close()
 
 class BookmarkForBlock(BlockInfoBase):
     __tablename__ = 'bookmark_for_block'
