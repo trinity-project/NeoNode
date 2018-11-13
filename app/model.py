@@ -25,6 +25,32 @@ class Token(db.Model):
 
 
 
+    @staticmethod
+    def query_token(address=None,symbol=None):
+        exist_instance = None
+
+        if address:
+
+            exist_instance = Token.query.filter(Token.address==address).first()
+
+
+        if symbol:
+            exist_instance = Token.query.filter(Token.symbol == symbol).first()
+
+
+        return exist_instance
+
+
+    def toJson(self):
+        return {
+            "tokenAddress":self.address,
+            "tokenName":self.name,
+            "tokenSynbol":self.symbol,
+            "tokenDecimal":self.decimal if self.decimal else 0,
+            "tokenIcon":self.icon,
+            "tokenType":self.token_type
+
+            }
 
 
 

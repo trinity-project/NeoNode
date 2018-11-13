@@ -1,6 +1,7 @@
 import json
 import random
 import time
+from collections import deque
 
 import gevent
 import requests
@@ -9,7 +10,7 @@ from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX
     createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
-    get_claimable_from_neoscan, get_unclaimed_from_neoscan
+    get_claimable_from_neoscan, get_unclaimed_from_neoscan, get_tokenholding_from_neoscan
 from app.model import  InvokeTx, ContractTx, Vout, ClaimTx,Token
 from decimal import Decimal
 
