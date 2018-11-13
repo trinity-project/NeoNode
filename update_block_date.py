@@ -34,7 +34,7 @@ def getblock(index,retry_num=3):
 
 
 
-bookmark_for_block=1000000
+bookmark_for_block=1433810
 
 
 
