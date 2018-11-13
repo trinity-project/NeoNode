@@ -101,6 +101,7 @@ while True:
 
                             token_info = get_token_info(contract)
                             if token_info:
+                                logger.info("store token {}".format(contract))
                                 Token.save(contract, token_info[0], token_info[1], token_info[2],
                                            "NEP-5", "NEO",
                                            "https://appserver.trinity.ink/static/icon/{}.png".format(token_info[1]))
