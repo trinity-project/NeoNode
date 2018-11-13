@@ -1,14 +1,10 @@
-import json
 import random
 import time
-import binascii
 import requests
-from decimal import Decimal
-from neocore.Cryptography.Crypto import Crypto
-from neocore.UInt160 import UInt160
+
 
 from config import setting
-from data_model.model import Tx, LocalBlockCout, BlockHeight, Token ,logger
+from data_model.token_model import Tx, LocalBlockCout, BlockHeight, Token ,logger
 
 
 
