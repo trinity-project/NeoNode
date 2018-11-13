@@ -135,7 +135,7 @@ def store_nep5_tx(executions,txid,block_height,block_time):
     finally:
         session.close()
 
-block_interval = 1000
+block_interval = 0
 
 while True:
     bookmark_for_block=BookmarkForBlock.query()
