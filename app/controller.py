@@ -43,17 +43,11 @@ def get_transaction_by_address(address,asset,page=1):
 def get_claim_tx(address,page=1):
     return service.get_claim_tx(address,page)
 
+
+
 @jsonrpc.method("getBalance")
-def get_balance(address,assetId):
-    balance = service.get_balance(address,assetId)
-    if not balance:
-        return 0
-    return balance
-
-
-@jsonrpc.method("getBalance_2")
-def get_balance_2(address,assetIdList):
-    return service.get_balance_2(address,assetIdList)
+def get_balance(address,assetIdList):
+    return service.get_balance(address,assetIdList)
 
 
 @jsonrpc.method("getBlockHeight")
