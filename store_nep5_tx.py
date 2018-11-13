@@ -28,13 +28,16 @@ def hex2address(input):
     return output
 
 def hex2interger(input):
-    tmp_list = []
-    for i in range(0, len(input), 2):
-        tmp_list.append(input[i:i + 2])
-    hex_str = "".join(list(reversed(tmp_list)))
-    output = int(hex_str, 16)
+    try:
+        tmp_list = []
+        for i in range(0, len(input), 2):
+            tmp_list.append(input[i:i + 2])
+        hex_str = "".join(list(reversed(tmp_list)))
+        output = int(hex_str, 16)
 
-    return output
+        return output
+    except:
+        return None
 
 def get_application_log(txid):
 
