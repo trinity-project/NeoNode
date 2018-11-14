@@ -24,7 +24,7 @@ def hex2address(input):
     try:
         output = Crypto.ToAddress(UInt160(data=binascii.unhexlify(bytearray(input.encode("utf8")))))
     except:
-        output = input[:40]
+        output = None
     return output
 
 def hex2interger(input):
@@ -106,8 +106,8 @@ def store_nep5_tx(executions,txid,block_height,block_time):
                 contract = notification["contract"]
                 if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
                     continue
-                address_from = hex2address(notification["state"]["value"][1]["value"]) if notification["state"]["value"][1]["value"] else None
-                address_to = hex2address(notification["state"]["value"][2]["value"]) if notification["state"]["value"][2]["value"] else None
+                address_from = hex2address(notification["state"]["value"][1]["value"])
+                address_to = hex2address(notification["state"]["value"][2]["value"])
                 value = hex2interger(notification["state"]["value"][3]["value"]) if notification["state"]["value"][3]["type"] != "Integer"\
                     else notification["state"]["value"][3]["value"]
                 md5_of_tx = md5_for_invoke_tx(tx_id,address_from,address_to,value,contract)
