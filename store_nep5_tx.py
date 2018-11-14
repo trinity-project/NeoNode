@@ -104,7 +104,10 @@ def store_nep5_tx(executions,txid,block_height,block_time):
         for execution in executions:
             for notification in execution.get("notifications"):
                 contract = notification["contract"]
-                if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
+                try:
+                    if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
+                        continue
+                except:
                     continue
                 address_from = hex2address(notification["state"]["value"][1]["value"])
                 address_to = hex2address(notification["state"]["value"][2]["value"])
