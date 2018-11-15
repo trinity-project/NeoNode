@@ -95,8 +95,8 @@ class Tx(Base):
         try:
             session.commit()
         except Exception as e:
-            logger.error(e)
             session.rollback()
+            raise e
         finally:
             session.close()
 
