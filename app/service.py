@@ -167,8 +167,8 @@ def get_balance(address,assetId):
 
 
         response={
-            "gasBalance":gas_balance,
-            "neoBalance":neo_balance,
+            "gasBalance":float(Decimal(gas_balance)),
+            "neoBalance":int(neo_balance),
             "tncBalance":float(Decimal(int(hex_reverse(value), 16)) / (10**8)) if value else 0
         }
 
