@@ -83,7 +83,6 @@ class InvokeTx(db.Model):
     address_to = db.Column(db.String(40),index=True)
     value = db.Column(db.DECIMAL(17,8))
     vm_state = db.Column(db.String(16))
-    has_pushed=db.Column(db.Boolean,default=False)
     block_timestamp=db.Column(db.Integer)
     block_height=db.Column(db.Integer)
 
