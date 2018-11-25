@@ -2,6 +2,7 @@ import binascii
 
 import requests
 from base58 import b58decode
+from decimal import Decimal
 from neocore.Cryptography.Crypto import Crypto
 from neocore.UInt160 import UInt160
 from neocore.BigInteger import BigInteger
@@ -121,3 +122,7 @@ def get_tokenholding_from_neoscan(address):
         return res.get("balance")
     except Exception as e:
         raise e
+
+def handle_invoke_tx_decimal(tx,decimal):
+    tx["value"] = str(Decimal(tx["value"]) / (10 ** decimal))
+    return tx

@@ -3,14 +3,15 @@ import random
 import time
 from collections import deque
 
+import gevent
 import requests
 
 from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, \
     createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
-    get_claimable_from_neoscan, get_unclaimed_from_neoscan, get_tokenholding_from_neoscan
-from app.model import Balance, InvokeTx, ContractTx, Vout,Token
+    get_claimable_from_neoscan, get_unclaimed_from_neoscan, get_tokenholding_from_neoscan, handle_invoke_tx_decimal
+from app.model import  InvokeTx, ContractTx, Vout, ClaimTx,Token
 from decimal import Decimal
 
 from sqlalchemy import or_
@@ -41,6 +42,8 @@ def send_raw_tx(rawTx):
     }
     try:
         url = random.choice(setting.NEOCLIURL)
+        runserver_logger.exception(url)
+        runserver_logger.exception(rawTx)
         res = requests.post(url,json=data).json()
         if res["result"]:
             return True
@@ -48,23 +51,6 @@ def send_raw_tx(rawTx):
     except Exception as e:
         runserver_logger.exception(e)
         return False
-
-
-def getapplicationlog(txid):
-    data = {
-        "jsonrpc": "2.0",
-        "method": "getapplicationlog",
-        "params": [txid],
-        "id": 1
-    }
-
-    try:
-        res = requests.post(random.choice(setting.NEO_RPC_APPLICATION_LOG), json=data).json()
-        if res.get("result"):
-            return res.get("result")
-    except Exception as e:
-        runserver_logger.error(e)
-
 
 def sign(txData,privtKey):
     signature = privtkey_sign(txData,privtKey)
@@ -117,18 +103,72 @@ def _get_nep5_balance(address,assetId):
 
     return value
 
+
+def _get_global_asset(address):
+    data = {
+        "jsonrpc": "2.0",
+        "method": "getaccountstate",
+        "params": [address],
+        "id": 1
+    }
+    try:
+        res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
+        balances = res["result"]["balances"]
+    except:
+        balances = None
+
+    return balances
+
+
+def _get_balance(address,assetId):
+    token=Token.query.filter(Token.address==assetId).first()
+    if not token:
+        balances = _get_global_asset(address)
+        if balances:
+            for balance in balances:
+                if balance.get("asset") == assetId:
+                    return {
+                        "assetId":assetId,
+                        "balance":balance.get("value")
+                    }
+
+        return {
+            "assetId": assetId,
+            "balance": "0"
+        }
+    else:
+        try:
+            res = _get_nep5_balance(address,assetId)
+            value = int(hex_reverse(res),16) if res else 0
+            return {
+                "assetId": assetId,
+                "balance": str(value)
+            }
+        except:
+            return {
+                "assetId": assetId,
+                "balance": "0"
+            }
+
+
 def get_balance(address,assetId):
-    balance=Balance.query.filter_by(address=address).first()
-    neo_balance = int(balance.neo_balance) if balance else 0
-    gas_balance = float(balance.gas_balance) if balance else 0
+    neo_balance = 0
+    gas_balance = 0
+    balances = _get_global_asset(address)
+    if balances:
+        for balance in balances:
+            if balance.get("asset") == setting.NEO_ASSETID:
+                neo_balance = balance.get("value")
+            elif balance.get("asset") == setting.GAS_ASSETID:
+                gas_balance = balance.get("value")
 
     if not assetId:
         value = _get_nep5_balance(address,setting.CONTRACTHASH)
 
 
         response={
-            "gasBalance":gas_balance,
-            "neoBalance":neo_balance,
+            "gasBalance":float(Decimal(gas_balance)),
+            "neoBalance":int(neo_balance),
             "tncBalance":float(Decimal(int(hex_reverse(value), 16)) / (10**8)) if value else 0
         }
 
@@ -146,6 +186,20 @@ def get_balance(address,assetId):
                 return value
             except:
                 return 0
+
+
+def get_balance_2(address,assetIdList):
+    task_list = []
+    for assetId in assetIdList:
+        task_list.append(gevent.spawn(_get_balance, address,assetId))
+
+    task_results = gevent.joinall(task_list)
+
+    return [task_result.value for task_result in task_results]
+
+
+
+
 
 def get_block_height():
     data = {
@@ -182,31 +236,36 @@ def get_transaction_by_address(address,asset,page=1):
         except:
             query_tx = []
 
+        decimal = 0
+
     else:
-    # elif asset==setting.CONTRACTHASH:
         try:
             query_tx = InvokeTx.query.filter(
                 or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
                 InvokeTx.contract == asset
             ).order_by(InvokeTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
-        except:
+        except Exception as e:
+            runserver_logger.error(e)
             query_tx = []
+        if query_tx:
+            exist_instance = Token.query_token(address=asset)
+            if exist_instance:
+                decimal = int(exist_instance.decimal)
 
-    # else:
-    #     query_tx=[]
+            else:
+                decimal = 0
+    txs = [handle_invoke_tx_decimal(item.to_json(),decimal) for item in query_tx]
 
+    return txs
+
+
+def get_claim_tx(address,page):
+
+    query_tx = ClaimTx.query.filter(ClaimTx.address_to == address).\
+        order_by(ClaimTx.block_timestamp.desc()).paginate(page=page, per_page=8).items
 
     return [item.to_json() for item in query_tx]
 
-
-def get_application_log(txid):
-    content = getapplicationlog(txid)
-    if not content:
-        return None
-    if content.get("vmstate") == "HALT, BREAK":
-        return True
-    else:
-        return False
 
 def get_token_info(queryWord):
     length_of_query_word=len(queryWord)

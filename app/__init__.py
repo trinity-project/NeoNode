@@ -14,7 +14,7 @@ cors = CORS(app, support_credentials=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                                                                 setting.MYSQLDATABASE["passwd"],
                                                                 setting.MYSQLDATABASE["host"],
-                                                                setting.MYSQLDATABASE["db_account_info"])
+                                                                setting.MYSQLDATABASE["db_neo_table"])
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=True
 db = SQLAlchemy(app)
 jsonrpc = JSONRPC(app, "/")

@@ -39,9 +39,9 @@ def get_transaction(txid):
 def get_transaction_by_address(address,asset,page=1):
     return service.get_transaction_by_address(address,asset,page)
 
-@jsonrpc.method("getApplicationLog")
-def get_application_log(txid):
-    return service.get_application_log(txid)
+@jsonrpc.method("getClaimTx")
+def get_claim_tx(address,page=1):
+    return service.get_claim_tx(address,page)
 
 @jsonrpc.method("getTokenInfo")
 def get_token_info(queryWord):
@@ -54,6 +54,10 @@ def get_token_holding(address):
 @jsonrpc.method("getBalance")
 def get_balance(address,assetId=None):
     return service.get_balance(address,assetId)
+
+@jsonrpc.method("getBalance_2")
+def get_balance_2(address,assetIdList):
+    return service.get_balance_2(address,assetIdList)
 
 
 @jsonrpc.method("getBlockHeight")

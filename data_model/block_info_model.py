@@ -30,7 +30,7 @@ engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                                                setting.MYSQLDATABASE["passwd"],
                                                setting.MYSQLDATABASE["host"],
                                                setting.MYSQLDATABASE["db_block_info"]),
-                       pool_recycle=3600, pool_size=100)
+                       pool_recycle=3600, pool_size=100,pool_pre_ping=True)
 
 
 Session = sessionmaker(bind=engine)
@@ -38,21 +38,21 @@ Base = declarative_base()
 
 
 
-class LocalBlockCout(Base):
-    __tablename__ = 'local_block_count'
+class BookmarkForBlock(Base):
+    __tablename__ = 'bookmark_for_block'
     id = Column(Integer, primary_key=True)
     height = Column(Integer)
 
     @staticmethod
     def query():
         session=Session()
-        exist_instance=session.query(LocalBlockCout).first()
+        exist_instance=session.query(BookmarkForBlock).first()
         session.close()
         return exist_instance
     @staticmethod
     def save(height):
         session=Session()
-        new_instance = LocalBlockCout(height=height)
+        new_instance = BookmarkForBlock(height=height)
         session.add(new_instance)
         try:
             session.commit()
@@ -95,12 +95,10 @@ class Tx(Base):
         try:
             session.commit()
         except Exception as e:
-            logger.error(e)
             session.rollback()
+            raise e
         finally:
             session.close()
 
 
 Base.metadata.create_all(engine)
-
-

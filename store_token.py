@@ -1,31 +1,32 @@
-import json
 import random
 import time
-import binascii
 import requests
-from decimal import Decimal
-from neocore.Cryptography.Crypto import Crypto
-from neocore.UInt160 import UInt160
+
 
 from config import setting
-from data_model.model import Tx, LocalBlockCout, BlockHeight, Token ,logger
+from data_model.token_model import Tx, BookmarkForToken, BookmarkForBlock, Token ,logger
 
 
 
 def get_application_log(txid):
-    data = {
-        "jsonrpc": "2.0",
-        "method": "getapplicationlog",
-        "params": [txid],
-        "id": 1
-    }
 
-    try:
-        res = requests.post(random.choice(setting.NEO_RPC_APPLICATION_LOG), json=data).json()
-        if res.get("result"):
-            return res.get("result")
-    except Exception as e:
-        logger.error(e)
+    data = {
+          "jsonrpc": "2.0",
+          "method": "getapplicationlog",
+          "params": [txid],
+          "id": 1
+}
+
+    while True:
+        try:
+            res = requests.post(random.choice(setting.NEO_RPC_APPLICATION_LOG),json=data).json()
+            if res.get("result"):
+                return res.get("result")
+            else:
+                logger.error("txid:{} get application log is null".format(txid))
+        except Exception as e:
+            logger.error(e)
+            time.sleep(10)
 
 
 
@@ -61,56 +62,61 @@ class TRANSACTION_TYPE(object):
     INVOKECONTRACT = "InvocationTransaction"
 
 
-localBlockCount = LocalBlockCout.query()
-if localBlockCount:
+bookmarkForToken = BookmarkForToken.query()
+if bookmarkForToken:
 
-    local_block_count = localBlockCount.height
+    bookmark_for_token = bookmarkForToken.height
 else:
-    local_block_count = 0
-    localBlockCount = LocalBlockCout.save(local_block_count)
+    bookmark_for_token = 0
+    bookmarkForToken = BookmarkForToken.save(bookmark_for_token)
 while True:
-    logger.info(local_block_count)
-    block_h = BlockHeight.query()
-    if not block_h:
+    logger.info(bookmark_for_token)
+    bookmark_for_block = BookmarkForBlock.query()
+    if not bookmark_for_block:
         continue
-    if local_block_count <= block_h.height - 1:
-        exist_instance = Tx.query(local_block_count)
+    if bookmark_for_token < bookmark_for_block.height:
+        exist_instance = Tx.query(bookmark_for_token)
         if exist_instance:
             for tx in exist_instance:
                 tx_id = tx.tx_id
                 tx_type = tx.tx_type
 
-                # store nep5 tx
                 if tx_type != TRANSACTION_TYPE.INVOKECONTRACT:
                     continue
 
                 content = get_application_log(tx_id)
-                if not content:
+
+                if not content.get("executions"):
                     continue
-                if not content.get("notifications"):
-                    continue
-                for notification in content["notifications"]:
-                    contract = notification["contract"]
-                    try:
-                        if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
-                            continue
 
-                        if Token.query_token(contract):
-                            continue
+                for execution in content.get("executions"):
+                    for notification in execution.get("notifications"):
+                        contract = notification["contract"]
+                        try:
+                            if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
+                                continue
 
-                        token_info = get_token_info(contract)
-                        if token_info:
+                            if Token.query_token(contract):
+                                continue
 
-                            Token.save(contract,token_info[0],token_info[1],token_info[2],
-                                       "NEP-5","NEO","https://appserver.trinity.ink/static/icon/{}.png".format(token_info[1]))
+                            token_info = get_token_info(contract)
+                            if token_info:
+                                logger.info("store token {}".format(contract))
+                                Token.save(contract, token_info[0], token_info[1], token_info[2],
+                                           "NEP-5", "NEO",
+                                           "https://appserver.trinity.ink/static/icon/{}.png".format(token_info[1]))
 
-                    except Exception as e:
-                        logger.info(notification)
-                        logger.error("contract address:{},error{}".format(contract,e))
+                        except Exception as e:
+                            logger.info(notification)
+                            logger.error("contract address:{},error{}".format(contract, e))
 
-        local_block_count += 1
-        localBlockCount.height = local_block_count
-        LocalBlockCout.update(localBlockCount)
+
+
+
+
+        bookmark_for_token += 1
+        bookmarkForToken.height = bookmark_for_token
+        BookmarkForToken.update(bookmarkForToken)
 
 
 

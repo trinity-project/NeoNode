@@ -22,6 +22,7 @@ NEO_RPC_APPLICATION_LOG_POOL=[
     # "http://seed7.ngd.network:10332",
     # "http://seed6.ngd.network:10332"
     # "http://47.254.64.251:10332",
+    # "http://seed6.ngd.network:10332",
     # "http://172.20.151.244:10332",
     "http://127.0.0.1:10332"
 ]
@@ -37,8 +38,8 @@ class SettingHolder(object):
         "user": ENVIRON.get("DATABASE_USERNAME"),
         "passwd": ENVIRON.get("DATABASE_PASSWORD"),
         "db_block_info": "block_info",
-        "db_account_info": "account_info",
-    }
+        "db_neo_table": "neo_table",
+}
 
     def setup_mainnet(self):
         self.CONTRACTHASH="0x08e8c4400f1af2c20c28e0018f29535eb85d15b6"
