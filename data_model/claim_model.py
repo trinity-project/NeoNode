@@ -20,14 +20,14 @@ block_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE[
                                                setting.MYSQLDATABASE["passwd"],
                                                setting.MYSQLDATABASE["host"],
                                                setting.MYSQLDATABASE["db_block_info"]),
-                                  pool_recycle=3600,pool_size=100)
+                                  pool_recycle=3600,pool_size=100,pool_pre_ping=True)
 
 neo_table_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                                                setting.MYSQLDATABASE["passwd"],
                                                setting.MYSQLDATABASE["host"],
                                                setting.MYSQLDATABASE["db_neo_table"]
                                                             ),
-                                   pool_recycle=3600,pool_size=100)
+                                   pool_recycle=3600,pool_size=100,pool_pre_ping=True)
 
 
 
