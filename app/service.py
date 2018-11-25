@@ -236,6 +236,8 @@ def get_transaction_by_address(address,asset,page=1):
         except:
             query_tx = []
 
+        decimal = 0
+
     else:
         try:
             query_tx = InvokeTx.query.filter(
@@ -245,12 +247,14 @@ def get_transaction_by_address(address,asset,page=1):
         except Exception as e:
             runserver_logger.error(e)
             query_tx = []
+        if query_tx:
+            exist_instance = Token.query_token(address=asset)
+            if exist_instance:
+                decimal = int(exist_instance.decimal)
 
-    # else:
-    #     query_tx=[]
 
 
-    return [item.to_json() for item in query_tx]
+    return list(map(lambda x:str(Decimal(x["value"])/(10**decimal)),[item.to_json() for item in query_tx]))
 
 
 def get_claim_tx(address,page):

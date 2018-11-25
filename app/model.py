@@ -46,7 +46,7 @@ class Token(db.Model):
             "tokenAddress":self.address,
             "tokenName":self.name,
             "tokenSynbol":self.symbol,
-            "tokenDecimal":self.decimal if self.decimal else 0,
+            "tokenDecimal":self.decimal if self.decimal else "0",
             "tokenIcon":self.icon,
             "tokenType":self.token_type
 
