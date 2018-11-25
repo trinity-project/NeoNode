@@ -10,7 +10,7 @@ from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX
     createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
-    get_claimable_from_neoscan, get_unclaimed_from_neoscan, get_tokenholding_from_neoscan
+    get_claimable_from_neoscan, get_unclaimed_from_neoscan, get_tokenholding_from_neoscan, handle_invoke_tx_decimal
 from app.model import  InvokeTx, ContractTx, Vout, ClaimTx,Token
 from decimal import Decimal
 
@@ -252,9 +252,11 @@ def get_transaction_by_address(address,asset,page=1):
             if exist_instance:
                 decimal = int(exist_instance.decimal)
 
+            else:
+                decimal = 0
+    txs = [handle_invoke_tx_decimal(item.to_json(),decimal) for item in query_tx]
 
-
-    return list(map(lambda x:str(Decimal(x["value"])/(10**decimal)),[item.to_json() for item in query_tx]))
+    return txs
 
 
 def get_claim_tx(address,page):
