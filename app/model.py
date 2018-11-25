@@ -119,7 +119,7 @@ class ContractTx(db.Model):
             "asset":self.asset,
             "addressFrom":self.address_from,
             "addressTo":self.address_to,
-            "value":str(float(self.value)),
+            "value":self.value,
             "blockTime":self.block_timestamp,
             "blockNumber":self.block_height
         }
