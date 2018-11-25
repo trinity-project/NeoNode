@@ -237,13 +237,13 @@ def get_transaction_by_address(address,asset,page=1):
             query_tx = []
 
     else:
-    # elif asset==setting.CONTRACTHASH:
         try:
             query_tx = InvokeTx.query.filter(
                 or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
                 InvokeTx.contract == asset
             ).order_by(InvokeTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
-        except:
+        except Exception as e:
+            runserver_logger.error(e)
             query_tx = []
 
     # else:
