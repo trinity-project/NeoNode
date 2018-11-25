@@ -150,7 +150,45 @@ def _get_balance(address,assetId):
                 "balance": "0"
             }
 
-def get_balance(address,assetIdList):
+
+def get_balance(address,assetId):
+    neo_balance = 0
+    gas_balance = 0
+    balances = _get_global_asset(address)
+    if balances:
+        for balance in balances:
+            if balance.get("asset") == setting.NEO_ASSETID:
+                neo_balance = balance.get("value")
+            elif balance.get("asset") == setting.GAS_ASSETID:
+                gas_balance = balance.get("value")
+
+    if not assetId:
+        value = _get_nep5_balance(address,setting.CONTRACTHASH)
+
+
+        response={
+            "gasBalance":gas_balance,
+            "neoBalance":neo_balance,
+            "tncBalance":float(Decimal(int(hex_reverse(value), 16)) / (10**8)) if value else 0
+        }
+
+        return response
+
+    else:
+        if assetId ==setting.NEO_ASSETID:
+            return neo_balance
+        elif assetId == setting.GAS_ASSETID:
+            return gas_balance*(10**8)
+        else:
+            try:
+                res = _get_nep5_balance(address,assetId)
+                value = float(Decimal(int(hex_reverse(res), 16))) if res else 0
+                return value
+            except:
+                return 0
+
+
+def get_balance_2(address,assetIdList):
     task_list = []
     for assetId in assetIdList:
         task_list.append(gevent.spawn(_get_balance, address,assetId))

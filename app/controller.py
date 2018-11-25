@@ -51,10 +51,13 @@ def get_token_info(queryWord):
 def get_token_holding(address):
     return service.get_token_holding(address)
 
-
 @jsonrpc.method("getBalance")
-def get_balance(address,assetIdList):
-    return service.get_balance(address,assetIdList)
+def get_balance(address,assetId=None):
+    return service.get_balance(address,assetId)
+
+@jsonrpc.method("getBalance_2")
+def get_balance_2(address,assetIdList):
+    return service.get_balance_2(address,assetIdList)
 
 
 @jsonrpc.method("getBlockHeight")
