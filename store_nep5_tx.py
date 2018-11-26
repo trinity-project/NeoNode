@@ -11,6 +11,7 @@ from neocore.UInt160 import UInt160
 
 from config import setting
 from data_model.nep5_model import Tx, InvokeTx, BookmarkForBlock, BookmarkForNep5, logger, NeoTableSession
+from plugin.redis_client import redis_client
 
 
 def hex_reverse(input):

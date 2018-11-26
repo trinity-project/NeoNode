@@ -9,3 +9,4 @@ log/
 *.out
 *.log
 *.sh
+test.py

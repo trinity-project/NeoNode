@@ -50,8 +50,9 @@ class SettingHolder(object):
         self.REMOTE_ADDR=ENVIRON.get("REMOTE_ADDR")
         self.FUNDING_ADDRESS="AQvEy2G42YfNhA69A9hiDoR6k3RUYA4H6x"
 
-        self.REDIS_IP="47.254.64.251"
+        self.REDIS_IP="appserver.trinity.ink"
         self.REDIS_PORT=6379
+        self.REDIS_PASSWORD = ENVIRON.get("REDIS_PASSWORD")
 
         self.NEO_SCAN_API = "https://api.neoscan.io/api/main_net/v1"
 
