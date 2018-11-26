@@ -11,7 +11,7 @@ from neocore.UInt160 import UInt160
 
 from config import setting
 from data_model.nep5_model import Tx, InvokeTx, BookmarkForBlock, BookmarkForNep5, logger, NeoTableSession
-from plugin.redis_client import redis_client
+# from plugin.redis_client import redis_client
 
 
 def hex_reverse(input):
@@ -69,14 +69,14 @@ def md5_for_invoke_tx(tx_id,address_from,address_to,value,contract):
     return m1.hexdigest()
 
 
-def push_event(to_push_message):
-    while True:
-        try:
-            redis_client.publish("monitor", json.dumps( to_push_message))
-            return True
-        except Exception as e:
-            logger.error("connect redis fail lead to push fail:{}".format(to_push_message))
-            time.sleep(3)
+# def push_event(to_push_message):
+#     while True:
+#         try:
+#             redis_client.publish("monitor", json.dumps( to_push_message))
+#             return True
+#         except Exception as e:
+#             logger.error("connect redis fail lead to push fail:{}".format(to_push_message))
+#             time.sleep(3)
 
 
 class TRANSACTION_TYPE(object):
