@@ -45,7 +45,7 @@ def send_raw_tx(rawTx):
         runserver_logger.exception(url)
         runserver_logger.exception(rawTx)
         res = requests.post(url,json=data).json()
-        if res["result"]:
+        if res.get("result"):
             return True
         return False
     except Exception as e:
