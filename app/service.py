@@ -47,7 +47,7 @@ def send_raw_tx(rawTx):
             return True
         return False
     except Exception as e:
-        runserver_logger.exception(e)
+        runserver_logger.error(e)
         return False
 
 def sign(txData,privtKey):
