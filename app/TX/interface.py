@@ -754,12 +754,12 @@ def _get_inputs(address,assetId,value):
 
         for item in vouts:
             if float(item.value) >= value:
-                input =_createInput(preHash=item.tx_id,preIndex=item.vout_number)
+                input =_createInput(preHash=item.tx_id,preIndex=int(item.vout_number))
                 inputs.append(input)
                 inputs_total+=float(item.value)
                 return inputs,inputs_total
             else:
-                input =_createInput(preHash=item.tx_id,preIndex=item.vout_number)
+                input =_createInput(preHash=item.tx_id,preIndex=int(item.vout_number))
                 inputs.append(input)
                 inputs_total+=float(item.value)
                 if inputs_total>=value:

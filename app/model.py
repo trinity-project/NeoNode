@@ -65,8 +65,7 @@ class Vout(db.Model):
     address = db.Column(db.String(40))
     asset_id = db.Column(db.String(66))
     vout_number = db.Column(db.SmallInteger)
-    value = db.Column(db.DECIMAL(17,8))
-
+    value = db.Column(db.String(30))
 
 
 
