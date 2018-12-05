@@ -3,7 +3,8 @@ import requests
 from project_log import setup_mylogger
 
 NEOSCAN_GETBLOCKHEIGHT_URL = "https://api.neoscan.io/api/main_net/v1/get_height"
-LOCAL_NEONODE_URL = "http://127.0.0.1:10332"
+# LOCAL_NEONODE_URL = "http://127.0.0.1:10332"
+LOCAL_NEONODE_URL = "http://47.254.43.76:10332"
 
 logger = setup_mylogger(logfile="log/watch_neo_node.log")
 
