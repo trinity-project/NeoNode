@@ -287,8 +287,8 @@ def get_token_holding(address):
         if query_res:
             tmp_dict = query_res.toJson()
             tmp_dict["balance"] = int(holding.get("amount")*(10** int(tmp_dict["tokenDecimal"])))
-            if tmp_dict["balance"] == 0:
-                continue
+            # if tmp_dict["balance"] == 0:
+            #     continue
             if tmp_dict.get("tokenIcon"):
                 res.appendleft(tmp_dict)
             else:
