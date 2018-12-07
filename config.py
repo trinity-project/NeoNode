@@ -3,6 +3,7 @@ import os
 
 ENVIRON=os.environ
 
+
 NEO_RPC_POOL=[
     # "http://api.otcgo.cn:10332",
     # "http://seed10.ngd.network:10332",
@@ -12,10 +13,9 @@ NEO_RPC_POOL=[
     # "http://seed6.ngd.network:10332",
     # "http://47.254.64.251:10332"
     # "http://172.20.151.244:10332",
-    # "http://127.0.0.1:10332",
-    "http://47.254.43.76:10332"
+    "http://127.0.0.1:10332"
+    # "http://47.254.43.76:10332"
 ]
-
 NEO_RPC_APPLICATION_LOG_POOL=[
     # "http://seed10.ngd.network:10332",
     # "http://seed9.ngd.network:10332",
@@ -25,8 +25,8 @@ NEO_RPC_APPLICATION_LOG_POOL=[
     # "http://47.254.64.251:10332",
     # "http://seed6.ngd.network:10332",
     # "http://172.20.151.244:10332",
-    # "http://127.0.0.1:10332",
-    "http://47.254.43.76:10332"
+    "http://127.0.0.1:10332"
+    # "http://47.254.43.76:10332"
 ]
 
 
