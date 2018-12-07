@@ -15,7 +15,7 @@ from app import db
 class Token(db.Model):
     __tablename__ = 'token'
     id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(42),unique=True)
+    address = db.Column(db.String(66),unique=True)
     name = db.Column(db.String(32),index=True)
     symbol = db.Column(db.String(8),index=True)
     decimal = db.Column(db.String(2))

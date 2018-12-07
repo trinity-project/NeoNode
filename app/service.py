@@ -294,6 +294,18 @@ def get_token_holding(address):
             else:
                 res.append(tmp_dict)
 
+    balances = _get_global_asset(address)
+    if balances:
+        for balance in balances:
+            if balance.get("asset") == setting.NEO_ASSETID:
+                res.appendleft(dict(balance=str(balance),tokenAddress=balance.get("asset"),
+                                    tokenDecimal="0",tokenIcon=None,tokenName="NEO",
+                                    tokenSymbol="NEO",tokenType="NEO"))
+
+            if balance.get("asset") == setting.GAS_ASSETID:
+                res.appendleft(dict(balance=str(Decimal(balance)*(10**8)),tokenAddress=balance.get("asset"),
+                                    tokenDecimal="8",tokenIcon=None,tokenName="GAS",
+                                    tokenSymbol="GAS",tokenType="NEO"))
     return list(res)
 
 
