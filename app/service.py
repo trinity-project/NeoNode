@@ -196,7 +196,20 @@ def get_balance_2(address,assetIdList):
     return [task_result.value for task_result in task_results]
 
 
-
+def get_application_log(txid):
+    data = {
+        "jsonrpc": "2.0",
+        "method": "getapplicationlog",
+        "params": [txid],
+        "id": 1
+    }
+    res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
+    try:
+        vmstate = res["result"]["executions"][0].get("vmstate")
+        vmstate = True if vmstate == "HALT, BREAK" else False
+        return vmstate
+    except:
+        return None
 
 
 def get_block_height():
