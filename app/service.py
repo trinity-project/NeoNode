@@ -313,12 +313,12 @@ def get_token_holding(address):
             if balance.get("asset") == setting.NEO_ASSETID:
                 res.appendleft(dict(balance=balance.get("value"),tokenAddress=balance.get("asset"),
                                     tokenDecimal="0",tokenIcon=None,tokenName="NEO",
-                                    tokenSymbol="NEO",tokenType="NEO"))
+                                    tokenSynbol="NEO",tokenType="NEO"))
 
             if balance.get("asset") == setting.GAS_ASSETID:
                 res.appendleft(dict(balance=str(Decimal(balance.get("value"))*(10**8)),tokenAddress=balance.get("asset"),
                                     tokenDecimal="8",tokenIcon=None,tokenName="GAS",
-                                    tokenSymbol="GAS",tokenType="NEO"))
+                                    tokenSynbol="GAS",tokenType="NEO"))
     return list(res)
 
 
