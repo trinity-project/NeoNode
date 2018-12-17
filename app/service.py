@@ -33,7 +33,23 @@ def construct_raw_tx(txData,signature,publicKey):
 
 
 
+def async_send_raw_tx(rawTx):
+    try:
+        verify_res = recover_and_verify_tx(rawTx).get("verify")
+    except:
+        verify_res = False
+    if verify_res:
+        import threading
+        t = threading.Thread(target=send_raw_tx, args=(rawTx,))  # 创建线程
+        t.setDaemon(True)  # 设置为后台线程，这里默认是False，设置为True之后则主线程不用等待子线程
+        t.start()  # 开启线程
+        return True
+    else:
+        return False
+
+
 def send_raw_tx(rawTx):
+
     data = {
         "jsonrpc": "2.0",
         "method": "sendrawtransaction",
@@ -49,6 +65,7 @@ def send_raw_tx(rawTx):
     except Exception as e:
         runserver_logger.error(e)
         return False
+
 
 def sign(txData,privtKey):
     signature = privtkey_sign(txData,privtKey)
