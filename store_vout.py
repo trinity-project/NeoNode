@@ -93,8 +93,8 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
                     for address_to, amount in address_mapping_to.items():
                         address_to = address_to
                         amount = amount
-                        if address_from != address_to:
-                            ContractTx.save(session,tx_id,asset_type_to,address_from,address_to,amount,block_time,block_height)
+                        # if address_from != address_to:
+                        ContractTx.save(session,tx_id,asset_type_to,address_from,address_to,amount,block_time,block_height)
 
 
 
