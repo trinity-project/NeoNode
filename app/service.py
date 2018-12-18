@@ -340,7 +340,7 @@ def get_token_holding(address):
         res.appendleft(dict(balance="0", tokenAddress="0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
                             tokenDecimal="0", tokenIcon=None, tokenName="NEO",
                             tokenSynbol="NEO", tokenType="NEO"))
-        res.appendleft(dict(balance="0", tokenAddress="0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+        res.appendleft(dict(balance="0", tokenAddress="0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
                             tokenDecimal="8", tokenIcon=None, tokenName="GAS",
                             tokenSynbol="GAS", tokenType="NEO"))
     return list(res)
