@@ -1,16 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
-"""
-@author: Maiganne
-
-"""
 
 
 from app import db
-
-
-
-
 
 class Token(db.Model):
     __tablename__ = 'token'
@@ -52,12 +44,6 @@ class Token(db.Model):
 
             }
 
-
-
-
-
-
-
 class Vout(db.Model):
     __tablename__ = 'vout'
     id = db.Column(db.Integer, primary_key=True)
@@ -66,12 +52,6 @@ class Vout(db.Model):
     asset_id = db.Column(db.String(66))
     vout_number = db.Column(db.SmallInteger)
     value = db.Column(db.String(30))
-
-
-
-
-
-
 
 class InvokeTx(db.Model):
     __tablename__ = 'invoke_tx'
@@ -100,7 +80,6 @@ class InvokeTx(db.Model):
             "blockNumber":self.block_height
         }
 
-
 class ContractTx(db.Model):
     __tablename__ = 'contract_tx'
     id = db.Column(db.Integer, primary_key=True)
@@ -123,7 +102,6 @@ class ContractTx(db.Model):
             "blockNumber":self.block_height
         }
 
-
 class ClaimTx(db.Model):
     __tablename__ = 'claim_tx'
     id = db.Column(db.Integer, primary_key=True)
@@ -141,3 +119,16 @@ class ClaimTx(db.Model):
             "value":self.value,
             "blockTime":self.block_timestamp,
         }
+
+class TokenHolding(db.Model):
+    __tablename__ = 'token_holding'
+    id = db.Column(db.Integer, primary_key=True)
+    contract = db.Column(db.String(42))
+    address = db.Column(db.String(40),index=True)
+
+
+    @staticmethod
+    def query_token_holding(address):
+        exist_instance = TokenHolding.query.filter(TokenHolding.address == address).all()
+        return exist_instance
+

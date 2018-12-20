@@ -116,8 +116,6 @@ class TokenHolding(NeoTableBase):
     address = Column(String(40),index=True)
 
 
-
-
     @staticmethod
     def save(contract,address):
         session = NeoTableSession()
