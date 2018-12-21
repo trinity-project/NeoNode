@@ -309,16 +309,56 @@ def get_token_info(queryWord):
         return [query_res.toJson()]
     return []
 
+# def get_token_holding(address):
+#     holding_list = get_tokenholding_from_neoscan(address)
+#     res = deque([])
+#     for holding in holding_list:
+#         query_res = Token.query_token(address="0x"+holding.get("asset_hash"))
+#         if query_res:
+#             tmp_dict = query_res.toJson()
+#             tmp_dict["balance"] = int(holding.get("amount")*(10** int(tmp_dict["tokenDecimal"])))
+#             # if tmp_dict["balance"] == 0:
+#             #     continue
+#             if tmp_dict.get("tokenIcon"):
+#                 res.appendleft(tmp_dict)
+#             else:
+#                 res.append(tmp_dict)
+#
+#     balances = _get_global_asset(address)
+#     for balance in balances:
+#         if balance.get("asset") == setting.NEO_ASSETID:
+#             neo_balance = balance.get("value")
+#
+#         if balance.get("asset") == setting.GAS_ASSETID:
+#             gas_balance = str(Decimal(balance.get("value")) * (10 ** 8))
+#     try:
+#         neo_balance = neo_balance
+#     except:
+#         neo_balance = "0"
+#     try:
+#         gas_balance = gas_balance
+#     except:
+#         gas_balance = "0"
+#
+#     res.appendleft(dict(balance=gas_balance, tokenAddress="0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+#                             tokenDecimal="8", tokenIcon=None, tokenName="GAS",
+#                             tokenSynbol="GAS", tokenType="NEO"))
+#     res.appendleft(dict(balance=neo_balance, tokenAddress="0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+#                             tokenDecimal="0", tokenIcon=None, tokenName="NEO",
+#                             tokenSynbol="NEO", tokenType="NEO"))
+#
+#     return list(res)
+
 def get_token_holding(address):
-    holding_list = get_tokenholding_from_neoscan(address)
+    holding_list = [holding.contract for holding in TokenHolding.query_token_holding(address)]
+    holding_list = get_balance_2(address,holding_list)
     res = deque([])
     for holding in holding_list:
-        query_res = Token.query_token(address="0x"+holding.get("asset_hash"))
+        query_res = Token.query_token(address=holding.get("assetId"))
         if query_res:
             tmp_dict = query_res.toJson()
-            tmp_dict["balance"] = int(holding.get("amount")*(10** int(tmp_dict["tokenDecimal"])))
-            # if tmp_dict["balance"] == 0:
-            #     continue
+            tmp_dict["balance"] = holding.get("balance")
+
             if tmp_dict.get("tokenIcon"):
                 res.appendleft(tmp_dict)
             else:
@@ -346,44 +386,7 @@ def get_token_holding(address):
     res.appendleft(dict(balance=neo_balance, tokenAddress="0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
                             tokenDecimal="0", tokenIcon=None, tokenName="NEO",
                             tokenSynbol="NEO", tokenType="NEO"))
-
     return list(res)
-
-# def get_token_holding(address):
-#     holding_list = [holding.contract for holding in TokenHolding.query_token_holding(address)]
-#     holding_list = get_balance_2(address,holding_list)
-#     res = deque([])
-#     for holding in holding_list:
-#         query_res = Token.query_token(address=holding.get("assetId"))
-#         if query_res:
-#             tmp_dict = query_res.toJson()
-#             tmp_dict["balance"] = holding.get("balance")
-#
-#             if tmp_dict.get("tokenIcon"):
-#                 res.appendleft(tmp_dict)
-#             else:
-#                 res.append(tmp_dict)
-#
-#     balances = _get_global_asset(address)
-#     if balances:
-#         for balance in balances:
-#             if balance.get("asset") == setting.NEO_ASSETID:
-#                 res.appendleft(dict(balance=balance.get("value"),tokenAddress=balance.get("asset"),
-#                                     tokenDecimal="0",tokenIcon=None,tokenName="NEO",
-#                                     tokenSynbol="NEO",tokenType="NEO"))
-#
-#             if balance.get("asset") == setting.GAS_ASSETID:
-#                 res.appendleft(dict(balance=str(Decimal(balance.get("value"))*(10**8)),tokenAddress=balance.get("asset"),
-#                                     tokenDecimal="8",tokenIcon=None,tokenName="GAS",
-#                                             tokenSynbol="GAS",tokenType="NEO"))
-#     else:
-#         res.appendleft(dict(balance="0", tokenAddress="0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
-#                             tokenDecimal="0", tokenIcon=None, tokenName="NEO",
-#                             tokenSynbol="NEO", tokenType="NEO"))
-#         res.appendleft(dict(balance="0", tokenAddress="0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
-#                             tokenDecimal="8", tokenIcon=None, tokenName="GAS",
-#                             tokenSynbol="GAS", tokenType="NEO"))
-#     return list(res)
 
 def faucet(addressFrom,addressTo):
     tx_data=construct_tx(addressFrom=addressFrom,addressTo=addressTo,
