@@ -331,9 +331,14 @@ def get_token_holding(address):
 
         if balance.get("asset") == setting.GAS_ASSETID:
             gas_balance = str(Decimal(balance.get("value")) * (10 ** 8))
-
-    neo_balance = neo_balance if neo_balance else "0"
-    gas_balance = gas_balance if gas_balance else "0"
+    try:
+        neo_balance = neo_balance
+    except:
+        neo_balance = "0"
+    try:
+        gas_balance = gas_balance
+    except:
+        gas_balance = "0"
 
     res.appendleft(dict(balance=neo_balance, tokenAddress="0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
                             tokenDecimal="8", tokenIcon=None, tokenName="GAS",
