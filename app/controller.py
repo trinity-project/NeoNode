@@ -78,6 +78,11 @@ def faucet(addressFrom,addressTo):
 def get_all_vout(address,assetId):
     return service.get_all_vout(address,assetId)
 
+@jsonrpc.method("getVin")
+def get_vin(txId,voutNumber):
+    return service.get_vin(txId,voutNumber)
+
+
 @jsonrpc.method("recoverAndVerifyTx")
 def recover_and_verify_tx(signedTx):
     return service.recover_and_verify_tx(signedTx)

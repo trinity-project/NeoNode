@@ -53,6 +53,15 @@ class Vout(db.Model):
     vout_number = db.Column(db.SmallInteger)
     value = db.Column(db.String(30))
 
+class Vin(db.Model):
+    __tablename__ = 'vin'
+    id = db.Column(db.Integer, primary_key=True)
+    tx_id = db.Column(db.String(66))
+    vout_number = db.Column(db.String(6))
+    address = db.Column(db.String(40))
+    asset_id = db.Column(db.String(66))
+    value = db.Column(db.String(30))
+
 class InvokeTx(db.Model):
     __tablename__ = 'invoke_tx'
     id = db.Column(db.Integer, primary_key=True)

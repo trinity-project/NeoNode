@@ -11,7 +11,7 @@ from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
     get_claimable_from_neoscan, get_unclaimed_from_neoscan, get_tokenholding_from_neoscan, handle_invoke_tx_decimal
-from app.model import InvokeTx, ContractTx, Vout, ClaimTx, Token, TokenHolding
+from app.model import InvokeTx, ContractTx, Vout, ClaimTx, Token, TokenHolding, Vin
 from decimal import Decimal
 
 from sqlalchemy import or_
@@ -454,6 +454,10 @@ def get_all_vout(address,assetid):
         return [(item.tx_id,float(item.value),item.vout_number) for item in items]
 
     return []
+
+
+def get_vin(txId,voutNumber):
+    return Vin.query.filter_by(tx_id=txId,vout_number=voutNumber).first()
 
 
 def recover_and_verify_tx(signedTx):
