@@ -325,24 +325,23 @@ def get_token_holding(address):
                 res.append(tmp_dict)
 
     balances = _get_global_asset(address)
-    if balances:
-        for balance in balances:
-            if balance.get("asset") == setting.NEO_ASSETID:
-                res.appendleft(dict(balance=balance.get("value"),tokenAddress=balance.get("asset"),
-                                    tokenDecimal="0",tokenIcon=None,tokenName="NEO",
-                                    tokenSynbol="NEO",tokenType="NEO"))
+    for balance in balances:
+        if balance.get("asset") == setting.NEO_ASSETID:
+            neo_balance = balance.get("value")
 
-            if balance.get("asset") == setting.GAS_ASSETID:
-                res.appendleft(dict(balance=str(Decimal(balance.get("value"))*(10**8)),tokenAddress=balance.get("asset"),
-                                    tokenDecimal="8",tokenIcon=None,tokenName="GAS",
-                                            tokenSynbol="GAS",tokenType="NEO"))
-    else:
-        res.appendleft(dict(balance="0", tokenAddress="0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
-                            tokenDecimal="0", tokenIcon=None, tokenName="NEO",
-                            tokenSynbol="NEO", tokenType="NEO"))
-        res.appendleft(dict(balance="0", tokenAddress="0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
+        if balance.get("asset") == setting.GAS_ASSETID:
+            gas_balance = str(Decimal(balance.get("value")) * (10 ** 8))
+
+    neo_balance = neo_balance if neo_balance else "0"
+    gas_balance = gas_balance if gas_balance else "0"
+
+    res.appendleft(dict(balance=neo_balance, tokenAddress="0x602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7",
                             tokenDecimal="8", tokenIcon=None, tokenName="GAS",
                             tokenSynbol="GAS", tokenType="NEO"))
+    res.appendleft(dict(balance=gas_balance, tokenAddress="0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b",
+                            tokenDecimal="0", tokenIcon=None, tokenName="NEO",
+                            tokenSynbol="NEO", tokenType="NEO"))
+
     return list(res)
 
 # def get_token_holding(address):

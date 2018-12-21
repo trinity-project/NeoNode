@@ -115,6 +115,9 @@ class TokenHolding(NeoTableBase):
     contract = Column(String(42))
     address = Column(String(40),index=True)
 
+    __table_args__ = (
+        UniqueConstraint('address', 'contract'),
+    )
 
     @staticmethod
     def save(contract,address):
