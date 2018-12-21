@@ -136,8 +136,8 @@ def _get_global_asset(address):
 
 
 def _get_balance(address,assetId):
-    token=Token.query.filter(Token.address==assetId).first()
-    if not token:
+    # token=Token.query.filter(Token.address==assetId).first()
+    if assetId in [setting.GAS_ASSETID,setting.NEO_ASSETID]:
         balances = _get_global_asset(address)
         if balances:
             for balance in balances:

@@ -69,15 +69,6 @@ def md5_for_invoke_tx(tx_id,address_from,address_to,value,contract):
     return m1.hexdigest()
 
 
-# def push_event(to_push_message):
-#     while True:
-#         try:
-#             redis_client.publish("monitor", json.dumps( to_push_message))
-#             return True
-#         except Exception as e:
-#             logger.error("connect redis fail lead to push fail:{}".format(to_push_message))
-#             time.sleep(3)
-
 
 class TRANSACTION_TYPE(object):
     CONTRACT="ContractTransaction"
@@ -123,14 +114,6 @@ def store_nep5_tx(executions,txid,block_height,block_time):
                                   value=str(value), vm_state=execution["vmstate"], block_timestamp=block_time,
                                   block_height=block_height,md5_of_tx=md5_of_tx)
 
-                # push_event({"messageType": "monitorTx", "chainType": "NEO",
-                #             "playload": tx_id, "blockNumber": local_block_count,
-                #             "blockTimeStamp": block_time, "txId": tx_id})
-                #
-                # push_event({"messageType": "monitorAddress", "chainType": "NEO",
-                #             "playload": address_to, "blockNumber": local_block_count,
-                #             "blockTimeStamp": block_time, "addressFrom": address_from,
-                #             "addressTo": address_to, "amount": str(value), "assetId": contract})
         session.commit()
     except sqlalchemy.exc.IntegrityError as e:
         session.rollback()
