@@ -62,6 +62,9 @@ class Vin(db.Model):
     asset_id = db.Column(db.String(66))
     value = db.Column(db.String(30))
 
+    def toJson(self):
+        return dict(address=self.address,assetId=self.asset_id,value=self.value)
+
 class InvokeTx(db.Model):
     __tablename__ = 'invoke_tx'
     id = db.Column(db.Integer, primary_key=True)

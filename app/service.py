@@ -457,7 +457,9 @@ def get_all_vout(address,assetid):
 
 
 def get_vin(txId,voutNumber):
-    return Vin.query.filter_by(tx_id=txId,vout_number=voutNumber).first()
+    exist_instance = Vin.query.filter_by(tx_id=txId,vout_number=voutNumber).first()
+    if exist_instance:
+        return exist_instance.toJson()
 
 
 def recover_and_verify_tx(signedTx):
