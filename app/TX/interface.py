@@ -598,8 +598,8 @@ def createTx(addressFrom,addressTo,value,assetId):
 
 
     if assetId == setting.NEO_ASSETID or assetId == setting.GAS_ASSETID:
-        # if not _check_balance(address=addressFrom,assetId=assetId,value=value):
-        #     raise Exception("no enough balance")
+        if not _check_balance(address=addressFrom,assetId=assetId,value=value):
+            raise Exception("no enough balance")
         time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
                                           data=bytearray.fromhex(hex(int(time.time()))[2:]))
         address_hash = TransactionAttribute(usage=TransactionAttributeUsage.Script,
@@ -696,27 +696,30 @@ def createMultiTx(addressFrom,addressTo,value,assetId):
 
 
 def _check_balance(address,assetId,value):
-    balance = Balance.query.filter_by(address=address).first()
-    if balance:
-        if assetId == setting.GAS_ASSETID :
-            gas=balance.gas_balance
-            if gas < Decimal(str(value)):
-                return False
-            return True
+    balances = _get_global_asset(address)
+    balance = 0
+    if balances:
+        for b in balances:
+            if b.get(assetId):
+                balance = int(b.get(assetId))
+    if balance < int(value):
+        return False
+    return True
+def _get_global_asset(address):
+    data = {
+        "jsonrpc": "2.0",
+        "method": "getaccountstate",
+        "params": [address],
+        "id": 1
+    }
+    try:
+        res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
+        balances = res["result"]["balances"]
+    except:
+        balances = None
 
-        elif assetId == setting.NEO_ASSETID:
-            neo=balance.neo_balance
-            if neo < Decimal(str(value)):
-                return False
-            return True
+    return balances
 
-        elif assetId == setting.CONTRACTHASH:
-            tnc=_get_tnc_balance(address)
-            if tnc < value:
-                return False
-            return True
-
-    return False
 
 def _get_tnc_balance(address):
     data = {
