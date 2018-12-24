@@ -144,7 +144,7 @@ def _get_balance(address,assetId):
                 if balance.get("asset") == assetId:
                     return {
                         "assetId":assetId,
-                        "balance":balance.get("value")
+                        "balance":str(Decimal(balance.get("value"))*(10**8)) if assetId == setting.GAS_ASSETID else balance.get("value")
                     }
 
         return {
