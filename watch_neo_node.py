@@ -1,5 +1,6 @@
 import time
 import requests
+import os
 from project_log import setup_mylogger
 
 NEOSCAN_GETBLOCKHEIGHT_URL = "https://api.neoscan.io/api/main_net/v1/get_height"
@@ -8,6 +9,8 @@ LOCAL_NEONODE_URL = "http://127.0.0.1:10332"
 
 logger = setup_mylogger(logfile="log/watch_neo_node.log")
 
+ENVIRON=os.environ
+NO_REPLY_EMAIL_PAWD = ENVIRON.get("EMAIL_PASSWORD")
 
 def execute_shell_command(command):
     import os
@@ -59,7 +62,7 @@ def send_email(toAddr, local_block_number, infura_block_number):
     msg['Subject'] = Header('notification from WATCH NEO NODE.....')
 
     server = smtplib.SMTP_SSL("smtp.mxhichina.com", 465)  # SMTP协议默认端口是25
-    server.login("no-reply@trinity.tech", "Trinity123456")
+    server.login("no-reply@trinity.tech",NO_REPLY_EMAIL_PAWD )
     server.sendmail("no-reply@trinity.tech", [toAddr], msg.as_string())
     server.quit()
 

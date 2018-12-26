@@ -41,7 +41,8 @@ class SettingHolder(object):
         "passwd": ENVIRON.get("DATABASE_PASSWORD"),
         "db_block_info": "block_info",
         "db_neo_table": "neo_table",
-}
+    }
+
 
     def setup_mainnet(self):
         self.CONTRACTHASH="0x08e8c4400f1af2c20c28e0018f29535eb85d15b6"
