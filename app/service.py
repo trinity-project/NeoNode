@@ -175,7 +175,7 @@ def get_balance(address,assetId):
             if balance.get("asset") == setting.NEO_ASSETID:
                 neo_balance = balance.get("value")
             elif balance.get("asset") == setting.GAS_ASSETID:
-                gas_balance = balance.get("value")
+                gas_balance = str(Decimal(str(balance.get("value")))*(10**8))
 
     if not assetId:
         value = _get_nep5_balance(address,setting.CONTRACTHASH)
