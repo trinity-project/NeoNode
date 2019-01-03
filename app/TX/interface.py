@@ -700,8 +700,8 @@ def _check_balance(address,assetId,value):
     balance = 0
     if balances:
         for b in balances:
-            if b.get(assetId):
-                balance = int(b.get(assetId))
+            if b.get("asset") == assetId:
+                balance = int(b.get("value"))
     if balance < int(value):
         return False
     return True
