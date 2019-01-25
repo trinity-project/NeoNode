@@ -94,9 +94,10 @@ class Tx(Base):
         session.add(new_instance)
         try:
             session.commit()
+
         except Exception as e:
             session.rollback()
-            raise e
+            # raise e
         finally:
             session.close()
 
