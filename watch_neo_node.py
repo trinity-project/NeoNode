@@ -4,8 +4,8 @@ import os
 from project_log import setup_mylogger
 
 NEOSCAN_GETBLOCKHEIGHT_URL = "https://api.neoscan.io/api/main_net/v1/get_height"
-LOCAL_NEONODE_URL = "http://127.0.0.1:10332"
-# LOCAL_NEONODE_URL = "http://47.254.43.76:10332"
+# LOCAL_NEONODE_URL = "http://127.0.0.1:10332"
+LOCAL_NEONODE_URL = "http://seed3.ngd.network:10332"
 
 logger = setup_mylogger(logfile="log/watch_neo_node.log")
 
@@ -49,9 +49,9 @@ def send_email(toAddr, local_block_number, infura_block_number):
         <body>
         <div id='preview-contents' class='note-content'>
 
-        <h3 >title: restart eth node </h3>
+        <h3 >title: restart neo node </h3>
 
-        <p>local block number: {},infura block number:{}</p>
+        <p>local block number: {},neoscan block number:{}</p>
 
         </div>
         </body>
@@ -74,8 +74,8 @@ def compare_block_number():
             local_block_number = request_block_height_from_local(LOCAL_NEONODE_URL)
             logger.info("local_block_number:{},neoscan_block_number:{}".format(local_block_number, neoscan_block_number))
             if neoscan_block_number - local_block_number >= 20:
-                execute_shell_command("supervisorctl restart NeoNode:dotnet")
-                logger.warning("restart neo-cli")
+                # execute_shell_command("supervisorctl restart NeoNode:dotnet")
+                # logger.warning("restart neo-cli")
                 send_email("m17379352738@163.com", local_block_number, neoscan_block_number)
                 time.sleep(10* 60)
         except:
