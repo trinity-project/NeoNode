@@ -39,7 +39,7 @@ class Token(db.Model):
             "tokenName":self.name,
             "tokenSynbol":self.symbol,
             "tokenDecimal":self.decimal if self.decimal else "0",
-            "tokenIcon":self.icon,
+            "tokenIcon":self.icon or "http://appserver.zjrs.ltd/NEO.png",
             "tokenType":self.token_type
 
             }
