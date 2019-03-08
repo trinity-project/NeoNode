@@ -107,10 +107,10 @@ class Token(NeoTableBase):
 
 
     @staticmethod
-    def save(address,name,symbol,decimal,tokenType,chainType,icon):
+    def save(address,name,symbol,decimal,tokenType,chainType):
         session = NeoTableSession()
         new_instance = Token(address=address, name=name,symbol=symbol,decimal=decimal,
-                             token_type = tokenType,chain_type=chainType,icon=icon)
+                             token_type = tokenType,chain_type=chainType)
         session.add(new_instance)
         try:
             session.commit()
