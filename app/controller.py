@@ -23,7 +23,7 @@ def sign(txData,privtKey):
 
 @jsonrpc.method("sendRawTx")
 def send_raw_tx(rawTx):
-    return service.async_send_raw_tx(rawTx)
+    return service.send_raw_tx(rawTx)
 
 
 @jsonrpc.method("signAndBroadcast")
