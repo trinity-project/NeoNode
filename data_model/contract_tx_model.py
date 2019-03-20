@@ -157,7 +157,7 @@ class ContractTxDetail(NeoTableBase):
 
     @staticmethod
     def save(session,tx_id,inputs,outputs,block_timestamp,block_height):
-        new_instance = ContractTx(tx_id=tx_id,
+        new_instance = ContractTxDetail(tx_id=tx_id,
                                 inputs=inputs,
                                 outputs=outputs,
                                 block_timestamp=block_timestamp,block_height=block_height
