@@ -161,8 +161,8 @@ class ContractTxDetail(db.Model):
     __tablename__ = 'contract_tx_detail'
     id = db.Column(db.Integer, primary_key=True)
     tx_id = db.Column(db.String(66),unique=True)
-    inputs = db.Column(db.LONGTEXT)
-    outputs = db.Column(db.LONGTEXT)
+    inputs = db.Column(db.Text)
+    outputs = db.Column(db.Text)
     block_timestamp = db.Column(db.Integer)
     block_height = db.Column(db.Integer)
 
