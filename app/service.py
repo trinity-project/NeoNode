@@ -11,7 +11,7 @@ from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
     get_claimable_from_neoscan, get_unclaimed_from_neoscan, get_tokenholding_from_neoscan, handle_invoke_tx_decimal
-from app.model import InvokeTx, ContractTx, Vout, ClaimTx, Token, TokenHolding, Vin
+from app.model import InvokeTx, ContractTx, Vout, ClaimTx, Token, TokenHolding, Vin, ContractTxMapping, ContractTxDetail
 from decimal import Decimal
 
 from sqlalchemy import or_
@@ -283,6 +283,45 @@ def get_transaction_by_address(address,asset,page=1):
             else:
                 decimal = 0
     txs = [handle_invoke_tx_decimal(item.to_json(),decimal) for item in query_tx]
+
+    return txs
+
+
+def get_transaction_by_address_new(address,asset,page=1):
+    query_tx = []
+    if asset==setting.NEO_ASSETID or asset==setting.GAS_ASSETID:
+        try:
+            query_tx_ids=ContractTxMapping.query.filter(
+                ContractTxMapping.address ==address
+                ).paginate(page=page,per_page=8).items
+
+        except:
+            query_tx_ids = []
+
+        decimal = 0
+
+        for tx in query_tx_ids:
+            exist_instance = ContractTxDetail.query.filter(ContractTxDetail.tx_id == tx.tx_id).first()
+            if exist_instance:
+                query_tx.append(exist_instance)
+
+    else:
+        try:
+            query_tx = InvokeTx.query.filter(
+                or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
+                InvokeTx.contract == asset
+            ).order_by(InvokeTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
+        except Exception as e:
+            runserver_logger.error(e)
+            query_tx = []
+        if query_tx:
+            exist_instance = Token.query_token(address=asset)
+            if exist_instance:
+                decimal = int(exist_instance.decimal)
+
+            else:
+                decimal = 0
+    txs = [item.to_json() for item in query_tx]
 
     return txs
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
+import json
 
 from app import db
 
@@ -144,3 +144,35 @@ class TokenHolding(db.Model):
         exist_instance = TokenHolding.query.filter(TokenHolding.address == address).all()
         return exist_instance
 
+class ContractTxMapping(db.Model):
+    __tablename__ = 'contract_tx_mapping'
+    id = db.Column(db.Integer, primary_key=True)
+    tx_id = db.Column(db.String(66))
+    address = db.Column(db.String(40),index=True)
+
+
+
+
+
+
+
+
+class ContractTxDetail(db.Model):
+    __tablename__ = 'contract_tx_detail'
+    id = db.Column(db.Integer, primary_key=True)
+    tx_id = db.Column(db.String(66),unique=True)
+    inputs = db.Column(db.LONGTEXT)
+    outputs = db.Column(db.LONGTEXT)
+    block_timestamp = db.Column(db.Integer)
+    block_height = db.Column(db.Integer)
+
+
+
+    def to_json(self):
+        return {
+            "txId":self.tx_id,
+            "inputs":json.loads(self.inputs),
+            "outputs":json.loads(self.outputs),
+            "blockTime":self.block_timestamp,
+            "blockNumber":self.block_height
+        }

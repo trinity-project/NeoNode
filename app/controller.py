@@ -43,6 +43,12 @@ def get_transaction(txid):
 def get_transaction_by_address(address,asset,page=1):
     return service.get_transaction_by_address(address,asset,page)
 
+
+@jsonrpc.method("getTransactionByAddress_new")
+def get_transaction_by_address_new(address,asset,page=1):
+    return service.get_transaction_by_address_new(address,asset,page)
+
+
 @jsonrpc.method("getClaimTx")
 def get_claim_tx(address,page=1):
     return service.get_claim_tx(address,page)
