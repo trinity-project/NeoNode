@@ -128,7 +128,7 @@ class Vin(NeoTableBase):
         return exist_instance
 
 
-class ContractTx(NeoTableBase):
+class ContractTxMapping(NeoTableBase):
     __tablename__ = 'contract_tx_mapping'
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66))
@@ -139,7 +139,7 @@ class ContractTx(NeoTableBase):
 
     @staticmethod
     def save(session,tx_id,address):
-        new_instance = ContractTx(tx_id=tx_id,address=address)
+        new_instance = ContractTxMapping(tx_id=tx_id,address=address)
         session.add(new_instance)
 
 

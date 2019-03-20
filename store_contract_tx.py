@@ -2,8 +2,8 @@ import json
 import time
 
 
-from data_model.contract_tx_model import Tx, logger, BookmarkForBlock, NeoTableSession, ContractTx, \
-    BookmarkForContractTx, Vin, ContractTxDetail, HandledTx
+from data_model.contract_tx_model import Tx, logger, BookmarkForBlock, NeoTableSession, \
+    BookmarkForContractTx, Vin, ContractTxDetail, HandledTx, ContractTxMapping
 
 #加载本地同步的快高
 bookmarkForContractTx = BookmarkForContractTx.query()
@@ -39,7 +39,7 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
         address_set.add(_vout["address"])
 
     for address in address_set:
-        ContractTx.save(session,tx_id,address)
+        ContractTxMapping.save(session,tx_id,address)
 
 
 
