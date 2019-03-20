@@ -76,6 +76,7 @@ while True:
                 try:
                     session.begin(subtransactions=True)
                     store_contract_tx(session, tx_id, vin, vout, block_height, block_time)
+                    HandledTx.save(session, tx_id)
                     session.commit()
                 except Exception as e:
                     session.rollback()
