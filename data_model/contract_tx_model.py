@@ -129,7 +129,7 @@ class Vin(NeoTableBase):
 
 
 class ContractTx(NeoTableBase):
-    __tablename__ = 'contract_tx'
+    __tablename__ = 'contract_tx_mapping'
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66))
     address = Column(String(40),index=True)
