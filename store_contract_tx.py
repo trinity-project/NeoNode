@@ -1,9 +1,14 @@
 import json
 import time
 
-
 from data_model.contract_tx_model import Tx, logger, BookmarkForBlock, NeoTableSession, \
     BookmarkForContractTx, Vin, ContractTxDetail, HandledTx, ContractTxMapping
+
+class TRANSACTION_TYPE(object):
+    CONTRACT="ContractTransaction"
+    CLAIM="ClaimTransaction"
+    INVOKECONTRACT="InvocationTransaction"
+
 
 #加载本地同步的快高
 bookmarkForContractTx = BookmarkForContractTx.query()
@@ -52,7 +57,7 @@ while True:
 
 
     if bookmark_for_contract_tx < bookmark_for_block.height:
-        exist_instance=Tx.query(bookmark_for_contract_tx)
+        exist_instance=Tx.query(bookmark_for_contract_tx,TRANSACTION_TYPE.CONTRACT)
         if  exist_instance:
             for tx in exist_instance:
                 tx_id=tx.tx_id
