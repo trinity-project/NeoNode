@@ -33,7 +33,7 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
 
         if vin_instance:
             address_set.add(vin_instance.address)
-            new_vin.append(dict(address=vin_instance.address,asset_id=vin_instance.asset_id,amount=vin_instance.value))
+            new_vin.append(dict(address=vin_instance.address,asset=vin_instance.asset_id,value=vin_instance.value))
 
         else:
             raise Exception("lost vin ({},{})".format(vin_txid, vin_vout_number))

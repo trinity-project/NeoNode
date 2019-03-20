@@ -322,8 +322,46 @@ def get_transaction_by_address_new(address,asset,page=1):
             else:
                 decimal = 0
     txs = [item.to_json() for item in query_tx]
+    for tx in txs:
+        if "inputs" in tx.keys() and "outputs" in tx.keys():
+            tx = utxo_to_account(tx)
 
     return txs
+
+def utxo_to_account(tx):
+    address_from_asset_info = dict()
+    address_to_asset_info = dict()
+    vin = tx.get("inputs")
+    vout = tx.get("outputs")
+    for _vin in vin:
+        asset_id = _vin.get("asset_id")
+        address = _vin.get("address")
+        amount = _vin.get("amount")
+
+        asset_mapping = address_from_asset_info.get(asset_id)
+        if asset_mapping:
+            address_amount = asset_mapping.get(address)
+            if address_amount:
+                asset_mapping[address] = str(Decimal(address_amount) + Decimal(amount))
+            else:
+                asset_mapping[address] = amount
+        else:
+            address_from_asset_info[asset_id] = {address: amount}
+
+    for _vout in vout:
+        asset_id = _vout["asset"]
+        address = _vout["address"]
+        value = _vout["value"]
+
+        asset_mapping = address_to_asset_info.get(asset_id)
+        if asset_mapping:
+            address_amount = asset_mapping.get(address)
+            if address_amount:
+                asset_mapping[address] = str(Decimal(address_amount) + Decimal(value))
+            else:
+                asset_mapping[address] = value
+        else:
+            address_to_asset_info[asset_id] = {address: value}
 
 
 def get_claim_tx(address,page):
