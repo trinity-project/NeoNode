@@ -253,41 +253,41 @@ def get_transaction(txid):
     return None
 
 
+# def get_transaction_by_address(address,asset,page=1):
+#     if asset==setting.NEO_ASSETID or asset==setting.GAS_ASSETID:
+#         try:
+#             query_tx=ContractTx.query.filter(
+#                 or_(ContractTx.address_from==address,ContractTx.address_to==address),
+#                 ContractTx.asset==asset,
+#                 ).order_by(ContractTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
+#
+#         except:
+#             query_tx = []
+#
+#         decimal = 0
+#
+#     else:
+#         try:
+#             query_tx = InvokeTx.query.filter(
+#                 or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
+#                 InvokeTx.contract == asset
+#             ).order_by(InvokeTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
+#         except Exception as e:
+#             runserver_logger.error(e)
+#             query_tx = []
+#         if query_tx:
+#             exist_instance = Token.query_token(address=asset)
+#             if exist_instance:
+#                 decimal = int(exist_instance.decimal)
+#
+#             else:
+#                 decimal = 0
+#     txs = [handle_invoke_tx_decimal(item.to_json(),decimal) for item in query_tx]
+#
+#     return txs
+
+
 def get_transaction_by_address(address,asset,page=1):
-    if asset==setting.NEO_ASSETID or asset==setting.GAS_ASSETID:
-        try:
-            query_tx=ContractTx.query.filter(
-                or_(ContractTx.address_from==address,ContractTx.address_to==address),
-                ContractTx.asset==asset,
-                ).order_by(ContractTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
-
-        except:
-            query_tx = []
-
-        decimal = 0
-
-    else:
-        try:
-            query_tx = InvokeTx.query.filter(
-                or_(InvokeTx.address_from == address, InvokeTx.address_to == address),
-                InvokeTx.contract == asset
-            ).order_by(InvokeTx.block_timestamp.desc()).paginate(page=page,per_page=8).items
-        except Exception as e:
-            runserver_logger.error(e)
-            query_tx = []
-        if query_tx:
-            exist_instance = Token.query_token(address=asset)
-            if exist_instance:
-                decimal = int(exist_instance.decimal)
-
-            else:
-                decimal = 0
-    txs = [handle_invoke_tx_decimal(item.to_json(),decimal) for item in query_tx]
-
-    return txs
-
-
-def get_transaction_by_address_new(address,asset,page=1):
     query_tx = []
     if asset==setting.NEO_ASSETID or asset==setting.GAS_ASSETID:
         try:

@@ -44,14 +44,14 @@ def get_application_log(txid):
 def get_transaction(txid):
     return service.get_transaction(txid)
 
+# @jsonrpc.method("getTransactionByAddress")
+# def get_transaction_by_address(address,asset,page=1):
+#     return service.get_transaction_by_address(address,asset,page)
+
+
 @jsonrpc.method("getTransactionByAddress")
 def get_transaction_by_address(address,asset,page=1):
     return service.get_transaction_by_address(address,asset,page)
-
-
-@jsonrpc.method("getTransactionByAddress_new")
-def get_transaction_by_address_new(address,asset,page=1):
-    return service.get_transaction_by_address_new(address,asset,page)
 
 
 @jsonrpc.method("getClaimTx")
