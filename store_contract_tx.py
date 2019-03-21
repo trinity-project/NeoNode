@@ -43,7 +43,7 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
     for _vout in vout:
         address_set.add((_vout["address"],_vout["asset"],block_height))
 
-    for address,asset in address_set:
+    for address,asset,block_height in address_set:
         ContractTxMapping.save(session,tx_id,address,asset,block_height)
 
 
