@@ -293,7 +293,7 @@ def get_transaction_by_address_new(address,asset,page=1):
         try:
             query_tx_ids=ContractTxMapping.query.filter(
                 ContractTxMapping.address ==address,ContractTxMapping.asset == asset
-                ).order_by(InvokeTx.block_height.desc()).paginate(page=page,per_page=8).items
+                ).order_by(ContractTxMapping.block_height.desc()).paginate(page=page,per_page=8).items
 
         except:
             query_tx_ids = []
@@ -321,7 +321,9 @@ def get_transaction_by_address_new(address,asset,page=1):
 
             else:
                 decimal = 0
+    runserver_logger.info(len(query_tx))
     txs = [handle_invoke_tx_decimal(item.to_json(), decimal) for item in query_tx]
+    runserver_logger.info(txs)
     return [utxo_to_account(tx,address,asset) if "inputs" in tx.keys() and "outputs" in tx.keys() else tx for tx in txs]
 
 def utxo_to_account(tx,target_address,target_asset):
