@@ -1,4 +1,6 @@
 import time
+
+from decimal import Decimal
 from flask import request
 from app import jsonrpc, app_logger
 from app import service
@@ -9,11 +11,14 @@ from config import setting
 
 @jsonrpc.method("constructTx")
 def construct_tx(addressFrom,addressTo,value,assetId):
-    if type(value)==str:
-        value=float(value)
+    decimals = 8 if assetId.lower() != "0xfc732edee1efdf968c23c20a9628eaa5a6ccb934" else 2
+    value = int(Decimal(value)*pow(10,decimals))
     return service.construct_tx(addressFrom,addressTo,value,assetId)
 
-
+@jsonrpc.method("constructTx_2")
+def construct_tx_2(addressFrom,addressTo,value,assetId):
+    value=int(value)
+    return service.construct_tx(addressFrom,addressTo,value,assetId)
 
 
 @jsonrpc.method("sign")

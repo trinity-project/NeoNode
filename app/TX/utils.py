@@ -80,8 +80,7 @@ def createMultiSigAddress(script):
 
 def create_opdata(address_from, address_to, value, contract_hash):
     op_data = ""
-    decimal = 8 if contract_hash != "0xfc732edee1efdf968c23c20a9628eaa5a6ccb934" else 2
-    value=int(Decimal(str(value)) * pow(10, decimal))
+    value=int(value)
     value = binascii.hexlify(BigInteger(value).ToByteArray()).decode()
     scripthash_from = ToAddresstHash(address_from).ToString2()
     scripthash_to = ToAddresstHash(address_to).ToString2()
