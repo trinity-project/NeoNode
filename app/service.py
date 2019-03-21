@@ -321,10 +321,9 @@ def get_transaction_by_address_new(address,asset,page=1):
 
             else:
                 decimal = 0
-    runserver_logger.info(len(query_tx))
     txs = [handle_invoke_tx_decimal(item.to_json(), decimal) for item in query_tx]
-    runserver_logger.info(txs)
-    return [utxo_to_account(tx,address,asset) if "inputs" in tx.keys() and "outputs" in tx.keys() else tx for tx in txs]
+    txs = [utxo_to_account(tx, address, asset) if "inputs" in tx.keys() and "outputs" in tx.keys() else tx for tx in txs]
+    return txs
 
 def utxo_to_account(tx,target_address,target_asset):
     address_from_asset_info = dict()

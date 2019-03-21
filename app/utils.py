@@ -124,5 +124,6 @@ def get_tokenholding_from_neoscan(address):
         raise e
 
 def handle_invoke_tx_decimal(tx,decimal):
-    tx["value"] = str(Decimal(tx["value"]) / (10 ** decimal))
+    if tx.get("value"):
+        tx["value"] = str(Decimal(tx["value"]) / (10 ** decimal))
     return tx
