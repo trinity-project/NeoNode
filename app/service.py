@@ -292,8 +292,8 @@ def get_transaction_by_address_new(address,asset,page=1):
     if asset==setting.NEO_ASSETID or asset==setting.GAS_ASSETID:
         try:
             query_tx_ids=ContractTxMapping.query.filter(
-                ContractTxMapping.address ==address
-                ).paginate(page=page,per_page=8).items
+                ContractTxMapping.address ==address,ContractTxMapping.asset == asset
+                ).order_by(InvokeTx.block_height.desc()).paginate(page=page,per_page=8).items
 
         except:
             query_tx_ids = []
@@ -321,22 +321,18 @@ def get_transaction_by_address_new(address,asset,page=1):
 
             else:
                 decimal = 0
-    txs = [item.to_json() for item in query_tx]
-    for tx in txs:
-        if "inputs" in tx.keys() and "outputs" in tx.keys():
-            tx = utxo_to_account(tx)
+    txs = [handle_invoke_tx_decimal(item.to_json(), decimal) for item in query_tx]
+    return [utxo_to_account(tx,address,asset) if "inputs" in tx.keys() and "outputs" in tx.keys() else tx for tx in txs]
 
-    return txs
-
-def utxo_to_account(tx):
+def utxo_to_account(tx,target_address,target_asset):
     address_from_asset_info = dict()
     address_to_asset_info = dict()
     vin = tx.get("inputs")
     vout = tx.get("outputs")
     for _vin in vin:
-        asset_id = _vin.get("asset_id")
+        asset_id = _vin.get("asset")
         address = _vin.get("address")
-        amount = _vin.get("amount")
+        amount = _vin.get("value")
 
         asset_mapping = address_from_asset_info.get(asset_id)
         if asset_mapping:
@@ -362,6 +358,54 @@ def utxo_to_account(tx):
                 asset_mapping[address] = value
         else:
             address_to_asset_info[asset_id] = {address: value}
+
+
+    for asset_type_from, address_mapping_from in address_from_asset_info.items():
+        address_mapping_to =  address_to_asset_info.get(asset_type_from)
+
+        for address_from in address_mapping_from.keys():
+            for address_to in address_mapping_to.keys():
+                if address_from == address_to:
+                    value_from = Decimal(address_mapping_from.get(address_from))
+                    value_to = Decimal(address_mapping_to.get(address_to))
+                    if value_from > value_to:
+                        address_mapping_from[address_from] = str(value_from-value_to)
+                        address_mapping_to[address_to] = None
+                    elif value_from < value_to:
+                        address_mapping_to[address_to] = str(value_to-value_from)
+                        address_mapping_from[address_from] = None
+                    else:
+                        address_mapping_to[address_to] = None
+                        address_mapping_from[address_from] = None
+
+
+    for _, address_mapping_from in address_from_asset_info.items():
+        for key in list( address_mapping_from.keys()):
+            if not address_mapping_from.get(key):
+                del address_mapping_from[key]
+
+    for _, address_mapping_to in address_to_asset_info.items():
+        for key in list( address_mapping_to.keys()):
+            if not address_mapping_to.get(key):
+                del address_mapping_to[key]
+
+    amount = address_from_asset_info.get(target_asset).get(target_address)
+    if amount:
+        addressFrom = target_address
+        value = amount
+        addressTo = list(address_to_asset_info.get(target_asset).keys())[0]
+
+    amount = address_to_asset_info.get(target_asset).get(target_address)
+    if amount:
+        addressTo = target_address
+        value = amount
+        addressFrom = list(address_from_asset_info.get(target_asset).keys())[0]
+
+    tx["addressFrom"] = addressFrom
+    tx["addressTo"] = addressTo
+    tx["value"] = value
+
+    return tx
 
 
 def get_claim_tx(address,page):

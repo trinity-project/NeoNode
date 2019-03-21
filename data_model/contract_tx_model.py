@@ -132,14 +132,16 @@ class ContractTxMapping(NeoTableBase):
     __tablename__ = 'contract_tx_mapping'
     id = Column(Integer, primary_key=True)
     tx_id = Column(String(66))
+    asset = Column(String(66))
     address = Column(String(40),index=True)
+    block_height = Column(Integer)
 
 
 
 
     @staticmethod
-    def save(session,tx_id,address):
-        new_instance = ContractTxMapping(tx_id=tx_id,address=address)
+    def save(session,tx_id,address,asset,block_height):
+        new_instance = ContractTxMapping(tx_id=tx_id,address=address,asset=asset,block_height=block_height)
         session.add(new_instance)
 
 

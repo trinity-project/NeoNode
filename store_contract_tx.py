@@ -32,7 +32,7 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
         vin_instance = Vin.query(session,vin_txid, vin_vout_number)
 
         if vin_instance:
-            address_set.add(vin_instance.address)
+            address_set.add((vin_instance.address,vin_instance.asset_id,block_height))
             new_vin.append(dict(address=vin_instance.address,asset=vin_instance.asset_id,value=vin_instance.value))
 
         else:
@@ -41,10 +41,10 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
     ContractTxDetail.save(session,tx_id,json.dumps(new_vin),json.dumps(vout),block_time,block_height)
 
     for _vout in vout:
-        address_set.add(_vout["address"])
+        address_set.add((_vout["address"],_vout["asset"],block_height))
 
-    for address in address_set:
-        ContractTxMapping.save(session,tx_id,address)
+    for address,asset in address_set:
+        ContractTxMapping.save(session,tx_id,address,asset,block_height)
 
 
 
