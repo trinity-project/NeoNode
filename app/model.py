@@ -148,7 +148,9 @@ class ContractTxMapping(db.Model):
     __tablename__ = 'contract_tx_mapping'
     id = db.Column(db.Integer, primary_key=True)
     tx_id = db.Column(db.String(66))
+    asset = db.Column(db.String(66))
     address = db.Column(db.String(40),index=True)
+    block_height = db.Column(db.Integer)
 
 
 
