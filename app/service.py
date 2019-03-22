@@ -390,9 +390,9 @@ def utxo_to_account(tx,target_address,target_asset):
             if not address_mapping_to.get(key):
                 del address_mapping_to[key]
 
-    addressFrom = ""
-    addressTo = ""
-    value = ""
+    addressFrom = target_address
+    addressTo = target_address
+    value = "0"
     amount = address_from_asset_info.get(target_asset).get(target_address)
     if amount:
         addressFrom = target_address
