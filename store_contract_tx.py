@@ -36,7 +36,7 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
             new_vin.append(dict(address=vin_instance.address,asset=vin_instance.asset_id,value=vin_instance.value))
 
         else:
-            raise Exception("handle tx:{}lost vin ({},{})".format(tx_id,vin_txid, vin_vout_number))
+            raise Exception("handle tx:{} lost vin ({},{})".format(tx_id,vin_txid, vin_vout_number))
 
     ContractTxDetail.save(session,tx_id,json.dumps(new_vin),json.dumps(vout),block_time,block_height)
 
