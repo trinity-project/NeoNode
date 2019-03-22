@@ -1,7 +1,7 @@
 import json
 import time
 
-from data_model.contract_tx_model import Tx, logger, BookmarkForBlock, NeoTableSession, \
+from data_model.contract_tx_model import Tx, logger, BookmarkForVout, NeoTableSession, \
     BookmarkForContractTx, Vin, ContractTxDetail, HandledTx, ContractTxMapping
 
 class TRANSACTION_TYPE(object):
@@ -36,6 +36,7 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
             new_vin.append(dict(address=vin_instance.address,asset=vin_instance.asset_id,value=vin_instance.value))
 
         else:
+
             raise Exception("handle tx:{} lost vin ({},{})".format(tx_id,vin_txid, vin_vout_number))
 
     ContractTxDetail.save(session,tx_id,json.dumps(new_vin),json.dumps(vout),block_time,block_height)
@@ -49,14 +50,14 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
 
 
 while True:
-    bookmark_for_block=BookmarkForBlock.query()
-    logger.info("bookmark_contract_tx:{} bookmark_block:{}".format(bookmark_for_contract_tx,bookmark_for_block.height))
-    if not bookmark_for_block:
+    bookmark_for_vout=BookmarkForVout.query()
+    logger.info("bookmark_contract_tx:{} bookmark_vout:{}".format(bookmark_for_contract_tx,bookmark_for_vout.height))
+    if not bookmark_for_vout:
         continue
 
 
 
-    if bookmark_for_contract_tx < bookmark_for_block.height:
+    if bookmark_for_contract_tx <= bookmark_for_vout.height:
         exist_instance=Tx.query(bookmark_for_contract_tx,TRANSACTION_TYPE.CONTRACT)
         if  exist_instance:
             for tx in exist_instance:
