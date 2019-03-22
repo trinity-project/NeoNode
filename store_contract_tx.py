@@ -57,7 +57,7 @@ while True:
 
 
 
-    if bookmark_for_contract_tx <= bookmark_for_vout.height:
+    if bookmark_for_contract_tx < bookmark_for_vout.height:
         exist_instance=Tx.query(bookmark_for_contract_tx,TRANSACTION_TYPE.CONTRACT)
         if  exist_instance:
             for tx in exist_instance:
