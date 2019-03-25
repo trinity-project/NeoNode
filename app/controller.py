@@ -24,7 +24,6 @@ def construct_tx(addressFrom,addressTo,value,assetId):
 
 @jsonrpc.method("constructTx_2")
 def construct_tx_2(addressFrom,addressTo,value,assetId):
-    value=int(value)
     return service.construct_tx(addressFrom,addressTo,value,assetId)
 
 
