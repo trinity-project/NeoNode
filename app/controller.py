@@ -13,13 +13,13 @@ from config import setting
 def construct_tx(addressFrom,addressTo,value,assetId):
     if assetId.lower == setting.NNC_ASSETID:
         decimals = 2
-    elif assetId.lower == setting.NEO_ASSETID:
-        decimals = 0
-    elif assetId == setting.GAS_ASSETID:
-        decimals = 8
+        value = int(Decimal(value) * pow(10, decimals))
+    elif assetId.lower in [setting.GAS_ASSETID,setting.NEO_ASSETID]:
+        value = value
     else:
         decimals = 8
-    value = int(Decimal(value)*pow(10,decimals))
+        value = int(Decimal(value) * pow(10, decimals))
+
     return service.construct_tx(addressFrom,addressTo,value,assetId)
 
 @jsonrpc.method("constructTx_2")
