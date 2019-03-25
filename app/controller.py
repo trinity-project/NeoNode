@@ -11,7 +11,14 @@ from config import setting
 
 @jsonrpc.method("constructTx")
 def construct_tx(addressFrom,addressTo,value,assetId):
-    decimals = 8 if assetId.lower() != "0xfc732edee1efdf968c23c20a9628eaa5a6ccb934" else 2
+    if assetId.lower == setting.NNC_ASSETID:
+        decimals = 2
+    elif assetId.lower == setting.NEO_ASSETID:
+        decimals = 0
+    elif assetId == setting.GAS_ASSETID:
+        decimals = 8
+    else:
+        decimals = 8
     value = int(Decimal(value)*pow(10,decimals))
     return service.construct_tx(addressFrom,addressTo,value,assetId)
 
