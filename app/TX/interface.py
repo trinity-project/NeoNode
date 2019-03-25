@@ -702,7 +702,7 @@ def _check_balance(address,assetId,value):
         for b in balances:
             if b.get("asset") == assetId:
                 balance = float(b.get("value"))
-    if balance < int(value):
+    if balance < float(value):
         return False
     return True
 def _get_global_asset(address):
