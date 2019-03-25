@@ -15,7 +15,7 @@ def construct_tx(addressFrom,addressTo,value,assetId):
         decimals = 2
         value = int(Decimal(value) * pow(10, decimals))
     elif assetId.lower() in [setting.GAS_ASSETID,setting.NEO_ASSETID]:
-        value = value
+        value = float(value)
     else:
         decimals = 8
         value = int(Decimal(value) * pow(10, decimals))
