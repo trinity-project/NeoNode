@@ -544,6 +544,7 @@ def token_swap(addressFrom,addressTo,value,privtKey):
 
 
 def construct_tx(addressFrom,addressTo,value,assetId):
+    runserver_logger.error(value)
     res=createTx(addressFrom,addressTo,value,assetId)
     return res
 
