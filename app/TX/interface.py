@@ -665,7 +665,8 @@ def createClaimTx(address,value,claims):
     return {
         "txData": tx.get_tx_data(),
         "txid": createTxid(tx.get_tx_data()),
-        "witness": "014140{signature}2321{pubkey}ac"
+        "witness": "014140{signature}2321{pubkey}ac",
+        "amount":value
     }
 
 def createMultiTx(addressFrom,addressTo,value,assetId):
