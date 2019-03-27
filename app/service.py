@@ -322,8 +322,16 @@ def get_transaction_by_address(address,asset,page=1):
             else:
                 decimal = 0
     txs = [handle_invoke_tx_decimal(item.to_json(), decimal) for item in query_tx]
-    txs = [utxo_to_account(tx, address, asset) if "inputs" in tx.keys() and "outputs" in tx.keys() else tx for tx in txs]
-    return txs
+    # txs = [utxo_to_account(tx, address, asset) if "inputs" in tx.keys() and "outputs" in tx.keys() else tx for tx in txs]
+    out = []
+    for tx in txs:
+        if "inputs" in tx.keys() and "outputs" in tx.keys():
+            try:
+                tx = utxo_to_account(tx, address, asset)
+            except:
+                pass
+        out.append(tx)
+    return out
 
 def utxo_to_account(tx,target_address,target_asset):
     address_from_asset_info = dict()
