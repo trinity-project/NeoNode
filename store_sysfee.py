@@ -1,32 +1,15 @@
-import json
 import time
-
 from decimal import Decimal
 
-from data_model.sysfee_model import   Tx, Sysfee, BookmarkForBlock, BookmarkForSysfee, logger, NeoTableSession
+from data_model.block_info_model import BlockInfoSession, BookmarkForBlock, Tx
+from data_model.sysfee_model import  Sysfee, BookmarkForSysfee, NeoTableSession
 
-
-
-
-class TRANSACTION_TYPE(object):
-    CONTRACT="ContractTransaction"
-    CLAIM="ClaimTransaction"
-    INVOKECONTRACT="InvocationTransaction"
-
-#加载本地同步的快高
-bookmarkForSysfee = BookmarkForSysfee.query()
-
-if bookmarkForSysfee:
-    bookmark_for_sysfee = bookmarkForSysfee.height
-else:
-    bookmark_for_sysfee = -1
-    bookmarkForSysfee=BookmarkForSysfee.save(bookmark_for_sysfee)
-
+from project_log import setup_logger
 
 
 def store_sysfee(session,block_height,sys_fee):
 
-    exist_instance = Sysfee.query(block_height-1)
+    exist_instance = Sysfee.query(session,block_height-1)
     if exist_instance:
         pre_sysfee = exist_instance.sys_fee
         Sysfee.save(session,block_height,str(sys_fee + Decimal(pre_sysfee)))
@@ -34,44 +17,50 @@ def store_sysfee(session,block_height,sys_fee):
         Sysfee.save(session, block_height, str(sys_fee))
 
 
-while True:
-    bookmark_for_sysfee += 1
-    bookmark_for_block=BookmarkForBlock.query()
+if __name__ == "__main__":
+    logger = setup_logger()
+    sys_fee_session = NeoTableSession()
+    block_info_session = BlockInfoSession()
 
-    if not bookmark_for_block:
-        time.sleep(10)
-        continue
-
-
-    if bookmark_for_sysfee <= bookmark_for_block.height:
-        exist_instance=Tx.query(bookmark_for_sysfee)
-        if exist_instance:
-            sys_fee = Decimal(0)
-            for tx in exist_instance:
-                net_fee = Decimal(tx.net_fee)
-                sys_fee += Decimal(tx.sys_fee)
+    bookmarkForSysfee = BookmarkForSysfee.query(sys_fee_session)
+    if bookmarkForSysfee:
+        bookmark_for_sysfee = bookmarkForSysfee.height
+    else:
+        bookmark_for_sysfee = -1
 
 
-            session = NeoTableSession(autocommit=True)
+    while True:
+        bookmark_for_sysfee += 1
+        bookmark_for_block=BookmarkForBlock.query(BlockInfoSession)
+
+        if bookmark_for_sysfee <= bookmark_for_block.height:
+            exist_instance=Tx.query(block_info_session,bookmark_for_sysfee)
+            if exist_instance:
+                sys_fee = Decimal(0)
+                for tx in exist_instance:
+                    # net_fee = Decimal(tx.net_fee)
+                    sys_fee += Decimal(tx.sys_fee)
+
+
+                store_sysfee(sys_fee_session,bookmark_for_sysfee,sys_fee)
+
+
+            bookmarkForSysfee.height = bookmark_for_sysfee
+            BookmarkForSysfee.update(sys_fee_session,bookmarkForSysfee)
             try:
-                session.begin(subtransactions=True)
-                store_sysfee(session,bookmark_for_sysfee,sys_fee)
-                session.commit()
+                sys_fee_session.commit()
             except Exception as e:
-                session.rollback()
+                sys_fee_session.rollback()
                 raise e
             finally:
-                session.close()
-
-        bookmarkForSysfee.height = bookmark_for_sysfee
-        BookmarkForSysfee.update(bookmarkForSysfee)
-        logger.info("bookmark_sysfee:{} bookmark_block:{}".format(bookmark_for_sysfee, bookmark_for_block.height))
+                sys_fee_session.close()
+            logger.info("bookmark_sysfee:{} bookmark_block:{}".format(bookmark_for_sysfee, bookmark_for_block.height))
 
 
 
 
-    else:
-        time.sleep(10)
+        else:
+            time.sleep(3)
 
 
 

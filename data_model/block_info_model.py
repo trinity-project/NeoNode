@@ -1,28 +1,18 @@
-import pymysql
 
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text, create_engine, Index
+from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.orm import sessionmaker
 
 from config import setting
+from utils.utils import check_database
 
 
 
 
-pymysql.install_as_MySQLdb()
-
-def _check_database(database_name):
-    conn = pymysql.connect(host=setting.MYSQLDATABASE["host"], user=setting.MYSQLDATABASE["user"],
-                           passwd=setting.MYSQLDATABASE["passwd"])
-    cursor = conn.cursor()
-    cursor.execute("""create database if not exists {} """.format(database_name))
-    cursor.close()
-    conn.commit()
-    conn.close()
 
 
-_check_database("block_info")
+check_database(setting.MYSQLDATABASE["host"],setting.MYSQLDATABASE["user"],setting.MYSQLDATABASE["passwd"],"block_info")
 
 engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                                                setting.MYSQLDATABASE["passwd"],
@@ -31,7 +21,7 @@ engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                        pool_recycle=3600, pool_size=100,pool_pre_ping=True)
 
 
-Session = sessionmaker(bind=engine)
+BlockInfoSession = sessionmaker(bind=engine)
 Base = declarative_base()
 
 
@@ -76,14 +66,7 @@ class Tx(Base):
 
 
         session.add(new_instance)
-        # try:
-        #     session.commit()
-        #
-        # except Exception as e:
-        #     session.rollback()
-        #     raise e
-        # finally:
-        #     session.close()
+
 
 
 Base.metadata.create_all(engine)

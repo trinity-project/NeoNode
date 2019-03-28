@@ -2,12 +2,11 @@
 import json
 import time
 
-
 from config import setting
-from data_model.block_info_model import BookmarkForBlock, Tx, Session
-
 from neo_cli import NeoCliRpc
+from data_model.block_info_model import BookmarkForBlock, Tx, BlockInfoSession
 from project_log import setup_logger
+
 
 
 
@@ -16,7 +15,7 @@ if __name__ == "__main__":
     neo_cli_rpc = NeoCliRpc(setting.NEOCLIURL)
 
     #开启mysql会话
-    session = Session()
+    session = BlockInfoSession()
     bookmarkForBlock = BookmarkForBlock.query(session)
     if bookmarkForBlock:
         bookmark_for_block = bookmarkForBlock.height
