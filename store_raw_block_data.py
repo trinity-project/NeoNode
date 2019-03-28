@@ -13,7 +13,7 @@ from data_model.block_info_model import BookmarkForBlock,Tx,logger
 
 
 
-def getblock(index,retry_num=3):
+def getblock(index):
 
     data = {
           "jsonrpc": "2.0",
@@ -26,11 +26,8 @@ def getblock(index,retry_num=3):
     try:
         res = requests.post(random.choice(setting.NEOCLIURL),json=data).json()
         return res["result"]
-    except Exception as e:
-        retry_num-=1
-        if retry_num==0:
-            return None
-        return getblock(index,retry_num)
+    except:
+        return None
 
 
 bookmarkForBlock = BookmarkForBlock.query()
@@ -49,31 +46,18 @@ while True:
 
         time.sleep(5)
         continue
-    if len(block_info["tx"])>1:
-        for tx in block_info["tx"]:
-            tx_type=tx["type"]
-            tx_id=tx["txid"]
-            block_height=block_info["index"]
-            block_time=block_info["time"]
-            vin=json.dumps(tx["vin"])
-            vout=json.dumps(tx["vout"])
-            scripts=""
-            attributes=json.dumps(tx["attributes"])
-            script=tx.get("script")
-            Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,script)
+    for tx in block_info["tx"]:
+        tx_type=tx["type"]
+        tx_id=tx["txid"]
+        block_height=block_info["index"]
+        block_time=block_info["time"]
+        vin=json.dumps(tx["vin"])
+        vout=json.dumps(tx["vout"])
+        sys_fee = tx["sys_fee"]
+        net_fee = tx["net_fee"]
+        Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,sys_fee,net_fee)
 
-    else:
-        if block_info["tx"][0]["vout"]:
-            tx_type=tx["type"]
-            tx_id=tx["txid"]
-            block_height=block_info["index"]
-            block_time=block_info["time"]
-            vin=json.dumps(tx["vin"])
-            vout=json.dumps(tx["vout"])
-            scripts=""
-            attributes=json.dumps(tx["attributes"])
-            script=tx.get("script")
-            Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,script)
+
 
     bookmark_for_block+=1
     bookmarkForBlock.height=bookmark_for_block

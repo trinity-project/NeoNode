@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from config import setting
 from project_log import setup_mylogger
 
-logger=setup_mylogger(logfile="log/store_block_info.log")
+logger=setup_mylogger()
 
 
 
@@ -81,14 +81,15 @@ class Tx(Base):
     block_time=Column(Integer)
     vin = Column(LONGTEXT)
     vout = Column(LONGTEXT)
-    script=Column(Text)
+    sys_fee = Column(String(16))
+    net_fee = Column(String(16))
 
 
     @staticmethod
-    def save(tx_id,tx_type,block_height,block_time,vin,vout,script):
+    def save(tx_id,tx_type,block_height,block_time,vin,vout,sys_fee,net_fee):
         session=Session()
         new_instance = Tx(tx_id=tx_id, tx_type=tx_type,block_height=block_height,
-                          block_time=block_time,vin =vin,vout=vout,script=script)
+                          block_time=block_time,vin =vin,vout=vout,sys_fee=sys_fee,net_fee=net_fee)
 
 
         session.add(new_instance)
@@ -97,7 +98,7 @@ class Tx(Base):
 
         except Exception as e:
             session.rollback()
-            # raise e
+            raise e
         finally:
             session.close()
 

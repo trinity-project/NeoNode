@@ -97,7 +97,8 @@ class Tx(BlockInfoBase):
     block_time=Column(Integer)
     vin = Column(LONGTEXT)
     vout = Column(LONGTEXT)
-    script=Column(Text)
+    sys_fee = Column(String(16))
+    net_fee = Column(String(16))
 
 
     @staticmethod
