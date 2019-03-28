@@ -116,14 +116,15 @@ class ClaimTx(NeoTableBase):
     tx_id = Column(String(66))
     address_to = Column(String(40),index=True)
     value = Column(String(30))
+    claims = Column(Text)
     block_timestamp=Column(Integer)
 
 
 
     @staticmethod
-    def save(session,tx_id,address_to,value,block_timestamp):
+    def save(session,tx_id,address_to,value,block_timestamp,claims):
         new_instance = ClaimTx(tx_id=tx_id,address_to=address_to,value=value,
-                                block_timestamp=block_timestamp)
+                                block_timestamp=block_timestamp,claims=claims)
         session.add(new_instance)
 
 

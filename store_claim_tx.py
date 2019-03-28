@@ -22,11 +22,11 @@ else:
 
 
 
-def store_claim_tx(session,tx_id,block_time,vout):
+def store_claim_tx(session,tx_id,block_time,vout,claims):
     for item in vout:
         address_to = item.get("address")
         value = item.get("value")
-        ClaimTx.save(session,tx_id,address_to,value,block_time)
+        ClaimTx.save(session,tx_id,address_to,value,block_time,json.dumps(claims))
 
 
 def update_utxo_status(session,claims):
@@ -61,7 +61,7 @@ while True:
                 session = NeoTableSession(autocommit=True)
                 try:
                     session.begin(subtransactions=True)
-                    store_claim_tx(session,tx_id,block_time,vout)
+                    store_claim_tx(session,tx_id,block_time,vout,claims)
                     update_utxo_status(session,claims)
                     session.commit()
                 except Exception as e:
