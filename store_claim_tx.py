@@ -35,7 +35,7 @@ def update_utxo_status(session,claims):
         Utxo.update(session,exist_instance)
 
 
-block_interval = 1000
+block_interval = 0
 
 while True:
     bookmark_for_utxo=BookmarkForUtxo.query()
