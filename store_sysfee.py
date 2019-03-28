@@ -34,7 +34,7 @@ if __name__ == "__main__":
         bookmark_for_block=BookmarkForBlock.query(block_info_session)
 
         if bookmark_for_sysfee <= bookmark_for_block.height:
-            exist_instance=Tx.query(block_info_session,bookmark_for_sysfee)
+            exist_instance = block_info_session.query(Tx).filter(Tx.block_height==bookmark_for_sysfee).all()
             if exist_instance:
                 sys_fee = Decimal(0)
                 for tx in exist_instance:
