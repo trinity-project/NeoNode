@@ -1,7 +1,7 @@
 import json
 import time
 
-from data_model.claim_model import   Tx, ClaimTx, BookmarkForBlock, BookmarkForClaim, logger, NeoTableSession
+from data_model.claim_model import Tx, ClaimTx, BookmarkForBlock, BookmarkForClaim, logger, NeoTableSession,Utxo
 
 
 
@@ -28,6 +28,14 @@ def store_claim_tx(session,tx_id,block_time,vout):
         value = item.get("value")
         ClaimTx.save(session,tx_id,address_to,value,block_time)
 
+
+def update_utxo_status(session,claims):
+    for item in claims:
+        exist_instance = Utxo.query(session,item.get("txid"),str(item.get("vout")))
+        exist_instance.is_claimed = True
+        Utxo.update(session,exist_instance)
+
+
 block_interval = 1000
 
 while True:
@@ -48,11 +56,13 @@ while True:
                 tx_type=tx.tx_type
                 block_time=tx.block_time
                 vout=json.loads(tx.vout)
+                claims=json.loads(tx.claims)
 
                 session = NeoTableSession(autocommit=True)
                 try:
                     session.begin(subtransactions=True)
                     store_claim_tx(session,tx_id,block_time,vout)
+                    update_utxo_status(session,claims)
                     session.commit()
                 except Exception as e:
                     session.rollback()
