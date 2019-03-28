@@ -1,7 +1,7 @@
 import json
 import time
 
-from data_model.claim_model import Tx, ClaimTx, BookmarkForBlock, BookmarkForClaim, logger, NeoTableSession, Utxo, \
+from data_model.claim_model import Tx, ClaimTx, BookmarkForClaim, logger, NeoTableSession, Utxo, \
     BookmarkForUtxo
 
 
