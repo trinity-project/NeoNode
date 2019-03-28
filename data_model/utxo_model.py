@@ -130,6 +130,7 @@ class Utxo(NeoTableBase):
     start_block = Column(Integer)
     end_block = Column(Integer)
     is_used = Column(Boolean,default=False)
+    is_claimed = Column(Boolean,default=False)
     gen_gas = Column(String(16))
 
     __table_args__ = (
@@ -167,6 +168,19 @@ class Utxo(NeoTableBase):
             logger.error(e)
             session.rollback()
 
+class Sysfee(NeoTableBase):
+    __tablename__ = 'sysfee'
+    id = Column(Integer, primary_key=True)
+    block_height=Column(Integer)
+    sys_fee = Column(String(16))
+
+
+    @staticmethod
+    def query(block_height):
+        session=NeoTableSession()
+        exist_instance=session.query(Sysfee).filter(Sysfee.block_height==block_height).first()
+        session.close()
+        return exist_instance
 
 
 
