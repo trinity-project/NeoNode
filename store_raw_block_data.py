@@ -21,6 +21,7 @@ if __name__ == "__main__":
         bookmark_for_block = bookmarkForBlock.height
     else:
         bookmark_for_block = -1
+        bookmarkForBlock = BookmarkForBlock.save(session,bookmark_for_block)
 
     while True:
         bookmark_for_block += 1

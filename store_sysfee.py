@@ -27,6 +27,7 @@ if __name__ == "__main__":
         bookmark_for_sysfee = bookmarkForSysfee.height
     else:
         bookmark_for_sysfee = -1
+        bookmarkForSysfee = BookmarkForSysfee.save(sys_fee_session,bookmark_for_sysfee)
 
 
     while True:
