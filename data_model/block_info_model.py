@@ -6,9 +6,7 @@ from sqlalchemy import Column, Integer, String, Text, create_engine, Index
 from sqlalchemy.orm import sessionmaker
 
 from config import setting
-from project_log import setup_mylogger
 
-logger=setup_mylogger()
 
 
 
