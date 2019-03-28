@@ -42,7 +42,7 @@ def count_block_reward_gas(start_block,end_block):
 def count_sysfee_gas(start_block,end_block):
     total_sysfee_start = Sysfee.query(start_block)
     total_sysfee_end = Sysfee.query(end_block)
-    diffence_fee = Decimal(total_sysfee_end.sys_fee) - Decimal(total_sysfee_start)
+    diffence_fee = Decimal(total_sysfee_end.sys_fee) - Decimal(total_sysfee_start.sys_fee)
     return diffence_fee/pow(10,8)
 
 
