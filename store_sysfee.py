@@ -45,10 +45,10 @@ while True:
     if bookmark_for_sysfee < bookmark_for_block.height:
         exist_instance=Tx.query(bookmark_for_sysfee)
         if exist_instance:
+            sys_fee = Decimal(0)
             for tx in exist_instance:
-                sys_fee = Decimal(tx.sys_fee)
                 net_fee = Decimal(tx.net_fee)
-                sys_fee += sys_fee
+                sys_fee += Decimal(tx.sys_fee)
 
 
             session = NeoTableSession(autocommit=True)
