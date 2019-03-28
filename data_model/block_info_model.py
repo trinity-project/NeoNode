@@ -81,15 +81,17 @@ class Tx(Base):
     block_time=Column(Integer)
     vin = Column(LONGTEXT)
     vout = Column(LONGTEXT)
+    claims = Column(Text)
     sys_fee = Column(String(16))
     net_fee = Column(String(16))
 
 
     @staticmethod
-    def save(tx_id,tx_type,block_height,block_time,vin,vout,sys_fee,net_fee):
+    def save(tx_id,tx_type,block_height,block_time,vin,vout,sys_fee,net_fee,claims):
         session=Session()
         new_instance = Tx(tx_id=tx_id, tx_type=tx_type,block_height=block_height,
-                          block_time=block_time,vin =vin,vout=vout,sys_fee=sys_fee,net_fee=net_fee)
+                          block_time=block_time,vin =vin,vout=vout,sys_fee=sys_fee,
+                          net_fee=net_fee,claims=claims)
 
 
         session.add(new_instance)

@@ -55,7 +55,8 @@ while True:
         vout=json.dumps(tx["vout"])
         sys_fee = tx["sys_fee"]
         net_fee = tx["net_fee"]
-        Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,sys_fee,net_fee)
+        claims = json.dumps(tx.get("claims",[]))
+        Tx.save(tx_id,tx_type,block_height,block_time,vin,vout,sys_fee,net_fee,claims=claims)
 
 
 
