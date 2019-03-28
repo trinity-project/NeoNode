@@ -4,30 +4,7 @@ import os
 ENVIRON=os.environ
 
 
-NEO_RPC_POOL=[
-    # "http://api.otcgo.cn:10332",
-    # "http://seed10.ngd.network:10332",
-    # "http://seed9.ngd.network:10332",
-    # "http://seed8.ngd.network:10332",
-    # "http://seed7.ngd.network:10332",
-    # "http://seed6.ngd.network:10332",
-    # "http://47.254.64.251:10332"
-    # "http://172.20.151.244:10332",
-    "http://127.0.0.1:10332"
-    # "http://47.254.43.76:10332"
-]
-NEO_RPC_APPLICATION_LOG_POOL=[
-    # "http://seed10.ngd.network:10332",
-    # "http://seed9.ngd.network:10332",
-    # "http://seed8.ngd.network:10332",
-    # "http://seed7.ngd.network:10332",
-    # "http://seed6.ngd.network:10332"
-    # "http://47.254.64.251:10332",
-    # "http://seed6.ngd.network:10332",
-    # "http://172.20.151.244:10332",
-    "http://127.0.0.1:10332"
-    # "http://47.254.43.76:10332"
-]
+
 
 
 class SettingHolder(object):
@@ -47,8 +24,8 @@ class SettingHolder(object):
 
     def setup_mainnet(self):
         self.CONTRACTHASH="0x08e8c4400f1af2c20c28e0018f29535eb85d15b6"
-        self.NEOCLIURL = NEO_RPC_POOL
-        self.NEO_RPC_APPLICATION_LOG = NEO_RPC_APPLICATION_LOG_POOL
+        self.NEOCLIURL = "http://127.0.0.1:10332"
+        self.NEO_RPC_APPLICATION_LOG = "http://127.0.0.1:10332"
         self.PRIVTKEY=ENVIRON.get("PRIVTKEY")
         self.PASSWD_HASH="$2b$10$F7GVmj.eahbHMIUjOxooYuLBMqZaIGcJZ7KxufGfbxwGTErKCzNQm"
         self.REMOTE_ADDR=ENVIRON.get("REMOTE_ADDR")
