@@ -1,9 +1,8 @@
 import json
 import time
 
-from data_model.claim_model import Tx, ClaimTx, BookmarkForBlock, BookmarkForClaim, logger, NeoTableSession,Utxo
-
-
+from data_model.claim_model import Tx, ClaimTx, BookmarkForBlock, BookmarkForClaim, logger, NeoTableSession, Utxo, \
+    BookmarkForUtxo
 
 
 class TRANSACTION_TYPE(object):
@@ -39,16 +38,16 @@ def update_utxo_status(session,claims):
 block_interval = 1000
 
 while True:
-    bookmark_for_block=BookmarkForBlock.query()
-    logger.info("bookmark_claim_tx:{} bookmark_block:{}".format(bookmark_for_claim,bookmark_for_block.height))
-    if not bookmark_for_block:
+    bookmark_for_utxo=BookmarkForUtxo.query()
+    logger.info("bookmark_claim_tx:{} bookmark_utxo:{}".format(bookmark_for_claim,bookmark_for_utxo.height))
+    if not bookmark_for_utxo:
         time.sleep(10)
         continue
 
-    if bookmark_for_claim + block_interval > bookmark_for_block.height:
+    if bookmark_for_claim + block_interval > bookmark_for_utxo.height:
         block_interval = 0
 
-    if bookmark_for_claim < bookmark_for_block.height:
+    if bookmark_for_claim < bookmark_for_utxo.height:
         exist_instance=Tx.query(bookmark_for_claim,block_interval,TRANSACTION_TYPE.CLAIM)
         if exist_instance:
             for tx in exist_instance:
@@ -78,7 +77,7 @@ while True:
 
 
     else:
-        time.sleep(10)
+        time.sleep(5)
 
 
 

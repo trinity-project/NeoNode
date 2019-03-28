@@ -76,15 +76,15 @@ class BookmarkForClaim(NeoTableBase):
         finally:
             session.close()
 
-class BookmarkForBlock(BlockInfoBase):
-    __tablename__ = 'bookmark_for_block'
+class BookmarkForUtxo(NeoTableBase):
+    __tablename__ = 'bookmark_for_utxo'
     id = Column(Integer, primary_key=True)
     height = Column(Integer)
 
     @staticmethod
     def query():
-        session=BlockInfoSession()
-        exist_instance=session.query(BookmarkForBlock).first()
+        session=NeoTableSession()
+        exist_instance=session.query(BookmarkForUtxo).first()
         session.close()
         return exist_instance
 
