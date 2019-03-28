@@ -48,7 +48,7 @@ while True:
             for tx in exist_instance:
                 sys_fee = Decimal(tx.sys_fee)
                 net_fee = Decimal(tx.net_fee)
-                sys_fee += Sysfee
+                sys_fee += sys_fee
 
 
             session = NeoTableSession(autocommit=True)
