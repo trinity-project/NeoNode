@@ -39,6 +39,7 @@ class BookmarkForBlock(Base):
     def save(session,height):
         new_instance = BookmarkForBlock(height=height)
         session.add(new_instance)
+        return new_instance
     @staticmethod
     def update(session,exist_instance):
         session.add(exist_instance)

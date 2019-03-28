@@ -50,6 +50,7 @@ class BookmarkForSysfee(NeoTableBase):
     def save(session,height):
         new_instance = BookmarkForSysfee(height=height)
         session.add(new_instance)
+        return new_instance
     @staticmethod
     def update(session,exist_instance):
         session.add(exist_instance)
