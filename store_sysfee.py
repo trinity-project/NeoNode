@@ -29,7 +29,7 @@ def store_sysfee(session,block_height,sys_fee):
     exist_instance = Sysfee.query(block_height-1)
     if exist_instance:
         pre_sysfee = exist_instance.sys_fee
-        Sysfee.save(session,block_height,str(sys_fee + pre_sysfee))
+        Sysfee.save(session,block_height,str(sys_fee + Decimal(pre_sysfee)))
     else:
         Sysfee.save(session, block_height, str(sys_fee))
 
