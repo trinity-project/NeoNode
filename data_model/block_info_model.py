@@ -81,7 +81,7 @@ class Tx(Base):
     block_time=Column(Integer)
     vin = Column(LONGTEXT)
     vout = Column(LONGTEXT)
-    claims = Column(Text)
+    claims = Column(LONGTEXT)
     sys_fee = Column(String(16))
     net_fee = Column(String(16))
 
