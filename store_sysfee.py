@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     while True:
         bookmark_for_sysfee += 1
-        bookmark_for_block=BookmarkForBlock.query(BlockInfoSession)
+        bookmark_for_block=BookmarkForBlock.query(block_info_session)
 
         if bookmark_for_sysfee <= bookmark_for_block.height:
             exist_instance=Tx.query(block_info_session,bookmark_for_sysfee)
