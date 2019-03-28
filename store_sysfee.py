@@ -19,7 +19,7 @@ bookmarkForSysfee = BookmarkForSysfee.query()
 if bookmarkForSysfee:
     bookmark_for_sysfee = bookmarkForSysfee.height
 else:
-    bookmark_for_sysfee = 0
+    bookmark_for_sysfee = -1
     bookmarkForSysfee=BookmarkForSysfee.save(bookmark_for_sysfee)
 
 
@@ -35,14 +35,15 @@ def store_sysfee(session,block_height,sys_fee):
 
 
 while True:
+    bookmark_for_sysfee += 1
     bookmark_for_block=BookmarkForBlock.query()
-    logger.info("bookmark_sysfee:{} bookmark_block:{}".format(bookmark_for_sysfee,bookmark_for_block.height))
+
     if not bookmark_for_block:
         time.sleep(10)
         continue
 
 
-    if bookmark_for_sysfee < bookmark_for_block.height:
+    if bookmark_for_sysfee <= bookmark_for_block.height:
         exist_instance=Tx.query(bookmark_for_sysfee)
         if exist_instance:
             sys_fee = Decimal(0)
@@ -61,10 +62,10 @@ while True:
                 raise e
             finally:
                 session.close()
-        # break
-        bookmark_for_sysfee += 1
+
         bookmarkForSysfee.height = bookmark_for_sysfee
         BookmarkForSysfee.update(bookmarkForSysfee)
+        logger.info("bookmark_sysfee:{} bookmark_block:{}".format(bookmark_for_sysfee, bookmark_for_block.height))
 
 
 

@@ -44,33 +44,17 @@ class BookmarkForBlock(Base):
     height = Column(Integer)
 
     @staticmethod
-    def query():
-        session=Session()
+    def query(session):
         exist_instance=session.query(BookmarkForBlock).first()
-        session.close()
         return exist_instance
     @staticmethod
-    def save(height):
-        session=Session()
+    def save(session,height):
         new_instance = BookmarkForBlock(height=height)
         session.add(new_instance)
-        try:
-            session.commit()
-        except:
-            session.rollback()
-        finally:
-            session.close()
-        return new_instance
     @staticmethod
-    def update(exist_instance):
-        session=Session()
+    def update(session,exist_instance):
         session.add(exist_instance)
-        try:
-            session.commit()
-        except:
-            session.rollback()
-        finally:
-            session.close()
+
 
 class Tx(Base):
     __tablename__ = 'tx'
@@ -87,22 +71,21 @@ class Tx(Base):
 
 
     @staticmethod
-    def save(tx_id,tx_type,block_height,block_time,vin,vout,sys_fee,net_fee,claims):
-        session=Session()
+    def save(session,tx_id,tx_type,block_height,block_time,vin,vout,sys_fee,net_fee,claims):
         new_instance = Tx(tx_id=tx_id, tx_type=tx_type,block_height=block_height,
                           block_time=block_time,vin =vin,vout=vout,sys_fee=sys_fee,
                           net_fee=net_fee,claims=claims)
 
 
         session.add(new_instance)
-        try:
-            session.commit()
-
-        except Exception as e:
-            session.rollback()
-            raise e
-        finally:
-            session.close()
+        # try:
+        #     session.commit()
+        #
+        # except Exception as e:
+        #     session.rollback()
+        #     raise e
+        # finally:
+        #     session.close()
 
 
 Base.metadata.create_all(engine)

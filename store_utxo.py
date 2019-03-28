@@ -3,7 +3,7 @@ import time
 
 from decimal import Decimal
 
-from data_model.utxo_model import Tx, Utxo,logger, HandledTx, BookmarkForBlock, BookmarkForUtxo, NeoTableSession,Sysfee
+from data_model.utxo_model import Tx, Utxo,logger, HandledTx, BookmarkForSysfee, BookmarkForUtxo, NeoTableSession,Sysfee
 
 
 NEO_ASSETID = "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b"
@@ -14,7 +14,7 @@ bookmarkForUtxo = BookmarkForUtxo.query()
 if bookmarkForUtxo:
     bookmark_for_utxo=bookmarkForUtxo.height
 else:
-    bookmark_for_utxo=0
+    bookmark_for_utxo=-1
     bookmarkForUtxo=BookmarkForUtxo.save(bookmark_for_utxo)
 
 
@@ -39,6 +39,7 @@ def count_block_reward_gas(start_block,end_block):
             block_reward -= 1
     return Decimal(gas_count)/pow(10,8)
 
+#以1个NEO计算
 def count_sysfee_gas(start_block,end_block):
     total_sysfee_start = Sysfee.query(start_block)
     total_sysfee_end = Sysfee.query(end_block)
@@ -85,14 +86,13 @@ def store_utxo(session,tx_id,vin,vout,block_height):
 
 
 while True:
-    bookmark_for_block=BookmarkForBlock.query()
-    logger.info("bookmark_utxo:{} bookmark_block:{}".format(bookmark_for_utxo,bookmark_for_block.height))
-    if not bookmark_for_block:
-        continue
+    bookmark_for_utxo += 1
+    bookmark_for_sysfee=BookmarkForSysfee.query()
 
+    session = NeoTableSession(autocommit=True)
+    session.begin(subtransactions=True)
 
-
-    if bookmark_for_utxo<bookmark_for_block.height:
+    if bookmark_for_utxo <= bookmark_for_sysfee.height:
         exist_instance=Tx.query(bookmark_for_utxo)
         if  exist_instance:
             for tx in exist_instance:
@@ -103,15 +103,15 @@ while True:
                 vin=json.loads(tx.vin)
                 vout=json.loads(tx.vout)
 
-                session = NeoTableSession(autocommit=True)
 
-                handled_tx = HandledTx.query(session,tx_id)
-                if handled_tx:
-                    logger.info("tx {} has been handled".format(tx_id))
-                    continue
+
+                # handled_tx = HandledTx.query(session,tx_id)
+                # if handled_tx:
+                #     logger.info("tx {} has been handled".format(tx_id))
+                #     continue
 
                 try:
-                    session.begin(subtransactions=True)
+
                     store_utxo(session,tx_id,vin,vout,bookmark_for_utxo)
                     HandledTx.save(session,tx_id)
                     session.commit()
@@ -121,15 +121,13 @@ while True:
                 finally:
                     session.close()
 
-        bookmark_for_utxo += 1
+        
         bookmarkForUtxo.height = bookmark_for_utxo
         BookmarkForUtxo.update(bookmarkForUtxo)
-
-
-
+        logger.info("bookmark_utxo:{} bookmark_sysfee:{}".format(bookmark_for_utxo, bookmark_for_sysfee.height))
 
     else:
-        time.sleep(5)
+        time.sleep(3)
 
 
 
