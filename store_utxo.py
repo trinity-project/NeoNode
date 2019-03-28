@@ -71,6 +71,18 @@ def store_utxo(session,tx_id,vin,vout,block_height):
                 gas_sysfee = count_sysfee_gas(start_block=exist_utxo.start_block,end_block=block_height)
                 gen_gas = str((gas_reward + gas_sysfee) * Decimal(exist_utxo.value))
                 exist_utxo.gen_gas = gen_gas
+                logger.info("txid:{} vout_number:{} address:{} asset_id:{} value:{} start_block:{} end_block:{} gen_gas:{} reward:{} sys:{}".format(
+                                                                                exist_utxo.tx_id,
+                                                                              exist_utxo.vout_number,
+                                                                              exist_utxo.address,
+                                                                              exist_utxo.asset_id,
+                                                                              exist_utxo.value,
+                                                                              exist_utxo.start_block,
+                                                                              exist_utxo.end_block,
+                                                                              exist_utxo.gen_gas,
+                                                                              str(gas_reward  * Decimal(exist_utxo.value)),
+                                                                              str(gas_sysfee * Decimal(exist_utxo.value))
+                                                                              ))
             Utxo.update(session, exist_utxo)
         else:
             raise Exception("lost utxo->tx_id:{},number:{}".format(vin_txid, vin_vout_number))
