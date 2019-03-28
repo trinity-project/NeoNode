@@ -23,9 +23,9 @@ class NeoCliRpc(object):
 
     def get_block(self,block_height):
         data = self.bulid_request_body("getblock",[block_height,1])
-        self.make_request(data)
+        return self.make_request(data)
 
 
     def get_application_log(self,tx_id):
         data = self.bulid_request_body("getapplicationlog",[tx_id])
-        self.make_request(data)
+        return self.make_request(data)
