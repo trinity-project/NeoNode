@@ -1,4 +1,4 @@
-
+import pymysql
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, create_engine
@@ -7,7 +7,7 @@ from config import setting
 from utils.utils import check_database
 
 
-
+pymysql.install_as_MySQLdb()
 
 
 

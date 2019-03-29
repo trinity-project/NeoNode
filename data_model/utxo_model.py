@@ -1,10 +1,11 @@
+import pymysql
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, create_engine, UniqueConstraint, Boolean
 
 from config import setting
 
 
-
+pymysql.install_as_MySQLdb()
 
 
 neo_table_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
