@@ -59,7 +59,7 @@ class BookmarkForSysfee(NeoTableBase):
 class Sysfee(NeoTableBase):
     __tablename__ = 'sysfee'
     id = Column(Integer, primary_key=True)
-    block_height=Column(Integer)
+    block_height=Column(Integer,unique=True)
     sys_fee = Column(String(16))
 
 

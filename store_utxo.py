@@ -1,21 +1,12 @@
 import json
 import time
-
 from decimal import Decimal
 
-from data_model.utxo_model import Tx, Utxo,logger, HandledTx, BookmarkForSysfee, BookmarkForUtxo, NeoTableSession,Sysfee
-
-
-NEO_ASSETID = "0xc56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b"
-
-#加载本地同步的快高
-bookmarkForUtxo = BookmarkForUtxo.query()
-
-if bookmarkForUtxo:
-    bookmark_for_utxo=bookmarkForUtxo.height
-else:
-    bookmark_for_utxo=-1
-    bookmarkForUtxo=BookmarkForUtxo.save(bookmark_for_utxo)
+from config import setting
+from data_model.utxo_model import Utxo, BookmarkForUtxo, NeoTableSession, BlockInfoSession
+from data_model.sysfee_model import BookmarkForSysfee,Sysfee
+from data_model.block_info_model import Tx
+from project_log import setup_logger
 
 
 #以1个NEO计算
@@ -40,13 +31,11 @@ def count_block_reward_gas(start_block,end_block):
     return Decimal(gas_count)/pow(10,8)
 
 #以1个NEO计算
-def count_sysfee_gas(start_block,end_block):
-    total_sysfee_start = Sysfee.query(start_block)
-    total_sysfee_end = Sysfee.query(end_block)
+def count_sysfee_gas(session,start_block,end_block):
+    total_sysfee_start = Sysfee.query(session,start_block)
+    total_sysfee_end = Sysfee.query(session,end_block)
     diffence_fee = Decimal(total_sysfee_end.sys_fee) - Decimal(total_sysfee_start.sys_fee)
     return diffence_fee/pow(10,8)
-
-
 
 #存储零花钱
 def store_utxo(session,tx_id,vin,vout,block_height):
@@ -67,67 +56,76 @@ def store_utxo(session,tx_id,vin,vout,block_height):
         if exist_utxo:
             exist_utxo.end_block = block_height
             exist_utxo.is_used = True
-            if exist_utxo.asset_id == NEO_ASSETID:
+            if exist_utxo.asset_id == setting.NEO_ASSETID:
                 gas_reward = count_block_reward_gas(start_block=exist_utxo.start_block,end_block=block_height)
-                gas_sysfee = count_sysfee_gas(start_block=exist_utxo.start_block,end_block=block_height)
+                gas_sysfee = count_sysfee_gas(session=session,start_block=exist_utxo.start_block,end_block=block_height)
                 gen_gas = str((gas_reward + gas_sysfee) * Decimal(exist_utxo.value))
                 exist_utxo.gen_gas = gen_gas
-                logger.info("txid:{} vout_number:{}  gen_gas:{} reward:{} sys:{}".format(
-                                                                                exist_utxo.tx_id,
-                                                                              exist_utxo.vout_number,
-                                                                              exist_utxo.gen_gas,
-                                                                              str(gas_reward  * Decimal(exist_utxo.value)),
-                                                                              str(gas_sysfee * Decimal(exist_utxo.value))
-                                                                              ))
+                # logger.info("txid:{} vout_number:{}  gen_gas:{} reward:{} sys:{}".format(
+                #                                                                 exist_utxo.tx_id,
+                #                                                               exist_utxo.vout_number,
+                #                                                               exist_utxo.gen_gas,
+                #                                                               str(gas_reward  * Decimal(exist_utxo.value)),
+                #                                                               str(gas_sysfee * Decimal(exist_utxo.value))
+                #                                                               ))
             Utxo.update(session, exist_utxo)
         else:
             raise Exception("lost utxo->tx_id:{},number:{}".format(vin_txid, vin_vout_number))
 
 
 
-while True:
-    bookmark_for_utxo += 1
-    bookmark_for_sysfee=BookmarkForSysfee.query()
 
-    session = NeoTableSession(autocommit=True)
-    session.begin(subtransactions=True)
+if __name__ == "__main__":
 
-    if bookmark_for_utxo <= bookmark_for_sysfee.height:
-        exist_instance=Tx.query(bookmark_for_utxo)
-        if  exist_instance:
-            for tx in exist_instance:
-                tx_id=tx.tx_id
-                tx_type=tx.tx_type
-                block_height=tx.block_height
-                block_time=tx.block_time
-                vin=json.loads(tx.vin)
-                vout=json.loads(tx.vout)
+    logger = setup_logger()
+    utxo_session = NeoTableSession()
+    block_info_session = BlockInfoSession()
+    # 加载本地同步的快高
+    bookmarkForUtxo = BookmarkForUtxo.query(utxo_session)
 
-
-
-                # handled_tx = HandledTx.query(session,tx_id)
-                # if handled_tx:
-                #     logger.info("tx {} has been handled".format(tx_id))
-                #     continue
-
-                try:
-
-                    store_utxo(session,tx_id,vin,vout,bookmark_for_utxo)
-                    HandledTx.save(session,tx_id)
-                    session.commit()
-                except Exception as e:
-                    session.rollback()
-                    raise e
-                finally:
-                    session.close()
-
-        
-        bookmarkForUtxo.height = bookmark_for_utxo
-        BookmarkForUtxo.update(bookmarkForUtxo)
-        logger.info("bookmark_utxo:{} bookmark_sysfee:{}".format(bookmark_for_utxo, bookmark_for_sysfee.height))
-
+    if bookmarkForUtxo:
+        bookmark_for_utxo = bookmarkForUtxo.height
     else:
-        time.sleep(3)
+        bookmark_for_utxo = -1
+        bookmarkForUtxo = BookmarkForUtxo.save(utxo_session,bookmark_for_utxo)
+
+
+    while True:
+
+        bookmark_for_utxo += 1
+        bookmark_for_sysfee=BookmarkForSysfee.query(utxo_session)
+
+
+        if bookmark_for_utxo <= bookmark_for_sysfee.height:
+            exist_instance = block_info_session.query(Tx).filter(Tx.block_height == bookmark_for_utxo).all()
+            if  exist_instance:
+                for tx in exist_instance:
+                    tx_id=tx.tx_id
+                    tx_type=tx.tx_type
+                    block_height=tx.block_height
+                    block_time=tx.block_time
+                    vin=json.loads(tx.vin)
+                    vout=json.loads(tx.vout)
+
+                    store_utxo(utxo_session,tx_id,vin,vout,bookmark_for_utxo)
+
+
+
+            bookmarkForUtxo.height = bookmark_for_utxo
+            BookmarkForUtxo.update(utxo_session,bookmarkForUtxo)
+
+            try:
+                utxo_session.commit()
+            except Exception as e:
+                utxo_session.rollback()
+                raise e
+            finally:
+                utxo_session.close()
+
+            logger.info("bookmark_utxo:{} bookmark_sysfee:{}".format(bookmark_for_utxo, bookmark_for_sysfee.height))
+
+        else:
+            time.sleep(3)
 
 
 
