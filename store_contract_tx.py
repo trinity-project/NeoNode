@@ -1,12 +1,12 @@
 import json
 import time
+from sqlalchemy.orm import sessionmaker
 
-from data_model.contract_tx_model import Tx, logger, BookmarkForVout, NeoTableSession, \
-    BookmarkForContractTx, Vin, ContractTxDetail, HandledTx, ContractTxMapping
-
-
-
-
+from data_model.block_info_model import engine,Tx
+from data_model.contract_tx_model import BookmarkForContractTx,ContractTxDetail,ContractTxMapping, neo_table_engine
+from data_model.utxo_model import BookmarkForUtxo,Utxo
+from project_log import setup_logger
+from utils.utils import TRANSACTION_TYPE
 
 
 
@@ -18,15 +18,14 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
     for _vin in vin:
         vin_txid = _vin["txid"]
         vin_vout_number = _vin["vout"]
-        vin_instance = Vin.query(session,vin_txid, vin_vout_number)
+        utxo_instance = Utxo.query(session,vin_txid, vin_vout_number)
 
-        if vin_instance:
-            address_set.add((vin_instance.address,vin_instance.asset_id,block_height))
-            new_vin.append(dict(address=vin_instance.address,asset=vin_instance.asset_id,value=vin_instance.value))
+        if utxo_instance:
+            address_set.add((utxo_instance.address,utxo_instance.asset_id,block_height))
+            new_vin.append(dict(address=utxo_instance.address,asset=utxo_instance.asset_id,value=utxo_instance.value))
 
         else:
-
-            raise Exception("handle tx:{} lost vin ({},{})".format(tx_id,vin_txid, vin_vout_number))
+            raise Exception("handle tx:{} lost utxo ({},{})".format(tx_id,vin_txid, vin_vout_number))
 
     ContractTxDetail.save(session,tx_id,json.dumps(new_vin),json.dumps(vout),block_time,block_height)
 
@@ -37,28 +36,33 @@ def store_contract_tx(session,tx_id,vin,vout,block_height,block_time):
         ContractTxMapping.save(session,tx_id,address,asset,block_height)
 
 if __name__ == "__main__":
-    BlockInfoSession = sessionmaker(bind=block_info_engine)
+    logger = setup_logger()
+
+    BlockInfoSession = sessionmaker(bind=engine)
     NeoTableSession = sessionmaker(bind=neo_table_engine)
 
+    neo_table_session = NeoTableSession()
+    block_info_session = BlockInfoSession()
+
     # 加载本地同步的快高
-    bookmarkForContractTx = BookmarkForContractTx.query()
+    bookmarkForContractTx = BookmarkForContractTx.query(neo_table_session)
 
     if bookmarkForContractTx:
         bookmark_for_contract_tx = bookmarkForContractTx.height
     else:
-        bookmark_for_contract_tx = 0
-        bookmarkForContractTx = BookmarkForContractTx.save(bookmark_for_contract_tx)
+        bookmark_for_contract_tx = -1
+        bookmarkForContractTx = BookmarkForContractTx.save(neo_table_session,bookmark_for_contract_tx)
 
     while True:
-        bookmark_for_vout=BookmarkForVout.query()
-        logger.info("bookmark_contract_tx:{} bookmark_vout:{}".format(bookmark_for_contract_tx,bookmark_for_vout.height))
-        if not bookmark_for_vout:
-            continue
 
+        bookmark_for_contract_tx += 1
 
+        bookmarkForUtxo = BookmarkForUtxo.query(neo_table_session)
+        bookmark_for_utxo = bookmarkForUtxo.height
 
-        if bookmark_for_contract_tx < bookmark_for_vout.height:
-            exist_instance=Tx.query(bookmark_for_contract_tx,TRANSACTION_TYPE.CONTRACT)
+        if bookmark_for_contract_tx <= bookmark_for_utxo:
+            exist_instance=block_info_session.query(Tx).filter(Tx.block_height==bookmark_for_contract_tx,Tx.tx_type==TRANSACTION_TYPE.CONTRACT).all()
+
             if  exist_instance:
                 for tx in exist_instance:
                     tx_id=tx.tx_id
@@ -68,32 +72,29 @@ if __name__ == "__main__":
                     vin=json.loads(tx.vin)
                     vout=json.loads(tx.vout)
 
-                    session = NeoTableSession(autocommit=True)
-                    handled_tx = HandledTx.query(session,tx_id)
+                    store_contract_tx(neo_table_session, tx_id, vin, vout, block_height, block_time)
 
-                    if handled_tx:
-                        logger.info("tx {} has been handled".format(tx_id))
-                        continue
-                    try:
-                        session.begin(subtransactions=True)
-                        store_contract_tx(session, tx_id, vin, vout, block_height, block_time)
-                        HandledTx.save(session, tx_id)
-                        session.commit()
-                    except Exception as e:
-                        session.rollback()
-                        raise e
-                    finally:
-                        session.close()
 
-            bookmark_for_contract_tx += 1
+
             bookmarkForContractTx.height = bookmark_for_contract_tx
-            BookmarkForContractTx.update(bookmarkForContractTx)
+            BookmarkForContractTx.update(neo_table_session,bookmarkForContractTx)
 
+            try:
+                neo_table_session.commit()
+            except Exception as e:
+                neo_table_session.rollback()
+                raise e
+            finally:
+                neo_table_session.close()
+
+            logger.info(
+                "bookmark_contract_tx:{} bookmark_utxo:{}".format(bookmark_for_contract_tx, bookmark_for_utxo))
 
 
 
         else:
-            time.sleep(10)
+            bookmark_for_contract_tx -= 1
+            time.sleep(3)
 
 
 

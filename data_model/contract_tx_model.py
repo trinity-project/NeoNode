@@ -2,8 +2,7 @@ import pymysql
 
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text, create_engine, UniqueConstraint
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, String, create_engine
 
 from config import setting
 
@@ -94,27 +93,5 @@ class ContractTxDetail(NeoTableBase):
 
 
 
-
-class HandledTx(NeoTableBase):
-    __tablename__ = 'handled_tx_for_contract_tx'
-    id = Column(Integer, primary_key=True)
-    tx_id = Column(String(66),unique=True)
-
-
-    @staticmethod
-    def query(session,tx_id):
-        exist_instance = session.query(HandledTx).filter(HandledTx.tx_id==tx_id).first()
-        return exist_instance
-
-    @staticmethod
-    def save(session,tx_id):
-        new_instance = HandledTx(tx_id=tx_id)
-        session.begin(subtransactions=True)
-        try:
-            session.add(new_instance)
-            session.commit()
-        except Exception as e:
-            logger.error(e)
-            session.rollback()
 
 NeoTableBase.metadata.create_all(neo_table_engine)
