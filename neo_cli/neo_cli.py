@@ -29,3 +29,32 @@ class NeoCliRpc(object):
     def get_application_log(self,tx_id):
         data = self.bulid_request_body("getapplicationlog",[tx_id])
         return self.make_request(data)
+
+
+
+    def get_token_info(tokenAddress):
+
+        data = {
+            "jsonrpc": "2.0",
+            "method": "invokefunction",
+            "id": 3
+        }
+
+        token_info = []
+
+        try:
+            for attr in ["name", "symbol", "decimals"]:
+                data["params"] = [tokenAddress, attr, []]
+                res = requests.post(random.choice(setting.NEO_RPC_APPLICATION_LOG), json=data).json()
+                value = res.get("result").get("stack")[0].get("value")
+                if res.get("result").get("stack")[0].get("type") == "ByteArray":
+                    value = bytearray.fromhex(value).decode()
+                token_info.append(value)
+
+            return token_info
+        except Exception as e:
+            logger.error(e)
+            return None
+
+d46e2df37f43fe3d1dd6f2bb0fddfac3c1821a22215df3df31050cf4f482001c
+d46e2df37f43fe3d1dd6f2bb0fddfac3c1821a22215df3df31050cf4f482001d

@@ -87,8 +87,7 @@ if __name__ == "__main__":
             finally:
                 neo_table_session.close()
 
-            logger.info(
-                "bookmark_contract_tx:{} bookmark_utxo:{}".format(bookmark_for_contract_tx, bookmark_for_utxo))
+            logger.info("bookmark_contract_tx:{} bookmark_utxo:{}".format(bookmark_for_contract_tx, bookmark_for_utxo))
 
 
 

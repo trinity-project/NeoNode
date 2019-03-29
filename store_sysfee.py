@@ -37,9 +37,9 @@ if __name__ == "__main__":
 
     while True:
         bookmark_for_sysfee += 1
-        bookmark_for_block=BookmarkForBlock.query(block_info_session)
-
-        if bookmark_for_sysfee <= bookmark_for_block.height:
+        bookmarkForBlock=BookmarkForBlock.query(block_info_session)
+        bookmark_for_block = bookmarkForBlock.height
+        if bookmark_for_sysfee <= bookmark_for_block:
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height==bookmark_for_sysfee).all()
             if exist_instance:
                 sys_fee = Decimal(0)
@@ -60,7 +60,7 @@ if __name__ == "__main__":
                 raise e
             finally:
                 sys_fee_session.close()
-            logger.info("bookmark_sysfee:{} bookmark_block:{}".format(bookmark_for_sysfee, bookmark_for_block.height))
+            logger.info("bookmark_sysfee:{} bookmark_block:{}".format(bookmark_for_sysfee, bookmark_for_block))
 
 
 
