@@ -1,8 +1,10 @@
 import time
 from decimal import Decimal
 
-from data_model.block_info_model import BlockInfoSession, BookmarkForBlock, Tx
-from data_model.sysfee_model import  Sysfee, BookmarkForSysfee, NeoTableSession
+from sqlalchemy.orm import sessionmaker
+
+from data_model.block_info_model import BookmarkForBlock, Tx, engine
+from data_model.sysfee_model import Sysfee, BookmarkForSysfee, neo_table_engine
 
 from project_log import setup_logger
 
@@ -19,6 +21,9 @@ def store_sysfee(session,block_height,sys_fee):
 
 if __name__ == "__main__":
     logger = setup_logger()
+
+    NeoTableSession = sessionmaker(bind=neo_table_engine)
+    BlockInfoSession = sessionmaker(bind=engine)
     sys_fee_session = NeoTableSession()
     block_info_session = BlockInfoSession()
 
@@ -61,6 +66,7 @@ if __name__ == "__main__":
 
 
         else:
+            bookmark_for_sysfee -= 1
             time.sleep(3)
 
 

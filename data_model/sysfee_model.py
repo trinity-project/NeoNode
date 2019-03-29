@@ -1,21 +1,12 @@
-import pymysql
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, create_engine
-from sqlalchemy.orm import sessionmaker
 
 from config import setting
 
 
 
 
-# pymysql.install_as_MySQLdb()
 
-
-block_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
-                                               setting.MYSQLDATABASE["passwd"],
-                                               setting.MYSQLDATABASE["host"],
-                                               setting.MYSQLDATABASE["db_block_info"]),
-                                  pool_recycle=3600,pool_size=100,pool_pre_ping=True)
 
 neo_table_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                                                setting.MYSQLDATABASE["passwd"],
@@ -28,10 +19,8 @@ neo_table_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["
 
 
 
-# BlockInfoSession = sessionmaker(bind=block_info_engine)
-NeoTableSession = sessionmaker(bind=neo_table_engine)
 
-BlockInfoBase = declarative_base()
+
 NeoTableBase = declarative_base()
 
 
