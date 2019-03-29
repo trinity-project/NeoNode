@@ -1,20 +1,26 @@
 
 import json
 import time
+from sqlalchemy.orm import sessionmaker
+
 
 from config import setting
 from neo_cli import NeoCliRpc
-from data_model.block_info_model import BookmarkForBlock, Tx, BlockInfoSession
+from data_model.block_info_model import BookmarkForBlock, Tx, engine
 from project_log import setup_logger
 
 
 
 
 if __name__ == "__main__":
+
+
+
     logger = setup_logger()
     neo_cli_rpc = NeoCliRpc(setting.NEOCLIURL)
 
     #开启mysql会话
+    BlockInfoSession = sessionmaker(bind=engine)
     session = BlockInfoSession()
     bookmarkForBlock = BookmarkForBlock.query(session)
     if bookmarkForBlock:

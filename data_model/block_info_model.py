@@ -2,7 +2,6 @@
 from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, create_engine
-from sqlalchemy.orm import sessionmaker
 
 from config import setting
 from utils.utils import check_database
@@ -21,7 +20,7 @@ engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                        pool_recycle=3600, pool_size=100,pool_pre_ping=True)
 
 
-BlockInfoSession = sessionmaker(bind=engine)
+
 Base = declarative_base()
 
 
