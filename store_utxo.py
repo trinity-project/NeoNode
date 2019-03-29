@@ -79,6 +79,7 @@ if __name__ == "__main__":
 
     logger = setup_logger()
     utxo_session = NeoTableSession()
+    sysfee_session = NeoTableSession()
     block_info_session = BlockInfoSession()
     # 加载本地同步的快高
     bookmarkForUtxo = BookmarkForUtxo.query(utxo_session)
@@ -93,7 +94,7 @@ if __name__ == "__main__":
     while True:
 
         bookmark_for_utxo += 1
-        bookmarkForSysfee=BookmarkForSysfee.query(utxo_session)
+        bookmarkForSysfee=BookmarkForSysfee.query(sysfee_session)
         bookmark_for_sysfee = bookmarkForSysfee.height
 
         if bookmark_for_utxo <= bookmark_for_sysfee:
