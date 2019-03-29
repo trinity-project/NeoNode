@@ -94,9 +94,9 @@ if __name__ == "__main__":
 
         bookmark_for_utxo += 1
         bookmarkForSysfee=BookmarkForSysfee.query(utxo_session)
+        bookmark_for_sysfee = bookmarkForSysfee.height
 
-
-        if bookmark_for_utxo <= bookmarkForSysfee.height:
+        if bookmark_for_utxo <= bookmark_for_sysfee:
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height == bookmark_for_utxo).all()
             if  exist_instance:
                 for tx in exist_instance:
@@ -122,7 +122,7 @@ if __name__ == "__main__":
             finally:
                 utxo_session.close()
 
-            logger.info("bookmark_utxo:{} bookmark_sysfee:{}".format(bookmark_for_utxo, bookmarkForSysfee.height))
+            logger.info("bookmark_utxo:{} bookmark_sysfee:{}".format(bookmark_for_utxo, bookmark_for_sysfee))
 
         else:
             time.sleep(3)
