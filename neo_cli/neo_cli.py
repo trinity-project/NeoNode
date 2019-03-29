@@ -56,5 +56,3 @@ class NeoCliRpc(object):
             logger.error(e)
             return None
 
-d46e2df37f43fe3d1dd6f2bb0fddfac3c1821a22215df3df31050cf4f482001c
-d46e2df37f43fe3d1dd6f2bb0fddfac3c1821a22215df3df31050cf4f482001d
