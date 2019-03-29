@@ -1,6 +1,7 @@
 import pymysql
+from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Text, create_engine
+from sqlalchemy import Column, Integer, String, create_engine
 
 from config import setting
 
@@ -58,7 +59,7 @@ class ClaimTx(NeoTableBase):
     tx_id = Column(String(66))
     address_to = Column(String(40),index=True)
     value = Column(String(30))
-    claims = Column(Text)
+    claims = Column(LONGTEXT)
     block_timestamp=Column(Integer)
 
 
