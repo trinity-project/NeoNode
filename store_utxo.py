@@ -2,10 +2,12 @@ import json
 import time
 from decimal import Decimal
 
+from sqlalchemy.orm import sessionmaker
+
 from config import setting
-from data_model.utxo_model import Utxo, BookmarkForUtxo, NeoTableSession, BlockInfoSession
+from data_model.utxo_model import Utxo, BookmarkForUtxo, neo_table_engine
 from data_model.sysfee_model import BookmarkForSysfee,Sysfee
-from data_model.block_info_model import Tx
+from data_model.block_info_model import Tx, engine
 from project_log import setup_logger
 
 
@@ -78,8 +80,11 @@ def store_utxo(session,tx_id,vin,vout,block_height):
 if __name__ == "__main__":
 
     logger = setup_logger()
-    utxo_session = NeoTableSession()
 
+    BlockInfoSession = sessionmaker(bind=engine)
+    NeoTableSession = sessionmaker(bind=neo_table_engine)
+
+    utxo_session = NeoTableSession()
     block_info_session = BlockInfoSession()
     # 加载本地同步的快高
     bookmarkForUtxo = BookmarkForUtxo.query(utxo_session)
