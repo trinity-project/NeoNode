@@ -1,24 +1,13 @@
 import json
 import time
 
-from data_model.claim_model import Tx, ClaimTx, BookmarkForClaim, logger, NeoTableSession, Utxo, \
-    BookmarkForUtxo
+from sqlalchemy.orm import sessionmaker
 
-
-class TRANSACTION_TYPE(object):
-    CONTRACT="ContractTransaction"
-    CLAIM="ClaimTransaction"
-    INVOKECONTRACT="InvocationTransaction"
-
-#加载本地同步的快高
-bookmarkForClaim = BookmarkForClaim.query()
-
-if bookmarkForClaim:
-    bookmark_for_claim = bookmarkForClaim.height
-else:
-    bookmark_for_claim = 0
-    bookmarkForClaim=BookmarkForClaim.save(bookmark_for_claim)
-
+from data_model.block_info_model import engine, Tx
+from data_model.claim_model import ClaimTx, BookmarkForClaim, neo_table_engine
+from data_model.utxo_model import Utxo, BookmarkForUtxo
+from project_log.my_log import setup_logger
+from utils.utils import TRANSACTION_TYPE
 
 
 def store_claim_tx(session,tx_id,block_time,vout,claims):
@@ -35,49 +24,67 @@ def update_utxo_status(session,claims):
         Utxo.update(session,exist_instance)
 
 
-block_interval = 0
-
-while True:
-    bookmark_for_utxo=BookmarkForUtxo.query()
-    logger.info("bookmark_claim_tx:{} bookmark_utxo:{}".format(bookmark_for_claim,bookmark_for_utxo.height))
-    if not bookmark_for_utxo:
-        time.sleep(10)
-        continue
-
-    if bookmark_for_claim + block_interval > bookmark_for_utxo.height:
-        block_interval = 0
-
-    if bookmark_for_claim < bookmark_for_utxo.height:
-        exist_instance=Tx.query(bookmark_for_claim,block_interval,TRANSACTION_TYPE.CLAIM)
-        if exist_instance:
-            for tx in exist_instance:
-                tx_id=tx.tx_id
-                tx_type=tx.tx_type
-                block_time=tx.block_time
-                vout=json.loads(tx.vout)
-                claims=json.loads(tx.claims)
-
-                session = NeoTableSession(autocommit=True)
-                try:
-                    session.begin(subtransactions=True)
-                    store_claim_tx(session,tx_id,block_time,vout,claims)
-                    update_utxo_status(session,claims)
-                    session.commit()
-                except Exception as e:
-                    session.rollback()
-                    raise e
-                finally:
-                    session.close()
-        # break
-        bookmark_for_claim += block_interval + 1
-        bookmarkForClaim.height = bookmark_for_claim
-        BookmarkForClaim.update(bookmarkForClaim)
 
 
+if __name__ == "__main__":
+    logger = setup_logger()
 
+    BlockInfoSession = sessionmaker(bind=engine)
+    NeoTableSession = sessionmaker(bind=neo_table_engine)
 
+    neo_table_session = NeoTableSession()
+    block_info_session = BlockInfoSession()
+
+    # 加载本地同步的快高
+    bookmarkForClaim = BookmarkForClaim.query(neo_table_session)
+
+    if bookmarkForClaim:
+        bookmark_for_claim = bookmarkForClaim.height
     else:
-        time.sleep(5)
+        bookmark_for_claim = -1
+        bookmarkForClaim = BookmarkForClaim.save(neo_table_session,bookmark_for_claim)
+
+
+
+    while True:
+        bookmark_for_claim += 1
+        bookmarkForUtxo=BookmarkForUtxo.query(neo_table_session)
+
+        bookmark_for_utxo = bookmarkForUtxo.height
+
+        if bookmark_for_claim <= bookmark_for_utxo:
+            exist_instance=block_info_session.query(Tx).filter(Tx.block_height==bookmark_for_claim,Tx.tx_type==TRANSACTION_TYPE.CLAIM).all()
+            if exist_instance:
+                for tx in exist_instance:
+                    tx_id=tx.tx_id
+                    tx_type=tx.tx_type
+                    block_time=tx.block_time
+                    vout=json.loads(tx.vout)
+                    claims=json.loads(tx.claims)
+
+                    store_claim_tx(neo_table_session,tx_id,block_time,vout,claims)
+                    update_utxo_status(neo_table_session,claims)
+
+
+            bookmarkForClaim.height = bookmark_for_claim
+            BookmarkForClaim.update(neo_table_session,bookmarkForClaim)
+            try:
+                neo_table_session.commit()
+            except Exception as e:
+                neo_table_session.rollback()
+                raise e
+            finally:
+                neo_table_session.close()
+
+
+            logger.info("bookmark_claim_tx:{} bookmark_utxo:{}".format(bookmark_for_claim, bookmark_for_utxo))
+
+
+
+
+        else:
+            bookmark_for_claim -= 1
+            time.sleep(3)
 
 
 
