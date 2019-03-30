@@ -41,6 +41,7 @@ if __name__ == "__main__":
 
         #如果 neo-cli rpc 不可用,睡眠几秒,继续请求
         if not block_info:
+            logger.info("sleep")
             time.sleep(3)
             continue
 
