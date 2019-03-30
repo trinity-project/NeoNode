@@ -32,27 +32,15 @@ class NeoCliRpc(object):
 
 
 
-    def get_token_info(tokenAddress):
-
-        data = {
-            "jsonrpc": "2.0",
-            "method": "invokefunction",
-            "id": 3
-        }
-
+    def get_token_info(self,token_address):
         token_info = []
+        for attr in ["name", "symbol", "decimals"]:
+            data = self.bulid_request_body("invokefunction",[token_address,attr,[]] )
+            res = self.make_request(data)
+            value = res.get("stack")[0].get("value")
+            if res.get("stack")[0].get("type") == "ByteArray":
+                value = bytearray.fromhex(value).decode()
 
-        try:
-            for attr in ["name", "symbol", "decimals"]:
-                data["params"] = [tokenAddress, attr, []]
-                res = requests.post(random.choice(setting.NEO_RPC_APPLICATION_LOG), json=data).json()
-                value = res.get("result").get("stack")[0].get("value")
-                if res.get("result").get("stack")[0].get("type") == "ByteArray":
-                    value = bytearray.fromhex(value).decode()
-                token_info.append(value)
+            token_info.append(value)
 
-            return token_info
-        except Exception as e:
-            logger.error(e)
-            return None
-
+        return token_info
