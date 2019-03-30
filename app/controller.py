@@ -120,7 +120,7 @@ def transfer_tnc(addressTo,value):
     privt_key=setting.PRIVTKEY
     res = verify_password(passwd, passwd_hash)
     app_logger.info(remote_ip)
-    value = value * pow(10, 8)
+    value = int(Decimal(value) * pow(10, 8))
     if remote_ip==setting.REMOTE_ADDR and res:
         return service.token_swap(address_from,addressTo,value,privt_key)
     return {}
