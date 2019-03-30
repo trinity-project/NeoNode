@@ -618,7 +618,7 @@ def verify_signature(message,signature,pubkey):
 
 
 def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
-    value = value*pow(10,8)
+
     res = createTx(addressFrom, addressTo, value, assetId)
     tx_data = res.get("txData")
     tx_id = res.get("txid")
