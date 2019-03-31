@@ -1,13 +1,9 @@
 import pymysql
-from sqlalchemy.dialects.mysql import LONGTEXT
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, create_engine,String, Text
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, create_engine,String
 
 from config import setting
-from project_log import setup_mylogger
 
-logger=setup_mylogger()
 
 
 
@@ -17,13 +13,7 @@ pymysql.install_as_MySQLdb()
 
 
 
-block_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
-                                               setting.MYSQLDATABASE["passwd"],
-                                               setting.MYSQLDATABASE["host"],
-                                               setting.MYSQLDATABASE["db_block_info"]),
-                                  pool_recycle=3600,pool_size=100,pool_pre_ping=True)
-
-account_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
+neo_table_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["user"],
                                                setting.MYSQLDATABASE["passwd"],
                                                setting.MYSQLDATABASE["host"],
                                                setting.MYSQLDATABASE["db_neo_table"]
@@ -32,10 +22,8 @@ account_info_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABAS
 
 
 
-BlockInfoSession = sessionmaker(bind=block_info_engine)
-NeoTableSession = sessionmaker(bind=account_info_engine)
 
-BlockInfoBase = declarative_base()
+
 NeoTableBase = declarative_base()
 
 
@@ -46,46 +34,20 @@ class BookmarkForToken(NeoTableBase):
     height = Column(Integer)
 
     @staticmethod
-    def query():
-        session=NeoTableSession()
+    def query(session):
         exist_instance=session.query(BookmarkForToken).first()
-        session.close()
         return exist_instance
     @staticmethod
-    def save(height):
-        session=NeoTableSession()
+    def save(session,height):
         new_instance = BookmarkForToken(height=height)
         session.add(new_instance)
-        try:
-            session.commit()
-        except:
-            session.rollback()
-        finally:
-            session.close()
         return new_instance
 
     @staticmethod
-    def update(exist_instance):
-        session=NeoTableSession()
+    def update(session,exist_instance):
         session.add(exist_instance)
-        try:
-            session.commit()
-        except:
-            session.rollback()
-        finally:
-            session.close()
 
-class BookmarkForBlock(BlockInfoBase):
-    __tablename__ = 'bookmark_for_block'
-    id = Column(Integer, primary_key=True)
-    height = Column(Integer)
 
-    @staticmethod
-    def query():
-        session=BlockInfoSession()
-        exist_instance=session.query(BookmarkForBlock).first()
-        session.close()
-        return exist_instance
 
 
 class Token(NeoTableBase):
@@ -100,45 +62,21 @@ class Token(NeoTableBase):
     icon = Column(String(256))
 
     @staticmethod
-    def query_token(address):
-        session = NeoTableSession()
+    def query_token(session,address):
         exist_instance = session.query(Token).filter(Token.address==address).first()
         return exist_instance
 
 
     @staticmethod
-    def save(address,name,symbol,decimal,tokenType,chainType,icon):
-        session = NeoTableSession()
+    def save(session,address,name,symbol,decimal,tokenType,chainType,icon):
         new_instance = Token(address=address, name=name,symbol=symbol,decimal=decimal,
                              token_type = tokenType,chain_type=chainType,icon=icon)
         session.add(new_instance)
-        try:
-            session.commit()
-            return True
-        except Exception as e:
-            return False
 
 
 
 
 
-class Tx(BlockInfoBase):
-    __tablename__ = 'tx'
-    id = Column(Integer, primary_key=True)
-    tx_id = Column(String(66),unique=True)
-    tx_type = Column(String(32))
-    block_height=Column(Integer,index=True)
-    block_time=Column(Integer)
-    vin = Column(LONGTEXT)
-    vout = Column(LONGTEXT)
-    sys_fee = Column(String(16))
-    net_fee = Column(String(16))
 
-    @staticmethod
-    def query(block_height):
-        session=BlockInfoSession()
-        exist_instance=session.query(Tx).filter(Tx.block_height==block_height).all()
-        session.close()
-        return exist_instance
 
-NeoTableBase.metadata.create_all(account_info_engine)
+NeoTableBase.metadata.create_all(neo_table_engine)
