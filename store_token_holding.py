@@ -22,7 +22,9 @@ def store_token_holding(session,executions):
             except:
                 continue
             address_to = hex2address(notification["state"]["value"][2]["value"])
-            TokenHolding.save(session,contract, address_to)
+            exist_instance = TokenHolding.query(session,contract,address_to)
+            if not exist_instance:
+                TokenHolding.save(session,contract, address_to)
 
 
 

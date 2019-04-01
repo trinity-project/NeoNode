@@ -66,6 +66,11 @@ class TokenHolding(NeoTableBase):
         UniqueConstraint('address', 'contract'),
     )
 
+
+    @staticmethod
+    def query(session,contract,address):
+        exist_instance = session.query(TokenHolding).filter(TokenHolding.address == contract,TokenHolding.address == address).first()
+        return exist_instance
     @staticmethod
     def save(session,contract,address):
         new_instance = TokenHolding(contract=contract, address=address)
