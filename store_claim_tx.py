@@ -33,7 +33,7 @@ if __name__ == "__main__":
     NeoTableSession = sessionmaker(bind=neo_table_engine)
 
     neo_table_session = NeoTableSession()
-    block_info_session = BlockInfoSession()
+
 
     # 加载本地同步的快高
     bookmarkForClaim = BookmarkForClaim.query(neo_table_session)
@@ -44,16 +44,23 @@ if __name__ == "__main__":
         bookmark_for_claim = -1
         bookmarkForClaim = BookmarkForClaim.save(neo_table_session,bookmark_for_claim)
 
-
-
+    block_interval = 1000
     while True:
+
+
+
         bookmark_for_claim += 1
         bookmarkForUtxo=BookmarkForUtxo.query(neo_table_session)
 
         bookmark_for_utxo = bookmarkForUtxo.height
+        if bookmark_for_claim + block_interval > bookmark_for_utxo:
+            block_interval = 0
 
         if bookmark_for_claim <= bookmark_for_utxo:
-            exist_instance=block_info_session.query(Tx).filter(Tx.block_height==bookmark_for_claim,Tx.tx_type==TRANSACTION_TYPE.CLAIM).all()
+            block_info_session = BlockInfoSession()
+            exist_instance = block_info_session.query(Tx).filter(Tx.block_height >= bookmark_for_claim,
+                                                                 Tx.block_height <= bookmark_for_claim + block_interval,
+                                                                 Tx.tx_type == TRANSACTION_TYPE.CLAIM).all()
             if exist_instance:
                 for tx in exist_instance:
                     tx_id=tx.tx_id
@@ -76,7 +83,7 @@ if __name__ == "__main__":
             finally:
                 neo_table_session.close()
 
-
+            block_info_session.close()
             logger.info("bookmark_claim_tx:{} bookmark_utxo:{}".format(bookmark_for_claim, bookmark_for_utxo))
 
 

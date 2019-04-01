@@ -109,6 +109,5 @@ if __name__ == "__main__":
             bookmark_for_nep5 -= 1
             time.sleep(3)
 
-
-
+        block_info_session.close()
 

@@ -127,8 +127,8 @@ if __name__ == "__main__":
             except Exception as e:
                 utxo_session.rollback()
                 raise e
-            finally:
-                utxo_session.close()
+            # finally:
+            #     utxo_session.close()
 
             logger.info("bookmark_utxo:{} bookmark_sysfee:{}".format(bookmark_for_utxo, bookmark_for_sysfee))
 

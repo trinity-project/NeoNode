@@ -42,7 +42,6 @@ if __name__ == "__main__":
         bookmark_for_block = bookmarkForBlock.height
         if bookmark_for_sysfee <= bookmark_for_block:
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height==bookmark_for_sysfee).all()
-            block_info_session.close()
             if exist_instance:
                 sys_fee = Decimal(0)
                 for tx in exist_instance:
@@ -60,8 +59,7 @@ if __name__ == "__main__":
             except Exception as e:
                 sys_fee_session.rollback()
                 raise e
-            finally:
-                sys_fee_session.close()
+
             logger.info("bookmark_sysfee:{} bookmark_block:{}".format(bookmark_for_sysfee, bookmark_for_block))
 
 
