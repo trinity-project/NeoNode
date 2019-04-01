@@ -71,7 +71,7 @@ if __name__ == "__main__":
                     store_claim_tx(neo_table_session,tx_id,block_time,vout,claims)
                     update_utxo_status(neo_table_session,claims)
 
-
+            bookmark_for_claim += block_interval
             bookmarkForClaim.height = bookmark_for_claim
             BookmarkForClaim.update(neo_table_session,bookmarkForClaim)
             try:
