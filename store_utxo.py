@@ -63,13 +63,7 @@ def store_utxo(session,tx_id,vin,vout,block_height):
                 gas_sysfee = count_sysfee_gas(session=session,start_block=exist_utxo.start_block,end_block=block_height)
                 gen_gas = str((gas_reward + gas_sysfee) * Decimal(exist_utxo.value))
                 exist_utxo.gen_gas = gen_gas
-                # logger.info("txid:{} vout_number:{}  gen_gas:{} reward:{} sys:{}".format(
-                #                                                                 exist_utxo.tx_id,
-                #                                                               exist_utxo.vout_number,
-                #                                                               exist_utxo.gen_gas,
-                #                                                               str(gas_reward  * Decimal(exist_utxo.value)),
-                #                                                               str(gas_sysfee * Decimal(exist_utxo.value))
-                #                                                               ))
+
             Utxo.update(session, exist_utxo)
         else:
             raise Exception("lost utxo->tx_id:{},number:{}".format(vin_txid, vin_vout_number))
@@ -86,6 +80,7 @@ if __name__ == "__main__":
 
     utxo_session = NeoTableSession()
     block_info_session = BlockInfoSession()
+    sysfee_session = NeoTableSession()
     # 加载本地同步的快高
     bookmarkForUtxo = BookmarkForUtxo.query(utxo_session)
 
@@ -99,10 +94,9 @@ if __name__ == "__main__":
     while True:
 
         bookmark_for_utxo += 1
-        sysfee_session = NeoTableSession()
+
         bookmarkForSysfee=BookmarkForSysfee.query(sysfee_session)
         bookmark_for_sysfee = bookmarkForSysfee.height
-        sysfee_session.close()
 
         if bookmark_for_utxo <= bookmark_for_sysfee:
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height == bookmark_for_utxo).all()
@@ -127,8 +121,7 @@ if __name__ == "__main__":
             except Exception as e:
                 utxo_session.rollback()
                 raise e
-            # finally:
-            #     utxo_session.close()
+
 
             logger.info("bookmark_utxo:{} bookmark_sysfee:{}".format(bookmark_for_utxo, bookmark_for_sysfee))
 
