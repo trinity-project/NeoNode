@@ -80,10 +80,8 @@ if __name__ == "__main__":
             except Exception as e:
                 neo_table_session.rollback()
                 raise e
-            finally:
-                neo_table_session.close()
 
-            block_info_session.close()
+
             logger.info("bookmark_claim_tx:{} bookmark_utxo:{}".format(bookmark_for_claim, bookmark_for_utxo))
 
 
