@@ -33,8 +33,7 @@ if __name__ == "__main__":
     logger = setup_logger()
     neo_cli_rpc = NeoCliRpc(setting.NEOCLIURL)
 
-    NeoTableSession = sessionmaker(bind=neo_table_engine)
-    BlockInfoSession = sessionmaker(bind=engine)
+
 
     token_session = NeoTableSession()
 

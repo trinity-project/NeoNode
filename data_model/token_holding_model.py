@@ -39,19 +39,34 @@ class BookmarkForTokenHolding(NeoTableBase):
     height = Column(Integer)
 
     @staticmethod
-    def query(session):
+    def query():
+        session = NeoTableSession()
         exist_instance=session.query(BookmarkForTokenHolding).first()
+        session.close()
         return exist_instance
     @staticmethod
-    def save(session,height):
+    def save(height):
+        session = NeoTableSession()
         new_instance = BookmarkForTokenHolding(height=height)
         session.add(new_instance)
+        try:
+            session.commit()
+        except Exception as e:
+            session.rollback()
+        finally:
+            session.close()
 
         return new_instance
     @staticmethod
-    def update(session,exist_instance):
+    def update(exist_instance):
+        session = NeoTableSession()
         session.add(exist_instance)
-
+        try:
+            session.commit()
+        except Exception as e:
+            session.rollback()
+        finally:
+            session.close()
 
 
 
