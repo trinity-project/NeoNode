@@ -4,13 +4,13 @@ from sqlalchemy.orm import sessionmaker
 
 from config import setting
 from data_model.block_info_model import engine, BookmarkForBlock, Tx
-from data_model.token_holding_model import BookmarkForTokenHolding, TokenHolding, neo_table_engine
+from data_model.token_holding_model import BookmarkForTokenHolding, TokenHolding
 from neo_cli import NeoCliRpc
 from project_log import setup_logger
 from utils.utils import hex2address, TRANSACTION_TYPE
 
 
-def store_token_holding(session,executions):
+def store_token_holding(executions):
     for execution in executions:
         if execution.get("vmstate") != "HALT, BREAK":
             continue
@@ -22,9 +22,9 @@ def store_token_holding(session,executions):
             except:
                 continue
             address_to = hex2address(notification["state"]["value"][2]["value"])
-            exist_instance = TokenHolding.query(session,contract,address_to)
+            exist_instance = TokenHolding.query(contract,address_to)
             if not exist_instance:
-                TokenHolding.save(session,contract, address_to)
+                TokenHolding.save(contract, address_to)
 
 
 
@@ -33,18 +33,17 @@ if __name__ == "__main__":
     logger = setup_logger()
     neo_cli_rpc = NeoCliRpc(setting.NEOCLIURL)
 
+    BlockInfoSession = sessionmaker(bind=engine)
 
-
-    token_session = NeoTableSession()
 
     #加载本地同步的快高
-    bookmarkForTokenHolding = BookmarkForTokenHolding.query(token_session)
+    bookmarkForTokenHolding = BookmarkForTokenHolding.query()
 
     if bookmarkForTokenHolding:
         bookmark_for_token_holding = bookmarkForTokenHolding.height
     else:
         bookmark_for_token_holding = -1
-        bookmarkForTokenHolding=BookmarkForTokenHolding.save(token_session,bookmark_for_token_holding)
+        bookmarkForTokenHolding=BookmarkForTokenHolding.save(bookmark_for_token_holding)
 
 
 
@@ -83,21 +82,12 @@ if __name__ == "__main__":
                     if not content.get("executions"):
                         continue
 
-                    store_token_holding(token_session,content.get("executions"))
+                    store_token_holding(content.get("executions"))
 
             # break
             bookmark_for_token_holding += block_interval
             bookmarkForTokenHolding.height = bookmark_for_token_holding
-            BookmarkForTokenHolding.update(token_session,bookmarkForTokenHolding)
-
-            try:
-                token_session.commit()
-            except Exception as e:
-                logger.error(e)
-                token_session.rollback()
-                raise e
-            finally:
-                token_session.close()
+            BookmarkForTokenHolding.update(bookmarkForTokenHolding)
 
             logger.info("bookmark_token_holding:{} bookmark_block:{}".format(bookmark_for_token_holding,
                                                                              bookmark_for_block))
