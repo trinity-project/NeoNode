@@ -33,7 +33,7 @@ if __name__ == "__main__":
     NeoTableSession = sessionmaker(bind=neo_table_engine)
 
     neo_table_session = NeoTableSession()
-
+    block_info_session = BlockInfoSession()
 
     # 加载本地同步的快高
     bookmarkForClaim = BookmarkForClaim.query(neo_table_session)
@@ -57,7 +57,6 @@ if __name__ == "__main__":
             block_interval = 0
 
         if bookmark_for_claim <= bookmark_for_utxo:
-            block_info_session = BlockInfoSession()
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height >= bookmark_for_claim,
                                                                  Tx.block_height <= bookmark_for_claim + block_interval,
                                                                  Tx.tx_type == TRANSACTION_TYPE.CLAIM).all()
