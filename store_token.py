@@ -33,6 +33,8 @@ if __name__ == "__main__":
         block_info_session = BlockInfoSession()
         bookmarkForBlock = BookmarkForBlock.query(block_info_session)
 
+        if bookmark_for_token + block_interval > bookmarkForBlock.height:
+            block_interval = 0
         if bookmark_for_token <= bookmarkForBlock.height:
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height >= bookmark_for_token,
                                                                  Tx.block_height <= bookmark_for_token + block_interval,
