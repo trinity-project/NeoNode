@@ -106,6 +106,7 @@ if __name__ == "__main__":
             logger.info("bookmark_nep5:{} bookmark_block:{}".format(bookmark_for_nep5, bookmark_for_block))
 
         else:
+            bookmark_for_nep5 -= 1
             time.sleep(3)
 
 
