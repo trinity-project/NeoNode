@@ -38,7 +38,7 @@ if __name__ == "__main__":
         if bookmark_for_token <= bookmarkForBlock.height:
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height >= bookmark_for_token,
                                                                  Tx.block_height <= bookmark_for_token + block_interval,
-                                                                 Tx.tx_type == TRANSACTION_TYPE.INVOKECONTRACT)
+                                                                 Tx.tx_type == TRANSACTION_TYPE.INVOKECONTRACT).all()
             if exist_instance:
                 for tx in exist_instance:
                     tx_id = tx.tx_id
