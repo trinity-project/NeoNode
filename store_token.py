@@ -83,8 +83,8 @@ if __name__ == "__main__":
 
 
 
-
-            bookmarkForToken.height = bookmark_for_token + block_interval
+            bookmark_for_token += block_interval
+            bookmarkForToken.height = bookmark_for_token
             BookmarkForToken.update(token_session,bookmarkForToken)
             try:
                 token_session.commit()
@@ -95,7 +95,7 @@ if __name__ == "__main__":
             finally:
                 token_session.close()
 
-            logger.info("bookmark token :{},bookmark block :{}".format(bookmark_for_token + block_interval,bookmarkForBlock.height))
+            logger.info("bookmark token :{},bookmark block :{}".format(bookmark_for_token,bookmarkForBlock.height))
 
 
 
