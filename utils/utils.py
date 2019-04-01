@@ -26,3 +26,24 @@ def hex2address(input):
     except:
         output = None
     return output
+
+
+def hex_reverse(input):
+    tmp_list = []
+    for i in range(0, len(input), 2):
+        tmp_list.append(input[i:i + 2])
+    hex_str = "".join(list(reversed(tmp_list)))
+    return hex_str
+
+
+def hex2interger(input):
+    try:
+        tmp_list = []
+        for i in range(0, len(input), 2):
+            tmp_list.append(input[i:i + 2])
+        hex_str = "".join(list(reversed(tmp_list)))
+        output = int(hex_str, 16)
+
+        return output
+    except:
+        return None

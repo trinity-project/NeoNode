@@ -1,171 +1,112 @@
-import json
-import random
 import time
-import binascii
-import requests
-from decimal import Decimal
-
-import sqlalchemy
-from neocore.Cryptography.Crypto import Crypto
-from neocore.UInt160 import UInt160
+from sqlalchemy.orm import sessionmaker
 
 from config import setting
-from data_model.nep5_model import Tx, InvokeTx, BookmarkForBlock, BookmarkForNep5, logger, NeoTableSession
-# from plugin.redis_client import redis_client
+from data_model.block_info_model import engine, BookmarkForBlock, Tx
+from data_model.nep5_model import InvokeTx,BookmarkForNep5, neo_table_engine
+from neo_cli import NeoCliRpc
+from project_log import setup_logger
+from utils.utils import TRANSACTION_TYPE, hex2address, hex2interger
 
 
-def hex_reverse(input):
-    tmp_list = []
-    for i in range(0, len(input), 2):
-        tmp_list.append(input[i:i + 2])
-    hex_str = "".join(list(reversed(tmp_list)))
-    return hex_str
+def store_nep5_tx(session,executions, txid, block_height, block_time):
+    for execution in executions:
+        for notification in execution.get("notifications"):
+            contract = notification["contract"]
+            try:
+                if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
+                    continue
+            except:
+                continue
+            address_from = hex2address(notification["state"]["value"][1]["value"])
+            address_to = hex2address(notification["state"]["value"][2]["value"])
+            value = hex2interger(notification["state"]["value"][3]["value"]) if notification["state"]["value"][3][
+                                                                                    "type"] != "Integer" \
+                else notification["state"]["value"][3]["value"]
 
-def hex2address(input):
-    try:
-        output = Crypto.ToAddress(UInt160(data=binascii.unhexlify(bytearray(input.encode("utf8")))))
-    except:
-        output = None
-    return output
+            if address_from and address_to and value:
+                InvokeTx.save(session=session,
+                              tx_id=txid, contract=contract, address_from=address_from, address_to=address_to,
+                              value=str(value), vm_state=execution["vmstate"], block_timestamp=block_time,
+                              block_height=block_height)
 
-def hex2interger(input):
-    try:
-        tmp_list = []
-        for i in range(0, len(input), 2):
-            tmp_list.append(input[i:i + 2])
-        hex_str = "".join(list(reversed(tmp_list)))
-        output = int(hex_str, 16)
 
-        return output
-    except:
-        return None
 
-def get_application_log(txid):
 
-    data = {
-          "jsonrpc": "2.0",
-          "method": "getapplicationlog",
-          "params": [txid],
-          "id": 1
-}
+if __name__ == "__main__":
+
+    logger = setup_logger()
+    neo_cli_rpc = NeoCliRpc(setting.NEOCLIURL)
+
+    NeoTableSession = sessionmaker(bind=neo_table_engine)
+    BlockInfoSession = sessionmaker(bind=engine)
+
+    nep5_session = NeoTableSession()
+    #加载本地同步的快高
+    bookmarkForNep5 = BookmarkForNep5.query(nep5_session)
+
+    if bookmarkForNep5:
+        bookmark_for_nep5 = bookmarkForNep5.height
+    else:
+        bookmark_for_nep5 = -1
+        bookmarkForNep5=BookmarkForNep5.save(nep5_session,bookmark_for_nep5)
+
+
+
+    block_interval = 1000
 
     while True:
-        try:
-            res = requests.post(random.choice(setting.NEO_RPC_APPLICATION_LOG),json=data).json()
-            if res.get("result"):
-                return res.get("result")
-            else:
-                logger.error("txid:{} get application log is null".format(txid))
-        except Exception as e:
-            logger.error(e)
-            time.sleep(10)
+        bookmark_for_nep5 += 1
+        block_info_session = BlockInfoSession()
+        bookmarkForBlock=BookmarkForBlock.query(block_info_session)
+        bookmark_for_block = bookmarkForBlock.height
 
+        if bookmark_for_nep5 + block_interval > bookmark_for_block:
+            block_interval = 0
 
-def md5_for_invoke_tx(tx_id,address_from,address_to,value,contract):
-    import hashlib
-    src = "{}{}{}{}{}".format(tx_id,address_from,address_to,value,contract).encode()
-    m1 = hashlib.md5()
-    m1.update(src)
-    return m1.hexdigest()
+        if bookmark_for_nep5 <= bookmark_for_block.height:
+            exist_instance = block_info_session.query(Tx).filter(Tx.block_height >= bookmark_for_nep5,
+                                                                 Tx.block_height <= bookmark_for_nep5 + block_interval,
+                                                                 Tx.tx_type == TRANSACTION_TYPE.INVOKECONTRACT).all()
+            if exist_instance:
+                for tx in exist_instance:
+                    tx_id=tx.tx_id
+                    tx_type=tx.tx_type
+                    block_height=tx.block_height
+                    block_time=tx.block_time
 
+                    try:
+                        content = neo_cli_rpc.get_application_log(tx_id)
+                    except Exception as e:
+                        logger.error(e)
+                        content = None
 
-
-class TRANSACTION_TYPE(object):
-    CONTRACT="ContractTransaction"
-    CLAIM="ClaimTransaction"
-    INVOKECONTRACT="InvocationTransaction"
-
-#加载本地同步的快高
-bookmarkForNep5 = BookmarkForNep5.query()
-
-if bookmarkForNep5:
-    bookmark_for_nep5 = bookmarkForNep5.height
-else:
-    bookmark_for_nep5 = 0
-    bookmarkForNep5=BookmarkForNep5.save(bookmark_for_nep5)
-
-
-
-
-
-
-def store_nep5_tx(executions,txid,block_height,block_time):
-    session = NeoTableSession(autocommit=True)
-    try:
-        session.begin(subtransactions=True)
-        for execution in executions:
-            for notification in execution.get("notifications"):
-                contract = notification["contract"]
-                try:
-                    if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
+                    if not content:
                         continue
-                except:
-                    continue
-                address_from = hex2address(notification["state"]["value"][1]["value"])
-                address_to = hex2address(notification["state"]["value"][2]["value"])
-                value = hex2interger(notification["state"]["value"][3]["value"]) if notification["state"]["value"][3]["type"] != "Integer"\
-                    else notification["state"]["value"][3]["value"]
-                md5_of_tx = md5_for_invoke_tx(tx_id,address_from,address_to,value,contract)
 
-                if address_from and address_to and value:
+                    if not content.get("executions"):
+                        continue
 
-                    InvokeTx.save(session=session,
-                                  tx_id=txid, contract=contract, address_from=address_from, address_to=address_to,
-                                  value=str(value), vm_state=execution["vmstate"], block_timestamp=block_time,
-                                  block_height=block_height,md5_of_tx=md5_of_tx)
+                    store_nep5_tx(nep5_session,content.get("executions"),content.get("txid"),block_height,block_time)
 
-        session.commit()
-    except sqlalchemy.exc.IntegrityError as e:
-        session.rollback()
-        logger.error(e)
-    except Exception as e:
-        session.rollback()
-        raise e
-    finally:
-        session.close()
+            # break
+            bookmark_for_nep5 += block_interval
+            bookmarkForNep5.height = bookmark_for_nep5
+            BookmarkForNep5.update(nep5_session,bookmarkForNep5)
 
-block_interval = 0
+            try:
+                nep5_session.commit()
+            except Exception as e:
+                logger.error(e)
+                nep5_session.rollback()
+                raise e
+            finally:
+                nep5_session.close()
 
-while True:
-    bookmark_for_block=BookmarkForBlock.query()
-    logger.info("bookmark_nep5:{} bookmark_block:{}".format(bookmark_for_nep5,bookmark_for_block.height))
-    if not bookmark_for_block:
-        continue
+            logger.info("bookmark_nep5:{} bookmark_block:{}".format(bookmark_for_nep5, bookmark_for_block))
 
-    if bookmark_for_nep5 + block_interval > bookmark_for_block.height:
-        block_interval = 0
-
-    if bookmark_for_nep5 < bookmark_for_block.height:
-        exist_instance=Tx.query(bookmark_for_nep5,block_interval,TRANSACTION_TYPE.INVOKECONTRACT)
-        if exist_instance:
-            for tx in exist_instance:
-                tx_id=tx.tx_id
-                tx_type=tx.tx_type
-                block_height=tx.block_height
-                block_time=tx.block_time
-                vin=json.loads(tx.vin)
-                vout=json.loads(tx.vout)
-
-                if tx_type != TRANSACTION_TYPE.INVOKECONTRACT:
-                    continue
-
-                content = get_application_log(tx_id)
-
-                if not content.get("executions"):
-                    continue
-
-                store_nep5_tx(content.get("executions"),content.get("txid"),block_height,block_time)
-
-        # break
-        bookmark_for_nep5 += block_interval + 1
-        bookmarkForNep5.height = bookmark_for_nep5
-        BookmarkForNep5.update(bookmarkForNep5)
-
-
-
-
-    else:
-        time.sleep(10)
+        else:
+            time.sleep(3)
 
 
 
