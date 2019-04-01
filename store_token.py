@@ -26,14 +26,17 @@ if __name__ == "__main__":
         bookmark_for_token = -1
         bookmarkForToken = BookmarkForToken.save(token_session,bookmark_for_token)
 
+    block_interval = 1000
     while True:
+
         bookmark_for_token += 1
         block_info_session = BlockInfoSession()
         bookmarkForBlock = BookmarkForBlock.query(block_info_session)
 
         if bookmark_for_token <= bookmarkForBlock.height:
-            exist_instance = block_info_session.query(Tx).filter(Tx.block_height==bookmark_for_token,
-                                                                 Tx.tx_type==TRANSACTION_TYPE.INVOKECONTRACT)
+            exist_instance = block_info_session.query(Tx).filter(Tx.block_height >= bookmark_for_token,
+                                                                 Tx.block_height <= bookmark_for_token + block_interval,
+                                                                 Tx.tx_type == TRANSACTION_TYPE.INVOKECONTRACT)
             if exist_instance:
                 for tx in exist_instance:
                     tx_id = tx.tx_id
@@ -79,17 +82,18 @@ if __name__ == "__main__":
 
 
 
-            bookmarkForToken.height = bookmark_for_token
+            bookmarkForToken.height = bookmark_for_token + block_interval
             BookmarkForToken.update(token_session,bookmarkForToken)
             try:
                 token_session.commit()
             except Exception as e:
                 logger.error(e)
                 token_session.rollback()
+                raise e
             finally:
                 token_session.close()
 
-            logger.info("bookmark token :{},bookmark block :{}".format(bookmark_for_token,bookmarkForBlock.height))
+            logger.info("bookmark token :{},bookmark block :{}".format(bookmark_for_token + block_interval,bookmarkForBlock.height))
 
 
 
