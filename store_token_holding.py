@@ -87,7 +87,16 @@ if __name__ == "__main__":
             # break
             bookmark_for_token_holding += block_interval
             bookmarkForTokenHolding.height = bookmark_for_token_holding
-            BookmarkForTokenHolding.update(bookmark_for_token_holding,bookmarkForTokenHolding)
+            BookmarkForTokenHolding.update(token_session,bookmarkForTokenHolding)
+
+            try:
+                token_session.commit()
+            except Exception as e:
+                logger.error(e)
+                token_session.rollback()
+                raise e
+            finally:
+                token_session.close()
 
             logger.info("bookmark_token_holding:{} bookmark_block:{}".format(bookmark_for_token_holding,
                                                                              bookmark_for_block))
@@ -99,6 +108,6 @@ if __name__ == "__main__":
             bookmark_for_token_holding -= 1
             time.sleep(3)
 
-
+        block_info_session.close()
 
 
