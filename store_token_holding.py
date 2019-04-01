@@ -82,7 +82,7 @@ if __name__ == "__main__":
                     if not content.get("executions"):
                         continue
 
-                    store_token_holding(bookmark_for_token_holding,content.get("executions"))
+                    store_token_holding(token_session,content.get("executions"))
 
             # break
             bookmark_for_token_holding += block_interval
