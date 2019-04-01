@@ -29,9 +29,9 @@ if __name__ == "__main__":
     while True:
         bookmark_for_token += 1
         block_info_session = BlockInfoSession()
-        bookmark_for_block = BookmarkForBlock.query(block_info_session)
+        bookmarkForBlock = BookmarkForBlock.query(block_info_session)
 
-        if bookmark_for_token <= bookmark_for_block.height:
+        if bookmark_for_token <= bookmarkForBlock.height:
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height==bookmark_for_token,
                                                                  Tx.tx_type==TRANSACTION_TYPE.INVOKECONTRACT)
             if exist_instance:
@@ -69,7 +69,7 @@ if __name__ == "__main__":
                                     logger.info("store token {}".format(contract))
                                     Token.save(token_session,contract, token_info[0], token_info[1], token_info[2],
                                                "NEP-5", "NEO",
-                                               "https://appserver.trinity.ink/static/icon/{}.png".format(token_info[1]))
+                                               "https://appserver.trinity.ink/static/icon/{}.png".format(contract))
 
                             except Exception as e:
                                 logger.info(notification)
@@ -89,7 +89,7 @@ if __name__ == "__main__":
             finally:
                 token_session.close()
 
-            logger.info("bookmark token :{},bookmark block :{}".format(bookmark_for_token,bookmark_for_block))
+            logger.info("bookmark token :{},bookmark block :{}".format(bookmark_for_token,bookmarkForBlock.height))
 
 
 
