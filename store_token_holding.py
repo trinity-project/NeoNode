@@ -1,113 +1,103 @@
-import random
 import time
-import binascii
-import requests
-from neocore.Cryptography.Crypto import Crypto
-from neocore.UInt160 import UInt160
+
+from sqlalchemy.orm import sessionmaker
 
 from config import setting
-from data_model.token_holding_model import BookmarkForTokenHolding,TokenHolding,Tx, BookmarkForBlock, logger
+from data_model.block_info_model import engine, BookmarkForBlock, Tx
+from data_model.token_holding_model import BookmarkForTokenHolding, TokenHolding, neo_table_engine
+from neo_cli import NeoCliRpc
+from project_log import setup_logger
+from utils.utils import hex2address, TRANSACTION_TYPE
+
+
+def store_token_holding(session,executions):
+    for execution in executions:
+        if execution.get("vmstate") != "HALT, BREAK":
+            continue
+        for notification in execution.get("notifications"):
+            contract = notification["contract"]
+            try:
+                if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
+                    continue
+            except:
+                continue
+            address_to = hex2address(notification["state"]["value"][2]["value"])
+            TokenHolding.save(session,contract, address_to)
 
 
 
-def hex2address(input):
-    try:
-        output = Crypto.ToAddress(UInt160(data=binascii.unhexlify(bytearray(input.encode("utf8")))))
-    except:
-        output = None
-    return output
+if __name__ == "__main__":
+
+    logger = setup_logger()
+    neo_cli_rpc = NeoCliRpc(setting.NEOCLIURL)
+
+    NeoTableSession = sessionmaker(bind=neo_table_engine)
+    BlockInfoSession = sessionmaker(bind=engine)
+
+    token_session = NeoTableSession()
+
+    #加载本地同步的快高
+    bookmarkForTokenHolding = BookmarkForTokenHolding.query(token_session)
+
+    if bookmarkForTokenHolding:
+        bookmark_for_token_holding = bookmarkForTokenHolding.height
+    else:
+        bookmark_for_token_holding = -1
+        bookmarkForTokenHolding=BookmarkForTokenHolding.save(token_session,bookmark_for_token_holding)
 
 
 
-def get_application_log(txid):
 
-    data = {
-          "jsonrpc": "2.0",
-          "method": "getapplicationlog",
-          "params": [txid],
-          "id": 1
-}
+
+
+
+
+    block_interval = 1000
 
     while True:
-        try:
-            res = requests.post(random.choice(setting.NEO_RPC_APPLICATION_LOG),json=data).json()
-            if res.get("result"):
-                return res.get("result")
-            else:
-                logger.error("txid:{} get application log is null".format(txid))
-                return {}
-        except Exception as e:
-            logger.error(e)
-            time.sleep(10)
+        bookmark_for_token_holding += 1
+        block_info_session = BlockInfoSession()
+        bookmarkForBlock=BookmarkForBlock.query(block_info_session)
+        bookmark_for_block = bookmarkForBlock.height
 
+        if bookmark_for_token_holding + block_interval > bookmark_for_block:
+            block_interval = 0
 
-class TRANSACTION_TYPE(object):
-    CONTRACT="ContractTransaction"
-    CLAIM="ClaimTransaction"
-    INVOKECONTRACT="InvocationTransaction"
+        if bookmark_for_token_holding <= bookmark_for_block:
+            exist_instance = block_info_session.query(Tx).filter(Tx.block_height >= bookmark_for_token_holding,
+                                                                 Tx.block_height <= bookmark_for_token_holding + block_interval,
+                                                                 Tx.tx_type == TRANSACTION_TYPE.INVOKECONTRACT).all()
+            if exist_instance:
+                for tx in exist_instance:
+                    tx_id=tx.tx_id
+                    try:
+                        content = neo_cli_rpc.get_application_log(tx_id)
+                    except Exception as e:
+                        logger.error(e)
+                        content = None
 
-#加载本地同步的快高
-bookmarkForTokenHolding = BookmarkForTokenHolding.query()
-
-if bookmarkForTokenHolding:
-    bookmark_for_token_holding = bookmarkForTokenHolding.height
-else:
-    bookmark_for_token_holding = 0
-    bookmarkForTokenHolding=BookmarkForTokenHolding.save(bookmark_for_token_holding)
-
-
-
-
-
-
-def store_token_holding(executions):
-
-        for execution in executions:
-            if execution.get("vmstate") != "HALT, BREAK":
-                continue
-            for notification in execution.get("notifications"):
-                contract = notification["contract"]
-                try:
-                    if bytearray.fromhex(notification["state"]["value"][0]["value"]).decode() != "transfer":
+                    if not content:
                         continue
-                except:
-                    continue
-                address_to = hex2address(notification["state"]["value"][2]["value"])
-                TokenHolding.save(contract=contract, address=address_to)
 
-block_interval = 1000
+                    if not content.get("executions"):
+                        continue
 
-while True:
-    bookmark_for_block=BookmarkForBlock.query()
-    logger.info("bookmark_token_holding:{} bookmark_block:{}".format(bookmark_for_token_holding,bookmark_for_block.height))
-    if not bookmark_for_block:
-        continue
+                    store_token_holding(bookmark_for_token_holding,content.get("executions"))
 
-    if bookmark_for_token_holding + block_interval > bookmark_for_block.height:
-        block_interval = 0
+            # break
+            bookmark_for_token_holding += block_interval
+            bookmarkForTokenHolding.height = bookmark_for_token_holding
+            BookmarkForTokenHolding.update(bookmark_for_token_holding,bookmarkForTokenHolding)
 
-    if bookmark_for_token_holding < bookmark_for_block.height:
-        exist_instance=Tx.query(bookmark_for_token_holding,block_interval,TRANSACTION_TYPE.INVOKECONTRACT)
-        if exist_instance:
-            for tx in exist_instance:
-                tx_id=tx.tx_id
-                content = get_application_log(tx_id)
-
-                if not content.get("executions"):
-                    continue
-
-                store_token_holding(content.get("executions"))
-
-        # break
-        bookmark_for_token_holding += block_interval + 1
-        bookmarkForTokenHolding.height = bookmark_for_token_holding
-        BookmarkForTokenHolding.update(bookmarkForTokenHolding)
+            logger.info("bookmark_token_holding:{} bookmark_block:{}".format(bookmark_for_token_holding,
+                                                                             bookmark_for_block))
 
 
 
 
-    else:
-        time.sleep(10)
+        else:
+            bookmark_for_token_holding -= 1
+            time.sleep(3)
 
 
 

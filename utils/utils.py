@@ -1,4 +1,7 @@
+import binascii
 import pymysql
+from neocore.Cryptography import Crypto
+from neocore.UInt160 import UInt160
 
 
 class TRANSACTION_TYPE(object):
@@ -15,3 +18,11 @@ def check_database(host,user,passwd,database_name):
     cursor.close()
     conn.commit()
     conn.close()
+
+
+def hex2address(input):
+    try:
+        output = Crypto.ToAddress(UInt160(data=binascii.unhexlify(bytearray(input.encode("utf8")))))
+    except:
+        output = None
+    return output
