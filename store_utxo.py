@@ -96,6 +96,7 @@ if __name__ == "__main__":
         bookmark_for_utxo += 1
         sysfee_session = NeoTableSession()
         block_info_session = BlockInfoSession()
+        utxo_session = NeoTableSession()
         bookmarkForSysfee=BookmarkForSysfee.query(sysfee_session)
         bookmark_for_sysfee = bookmarkForSysfee.height
 
