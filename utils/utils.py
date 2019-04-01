@@ -1,6 +1,6 @@
 import binascii
 import pymysql
-from neocore.Cryptography import Crypto
+from neocore.Cryptography.Crypto import Crypto
 from neocore.UInt160 import UInt160
 
 
