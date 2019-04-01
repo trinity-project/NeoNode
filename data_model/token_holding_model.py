@@ -75,6 +75,7 @@ class TokenHolding(NeoTableBase):
     def save(session,contract,address):
         new_instance = TokenHolding(contract=contract, address=address)
         session.add(new_instance)
+        session.flush()
 
 
 
