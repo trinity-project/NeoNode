@@ -64,7 +64,7 @@ if __name__ == "__main__":
         if bookmark_for_nep5 + block_interval > bookmark_for_block:
             block_interval = 0
 
-        if bookmark_for_nep5 <= bookmark_for_block.height:
+        if bookmark_for_nep5 <= bookmark_for_block:
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height >= bookmark_for_nep5,
                                                                  Tx.block_height <= bookmark_for_nep5 + block_interval,
                                                                  Tx.tx_type == TRANSACTION_TYPE.INVOKECONTRACT).all()
