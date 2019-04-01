@@ -79,7 +79,7 @@ if __name__ == "__main__":
     NeoTableSession = sessionmaker(bind=neo_table_engine)
 
     utxo_session = NeoTableSession()
-    block_info_session = BlockInfoSession()
+
 
     # 加载本地同步的快高
     bookmarkForUtxo = BookmarkForUtxo.query(utxo_session)
@@ -95,6 +95,7 @@ if __name__ == "__main__":
 
         bookmark_for_utxo += 1
         sysfee_session = NeoTableSession()
+        block_info_session = BlockInfoSession()
         bookmarkForSysfee=BookmarkForSysfee.query(sysfee_session)
         bookmark_for_sysfee = bookmarkForSysfee.height
 
