@@ -32,25 +32,26 @@ if __name__ == "__main__":
     BlockInfoSession = sessionmaker(bind=engine)
     NeoTableSession = sessionmaker(bind=neo_table_engine)
 
-    neo_table_session = NeoTableSession()
-    block_info_session = BlockInfoSession()
+    claim_session = NeoTableSession()
+
 
     # 加载本地同步的快高
-    bookmarkForClaim = BookmarkForClaim.query(neo_table_session)
+    bookmarkForClaim = BookmarkForClaim.query(claim_session)
 
     if bookmarkForClaim:
         bookmark_for_claim = bookmarkForClaim.height
     else:
         bookmark_for_claim = -1
-        bookmarkForClaim = BookmarkForClaim.save(neo_table_session,bookmark_for_claim)
+        bookmarkForClaim = BookmarkForClaim.save(claim_session,bookmark_for_claim)
 
     block_interval = 1000
     while True:
 
-
+        utxo_session = NeoTableSession()
+        block_info_session = BlockInfoSession()
 
         bookmark_for_claim += 1
-        bookmarkForUtxo=BookmarkForUtxo.query(neo_table_session)
+        bookmarkForUtxo=BookmarkForUtxo.query(utxo_session)
 
         bookmark_for_utxo = bookmarkForUtxo.height
         if bookmark_for_claim + block_interval > bookmark_for_utxo:
@@ -68,16 +69,16 @@ if __name__ == "__main__":
                     vout=json.loads(tx.vout)
                     claims=json.loads(tx.claims)
 
-                    store_claim_tx(neo_table_session,tx_id,block_time,vout,claims)
-                    update_utxo_status(neo_table_session,claims)
+                    store_claim_tx(claim_session,tx_id,block_time,vout,claims)
+                    update_utxo_status(claim_session,claims)
 
             bookmark_for_claim += block_interval
             bookmarkForClaim.height = bookmark_for_claim
-            BookmarkForClaim.update(neo_table_session,bookmarkForClaim)
+            BookmarkForClaim.update(claim_session,bookmarkForClaim)
             try:
-                neo_table_session.commit()
+                claim_session.commit()
             except Exception as e:
-                neo_table_session.rollback()
+                claim_session.rollback()
                 raise e
 
 
