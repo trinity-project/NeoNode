@@ -7,7 +7,6 @@ from neocore.UInt256 import UInt256
 from neocore.BigInteger import BigInteger
 from neocore.Cryptography.Crypto import Crypto
 
-from app.model import Vout
 from config import setting
 
 
