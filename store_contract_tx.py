@@ -41,23 +41,24 @@ if __name__ == "__main__":
     BlockInfoSession = sessionmaker(bind=engine)
     NeoTableSession = sessionmaker(bind=neo_table_engine)
 
-    neo_table_session = NeoTableSession()
-    block_info_session = BlockInfoSession()
+    contract_tx_session = NeoTableSession()
+
 
     # 加载本地同步的快高
-    bookmarkForContractTx = BookmarkForContractTx.query(neo_table_session)
+    bookmarkForContractTx = BookmarkForContractTx.query(contract_tx_session)
 
     if bookmarkForContractTx:
         bookmark_for_contract_tx = bookmarkForContractTx.height
     else:
         bookmark_for_contract_tx = -1
-        bookmarkForContractTx = BookmarkForContractTx.save(neo_table_session,bookmark_for_contract_tx)
+        bookmarkForContractTx = BookmarkForContractTx.save(contract_tx_session,bookmark_for_contract_tx)
 
     while True:
 
         bookmark_for_contract_tx += 1
-
-        bookmarkForUtxo = BookmarkForUtxo.query(neo_table_session)
+        block_info_session = BlockInfoSession()
+        utxo_session = NeoTableSession()
+        bookmarkForUtxo = BookmarkForUtxo.query(utxo_session)
         bookmark_for_utxo = bookmarkForUtxo.height
 
         if bookmark_for_contract_tx <= bookmark_for_utxo:
@@ -72,17 +73,17 @@ if __name__ == "__main__":
                     vin=json.loads(tx.vin)
                     vout=json.loads(tx.vout)
 
-                    store_contract_tx(neo_table_session, tx_id, vin, vout, block_height, block_time)
+                    store_contract_tx(contract_tx_session, tx_id, vin, vout, block_height, block_time)
 
 
 
             bookmarkForContractTx.height = bookmark_for_contract_tx
-            BookmarkForContractTx.update(neo_table_session,bookmarkForContractTx)
+            BookmarkForContractTx.update(contract_tx_session,bookmarkForContractTx)
 
             try:
-                neo_table_session.commit()
+                contract_tx_session.commit()
             except Exception as e:
-                neo_table_session.rollback()
+                contract_tx_session.rollback()
                 raise e
 
 
