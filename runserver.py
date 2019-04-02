@@ -6,7 +6,7 @@ ENVIRON=os.environ
 
 if ENVIRON.get("CURRENT_ENVIRON") == "mainnet":
     host = "127.0.0.1"
-    debug = False
+    debug = True
 else:
 
     host = "0.0.0.0"
