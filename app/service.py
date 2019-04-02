@@ -645,7 +645,7 @@ def get_claimable_gas(address):
 
 def get_unclaimable_gas(address):
     current_block_height = BookmarkForUtxo.query_bookmark_for_utxo()
-    exist_instance = Utxo.query.filter(Utxo.address == address, Utxo.is_used == False).all()
+    exist_instance = Utxo.query.filter(Utxo.address == address, Utxo.is_used == False,Utxo.asset_id == setting.NEO_ASSETID).all()
     total = 0
     unclaimable = []
     for item in exist_instance:
