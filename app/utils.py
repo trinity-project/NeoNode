@@ -9,6 +9,7 @@ from neocore.BigInteger import BigInteger
 from neocore.KeyPair import KeyPair
 from neocore.UInt256 import UInt256
 
+from app.model import Sysfee
 from config import setting
 
 
@@ -127,3 +128,39 @@ def handle_invoke_tx_decimal(tx,decimal):
     if tx.get("value"):
         tx["value"] = str(Decimal(tx["value"]) / (10 ** decimal))
     return tx
+
+
+#以1个NEO计算
+def count_block_reward_gas(start_block,end_block):
+    step = 2000000
+    block_reward = 8
+    gas_count = 0
+    for i in range(22):
+        start = i * step
+        end = (i+1) * step -1
+        if end_block < start:
+            break
+        if start_block <= end:
+            if start_block > start:
+                start = start_block
+            if end_block < end:
+                end = end_block
+            gas_count += (end - start) * block_reward
+
+        if block_reward > 1:
+            block_reward -= 1
+    return Decimal(gas_count)/pow(10,8)
+
+#以1个NEO计算
+def count_sysfee_gas(start_block,end_block):
+    total_sysfee_start = Sysfee.query_sysfee(start_block)
+    total_sysfee_end = Sysfee.query_sysfee(end_block)
+    diffence_fee = Decimal(total_sysfee_end) - Decimal(total_sysfee_start)
+    return diffence_fee/pow(10,8)
+
+def cul_gas(neo_amount,start_block,end_block):
+
+    g1= count_block_reward_gas(start_block,end_block)
+    g2 = count_sysfee_gas(start_block,end_block)
+
+    return str((g1+g2)*neo_amount)

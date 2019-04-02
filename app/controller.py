@@ -2,7 +2,7 @@ import time
 
 from decimal import Decimal
 from flask import request
-from app import jsonrpc, app_logger
+from app import jsonrpc
 from app import service
 from .utils import verify_password
 
@@ -119,7 +119,6 @@ def transfer_tnc(addressTo,value):
     address_from=setting.FUNDING_ADDRESS
     privt_key=setting.PRIVTKEY
     res = verify_password(passwd, passwd_hash)
-    app_logger.info(remote_ip)
     if remote_ip==setting.REMOTE_ADDR and res:
         return service.token_swap(address_from,addressTo,value,privt_key)
     return {}
@@ -136,8 +135,8 @@ def get_claimable_gas(address):
         return service.get_claimable_gas(address)
 
 @jsonrpc.method("getUnClaimedGas")
-def get_unclaimed_gas(address):
-        return service.get_unclaimed_gas(address)
+def get_unclaimable_gas(address):
+        return service.get_unclaimable_gas(address)
 
 @jsonrpc.method("extractGas")
 def extract_gas(address):

@@ -10,8 +10,9 @@ from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX
     createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
-    get_claimable_from_neoscan, get_unclaimed_from_neoscan, get_tokenholding_from_neoscan, handle_invoke_tx_decimal
-from app.model import InvokeTx, ContractTx, Vout, ClaimTx, Token, TokenHolding, Vin, ContractTxMapping, ContractTxDetail
+    get_claimable_from_neoscan,handle_invoke_tx_decimal,cul_gas
+from app.model import InvokeTx, ContractTx, ClaimTx, Token, TokenHolding, ContractTxMapping, \
+    ContractTxDetail, Utxo, BookmarkForUtxo
 from decimal import Decimal
 
 from sqlalchemy import or_
@@ -23,9 +24,9 @@ from neo.IO import Helper
 from neo.Core import Helper as CoreHelper
 from neocore.Cryptography.Crypto import Crypto
 
-from project_log.my_log import setup_mylogger
+from project_log.my_log import setup_logger
 
-runserver_logger = setup_mylogger(logfile="runserver.log")
+runserver_logger = setup_logger()
 
 def construct_raw_tx(txData,signature,publicKey):
     rawData=txData+"01"+"41"+"40"+signature+"23"+"21"+publicKey+"ac"
@@ -628,12 +629,33 @@ def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
 
 
 def get_claimable_gas(address):
-    res = get_claimable_from_neoscan(address)
-    return res[0]
+    exist_instance = Utxo.query.filter(Utxo.address == address,Utxo.is_used == True,Utxo.is_claimed == False).all()
+    claimable = []
+    unclaimed = 0
+    for item in exist_instance:
+        json_utxo = item.to_json()
+        claimable.append(json_utxo)
+        unclaimed += json_utxo["unclaimed"]
+
+    res = dict(unclaimed = unclaimed,claimable = claimable)
+
+    return res
 
 
-def get_unclaimed_gas(address):
-    res = get_unclaimed_from_neoscan(address)
+def get_unclaimable_gas(address):
+    current_block_height = BookmarkForUtxo.query_bookmark_for_utxo()
+    exist_instance = Utxo.query.filter(Utxo.address == address, Utxo.is_used == False).all()
+    total = 0
+    unclaimable = []
+    for item in exist_instance:
+        start_block = item.start_block
+        value = int(item.value)
+        gen_gas = float(cul_gas(value,start_block,current_block_height))
+        total += gen_gas
+        unclaimable.append(dict(txid=item.tx_id,n=item.vout_number,start_height=item.start_block,unclaimable=gen_gas))
+
+    res = dict(total_unclaimable=total, unclaimable=unclaimable)
+
     return res
 
 

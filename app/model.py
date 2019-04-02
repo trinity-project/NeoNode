@@ -44,26 +44,30 @@ class Token(db.Model):
 
             }
 
-class Vout(db.Model):
-    __tablename__ = 'vout'
-    id = db.Column(db.Integer, primary_key=True)
-    tx_id = db.Column(db.String(66),index=True)
-    address = db.Column(db.String(40))
-    asset_id = db.Column(db.String(66))
-    vout_number = db.Column(db.SmallInteger)
-    value = db.Column(db.String(30))
-
-class Vin(db.Model):
-    __tablename__ = 'vin'
+class Utxo(db.Model):
+    __tablename__ = 'utxo'
     id = db.Column(db.Integer, primary_key=True)
     tx_id = db.Column(db.String(66))
     vout_number = db.Column(db.String(6))
-    address = db.Column(db.String(40))
+    address = db.Column(db.String(40),index=True)
     asset_id = db.Column(db.String(66))
-    value = db.Column(db.String(30))
+    value = db.Column(db.String(16))
+    start_block = db.Column(db.Integer)
+    end_block = db.Column(db.Integer)
+    is_used = db.Column(db.Boolean,default=False)
+    is_claimed = db.Column(db.Boolean,default=False)
+    gen_gas = db.Column(db.String(16))
 
-    def toJson(self):
-        return dict(address=self.address,assetId=self.asset_id,value=self.value)
+
+    def to_json(self):
+        return {
+            "txid":self.tx_id,
+            "unclaimed":float(self.gen_gas),
+            "n":int(self.vout_number),
+            "start_height":self.start_block,
+            "end_height":self.end_block,
+            "value":int(self.value)
+        }
 
 class InvokeTx(db.Model):
     __tablename__ = 'invoke_tx'
@@ -152,12 +156,27 @@ class ContractTxMapping(db.Model):
     address = db.Column(db.String(40),index=True)
     block_height = db.Column(db.Integer)
 
+class Sysfee(db.Model):
+    __tablename__ = 'sysfee'
+    id = db.Column(db.Integer, primary_key=True)
+    sys_fee = db.Column(db.String(16))
+    block_height = db.Column(db.Integer,unique=True)
+
+    @staticmethod
+    def query_sysfee(block_height):
+        exist_instance = Sysfee.query.filter(Sysfee.block_height == block_height).first()
+        return exist_instance.sys_fee
+
+class BookmarkForUtxo(db.Model):
+    __tablename__ = 'bookmark_for_utxo'
+    id = db.Column(db.Integer, primary_key=True)
+    height = db.Column(db.Integer)
 
 
-
-
-
-
+    @staticmethod
+    def query_bookmark_for_utxo():
+        exist_instance = BookmarkForUtxo.query.first()
+        return exist_instance.height
 
 class ContractTxDetail(db.Model):
     __tablename__ = 'contract_tx_detail'
