@@ -9,7 +9,6 @@ from neocore.UInt256 import UInt256
 
 from app.TX.MyTransaction import InvocationTransaction, ContractTransaction, TransactionInput, TransactionOutput,ClaimTransaction
 from app.TX.TransactionAttribute import TransactionAttribute, TransactionAttributeUsage
-from app.model import  Vout
 from app.utils import ToScriptHash
 from config import setting
 from app.TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSigContract, create_opdata, \
