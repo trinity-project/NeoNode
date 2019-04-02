@@ -629,7 +629,8 @@ def auto_transfer(addressFrom,addressTo,value,assetId,privtKey):
 
 
 def get_claimable_gas(address):
-    exist_instance = Utxo.query.filter(Utxo.address == address,Utxo.is_used == True,Utxo.is_claimed == False).all()
+    exist_instance = Utxo.query.filter(Utxo.address == address,Utxo.is_used == True,
+                                       Utxo.is_claimed == False,Utxo.asset_id == setting.GAS_ASSETID).all()
     claimable = []
     unclaimed = 0
     for item in exist_instance:
