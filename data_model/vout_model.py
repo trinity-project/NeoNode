@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from config import setting
 from project_log import setup_mylogger
 
-logger=setup_mylogger(logfile="log/store_vout.log")
+logger=setup_mylogger()
 
 
 
@@ -190,26 +190,6 @@ class Vin(NeoTableBase):
             logger.error(e)
             session.rollback()
 
-class ContractTx(NeoTableBase):
-    __tablename__ = 'contract_tx'
-    id = Column(Integer, primary_key=True)
-    tx_id = Column(String(66))
-    asset = Column(String(66))
-    address_from = Column(String(40),index=True)
-    address_to = Column(String(40),index=True)
-    value = Column(String(30))
-    block_timestamp=Column(Integer)
-    block_height=Column(Integer)
-
-
-
-    @staticmethod
-    def save(session,tx_id,asset,address_from,address_to,value,block_timestamp,block_height):
-        new_instance = ContractTx(tx_id=tx_id,
-                                asset=asset,address_from=address_from,
-                                address_to=address_to,value=value,
-                                block_timestamp=block_timestamp,block_height=block_height)
-        session.add(new_instance)
 
 class HandledTx(NeoTableBase):
     __tablename__ = 'handled_tx_for_vout'
