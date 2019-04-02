@@ -62,7 +62,7 @@ class Utxo(db.Model):
     def to_json(self):
         return {
             "txid":self.tx_id,
-            "unclaimed":float(self.gen_gas),
+            "unclaimed":self.gen_gas,
             "n":int(self.vout_number),
             "start_height":self.start_block,
             "end_height":self.end_block,

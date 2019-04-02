@@ -636,9 +636,9 @@ def get_claimable_gas(address):
     for item in exist_instance:
         json_utxo = item.to_json()
         claimable.append(json_utxo)
-        unclaimed += json_utxo["unclaimed"]
-
-    res = dict(unclaimed = unclaimed,claimable = claimable)
+        unclaimed += Decimal(json_utxo["unclaimed"])
+        json_utxo["unclaimed"] = float(json_utxo["unclaimed"])
+    res = dict(unclaimed = float(unclaimed),claimable = claimable)
 
     return res
 
