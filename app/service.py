@@ -651,11 +651,11 @@ def get_unclaimable_gas(address):
     for item in exist_instance:
         start_block = item.start_block
         value = int(item.value)
-        gen_gas = float(cul_gas(value,start_block,current_block_height))
+        gen_gas = Decimal(cul_gas(value,start_block,current_block_height))
         total += gen_gas
-        unclaimable.append(dict(txid=item.tx_id,n=item.vout_number,start_height=item.start_block,unclaimable=gen_gas))
+        unclaimable.append(dict(txid=item.tx_id,n=item.vout_number,start_height=item.start_block,unclaimable=float(gen_gas)))
 
-    res = dict(total_unclaimable=total, unclaimable=unclaimable)
+    res = dict(total_unclaimable=float(total), unclaimable=unclaimable)
 
     return res
 
