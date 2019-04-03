@@ -78,25 +78,25 @@ if __name__ == "__main__":
     BlockInfoSession = sessionmaker(bind=engine)
     NeoTableSession = sessionmaker(bind=neo_table_engine)
 
-    utxo_session = NeoTableSession()
+    neo_table_session = NeoTableSession()
 
 
     # 加载本地同步的快高
-    bookmarkForUtxo = BookmarkForUtxo.query(utxo_session)
+    bookmarkForUtxo = BookmarkForUtxo.query(neo_table_session)
 
     if bookmarkForUtxo:
         bookmark_for_utxo = bookmarkForUtxo.height
     else:
         bookmark_for_utxo = -1
-        bookmarkForUtxo = BookmarkForUtxo.save(utxo_session,bookmark_for_utxo)
+        bookmarkForUtxo = BookmarkForUtxo.save(neo_table_session,bookmark_for_utxo)
 
 
     while True:
 
         bookmark_for_utxo += 1
-        sysfee_session = NeoTableSession()
+
         block_info_session = BlockInfoSession()
-        bookmarkForSysfee=BookmarkForSysfee.query(sysfee_session)
+        bookmarkForSysfee=BookmarkForSysfee.query(neo_table_session)
         bookmark_for_sysfee = bookmarkForSysfee.height
 
         if bookmark_for_utxo <= bookmark_for_sysfee:
@@ -110,17 +110,17 @@ if __name__ == "__main__":
                     vin=json.loads(tx.vin)
                     vout=json.loads(tx.vout)
 
-                    store_utxo(utxo_session,tx_id,vin,vout,bookmark_for_utxo)
+                    store_utxo(neo_table_session,tx_id,vin,vout,bookmark_for_utxo)
 
 
 
             bookmarkForUtxo.height = bookmark_for_utxo
-            BookmarkForUtxo.update(utxo_session,bookmarkForUtxo)
+            BookmarkForUtxo.update(neo_table_session,bookmarkForUtxo)
 
             try:
-                utxo_session.commit()
+                neo_table_session.commit()
             except Exception as e:
-                utxo_session.rollback()
+                neo_table_session.rollback()
                 raise e
 
 
@@ -131,5 +131,5 @@ if __name__ == "__main__":
             time.sleep(3)
 
 
-
+        block_info_session.close()
 
