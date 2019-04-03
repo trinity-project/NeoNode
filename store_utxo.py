@@ -96,8 +96,11 @@ if __name__ == "__main__":
         bookmark_for_utxo += 1
 
         block_info_session = BlockInfoSession()
-        bookmarkForSysfee=BookmarkForSysfee.query(neo_table_session)
+        query_height_session = NeoTableSession()
+
+        bookmarkForSysfee=BookmarkForSysfee.query(query_height_session)
         bookmark_for_sysfee = bookmarkForSysfee.height
+        query_height_session.close()
 
         if bookmark_for_utxo <= bookmark_for_sysfee:
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height == bookmark_for_utxo).all()
