@@ -128,7 +128,7 @@ def _get_global_asset(address):
         "id": 1
     }
     try:
-        res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
+        res = requests.post(setting.NEOCLIURL, json=data).json()
         balances = res["result"]["balances"]
     except:
         balances = None
