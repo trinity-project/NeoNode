@@ -112,7 +112,7 @@ def _get_nep5_balance(address,assetId):
         "id": 1
     }
     try:
-        res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
+        res = requests.post(setting.NEOCLIURL, json=data).json()
         value = res["result"]["stack"][0]["value"]
     except:
         value = 0
