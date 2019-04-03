@@ -3,8 +3,8 @@ import time
 from sqlalchemy.orm import sessionmaker
 
 from data_model.block_info_model import engine,Tx
-from data_model.contract_tx_model import BookmarkForContractTx,ContractTxDetail,ContractTxMapping, neo_table_engine
 from data_model.utxo_model import BookmarkForUtxo,Utxo
+from data_model.contract_tx_model import BookmarkForContractTx,ContractTxDetail,ContractTxMapping, neo_table_engine
 from project_log import setup_logger
 from utils.utils import TRANSACTION_TYPE
 
@@ -57,9 +57,10 @@ if __name__ == "__main__":
 
         bookmark_for_contract_tx += 1
         block_info_session = BlockInfoSession()
-        utxo_session = NeoTableSession()
-        bookmarkForUtxo = BookmarkForUtxo.query(utxo_session)
+        query_height_session = NeoTableSession()
+        bookmarkForUtxo = BookmarkForUtxo.query(query_height_session)
         bookmark_for_utxo = bookmarkForUtxo.height
+        query_height_session.close()
 
         if bookmark_for_contract_tx <= bookmark_for_utxo:
             exist_instance=block_info_session.query(Tx).filter(Tx.block_height==bookmark_for_contract_tx,Tx.tx_type==TRANSACTION_TYPE.CONTRACT).all()
@@ -95,6 +96,6 @@ if __name__ == "__main__":
             bookmark_for_contract_tx -= 1
             time.sleep(3)
 
-
+        block_info_session.close()
 
 
