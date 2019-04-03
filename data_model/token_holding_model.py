@@ -86,6 +86,7 @@ class TokenHolding(NeoTableBase):
     def query(contract,address):
         session = NeoTableSession()
         exist_instance = session.query(TokenHolding).filter(TokenHolding.address == contract,TokenHolding.address == address).first()
+        session.close()
         return exist_instance
     @staticmethod
     def save(contract,address):
