@@ -34,19 +34,15 @@ if __name__ == "__main__":
         bookmark_for_sysfee = -1
         bookmarkForSysfee = BookmarkForSysfee.save(sys_fee_session,bookmark_for_sysfee)
 
-    sys_fee_session.close()
 
     while True:
         bookmark_for_sysfee += 1
         block_info_session = BlockInfoSession()
 
-
         bookmarkForBlock=BookmarkForBlock.query(block_info_session)
         bookmark_for_block = bookmarkForBlock.height
         if bookmark_for_sysfee <= bookmark_for_block:
             exist_instance = block_info_session.query(Tx).filter(Tx.block_height==bookmark_for_sysfee).all()
-            block_info_session.close()
-            sys_fee_session = NeoTableSession()
             if exist_instance:
                 sys_fee = Decimal(0)
                 for tx in exist_instance:
@@ -71,5 +67,5 @@ if __name__ == "__main__":
             bookmark_for_sysfee -= 1
             time.sleep(3)
 
-
+        block_info_session.close()
 
