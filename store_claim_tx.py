@@ -4,8 +4,8 @@ import time
 from sqlalchemy.orm import sessionmaker
 
 from data_model.block_info_model import engine, Tx
-from data_model.claim_model import ClaimTx, BookmarkForClaim, neo_table_engine
 from data_model.utxo_model import Utxo, BookmarkForUtxo
+from data_model.claim_model import ClaimTx, BookmarkForClaim, neo_table_engine
 from project_log.my_log import setup_logger
 from utils.utils import TRANSACTION_TYPE
 

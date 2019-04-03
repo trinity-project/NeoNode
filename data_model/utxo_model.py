@@ -21,7 +21,6 @@ neo_table_engine = create_engine('mysql://%s:%s@%s/%s' %(setting.MYSQLDATABASE["
 
 
 
-BlockInfoBase = declarative_base()
 NeoTableBase = declarative_base()
 
 
