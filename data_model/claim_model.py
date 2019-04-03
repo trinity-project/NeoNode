@@ -43,7 +43,6 @@ class BookmarkForClaim(NeoTableBase):
     def save(session,height):
         new_instance = BookmarkForClaim(height=height)
         session.add(new_instance)
-        session.commit()
         return new_instance
     @staticmethod
     def update(session,exist_instance):

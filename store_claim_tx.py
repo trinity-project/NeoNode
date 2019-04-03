@@ -47,13 +47,14 @@ if __name__ == "__main__":
     block_interval = 1000
     while True:
 
-        utxo_session = NeoTableSession()
+        query_height_session = NeoTableSession()
         block_info_session = BlockInfoSession()
 
         bookmark_for_claim += 1
-        bookmarkForUtxo=BookmarkForUtxo.query(utxo_session)
+        bookmarkForUtxo=BookmarkForUtxo.query(query_height_session)
 
         bookmark_for_utxo = bookmarkForUtxo.height
+        query_height_session.close()
         if bookmark_for_claim + block_interval > bookmark_for_utxo:
             block_interval = 0
 
@@ -91,6 +92,4 @@ if __name__ == "__main__":
             bookmark_for_claim -= 1
             time.sleep(3)
 
-
-
-
+        block_info_session.close()
