@@ -661,10 +661,12 @@ def get_unclaimable_gas(address):
 
 
 def extract_gas(address):
-    res = get_claimable_from_neoscan(address)
-    if res[0] ==0 and res[1] ==[]:
+    res = get_claimable_gas(address)
+    unclaimed = res.get("unclaimed")
+    claimable = res.get("claimable")
+    if unclaimed ==0 and claimable ==[]:
         raise Exception("no claimble gas")
-    return createClaimTx(address=address,value=res[0],claims=res[1])
+    return createClaimTx(address=address,value=unclaimed,claims=claimable)
 
 
 def transfer_all_neo_to_self(address,balance):

@@ -653,7 +653,7 @@ def createClaimTx(address,value,claims):
 
     txAttributes = [time_stamp]
 
-    claims  =[_createInput(preHash="0x"+item.get("txid"),preIndex=item.get("n")) for item in claims]
+    claims  =[_createInput(preHash=item.get("txid"),preIndex=item.get("n")) for item in claims]
     output = _createOutput(assetId=setting.GAS_ASSETID,amount=value,address=address)
 
     tx = ClaimTransaction()

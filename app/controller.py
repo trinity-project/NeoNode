@@ -2,7 +2,7 @@ import time
 
 from decimal import Decimal
 from flask import request
-from app import jsonrpc,logger
+from app import jsonrpc
 from app import service
 from .utils import verify_password
 
