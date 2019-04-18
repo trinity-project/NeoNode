@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 import pymysql
 from flask_cors import CORS
 from config import setting
+from project_log import setup_logger
 
 pymysql.install_as_MySQLdb()
 
@@ -19,7 +20,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=True
 db = SQLAlchemy(app)
 jsonrpc = JSONRPC(app, "/")
 
-
+logger = setup_logger()
 
 
 from .controller import *
