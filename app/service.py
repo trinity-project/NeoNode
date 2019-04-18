@@ -58,7 +58,7 @@ def send_raw_tx(rawTx):
         "id": 1
     }
     try:
-        url = random.choice(setting.NEOCLIURL)
+        url = setting.NEOCLIURL
         res = requests.post(url,json=data).json()
         if res.get("result"):
             return True
@@ -221,7 +221,7 @@ def get_application_log(txid):
         "params": [txid],
         "id": 1
     }
-    res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
+    res = requests.post(setting.NEOCLIURL, json=data).json()
     try:
         vmstate = res["result"]["executions"][0].get("vmstate")
         vmstate = True if vmstate == "HALT, BREAK" else False
@@ -237,7 +237,7 @@ def get_block_height():
         "params": [],
         "id": 1
     }
-    res = requests.post(random.choice(setting.NEOCLIURL), json=data).json()
+    res = requests.post(setting.NEOCLIURL, json=data).json()
     try:
         return res["result"]-1
     except:
