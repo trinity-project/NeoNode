@@ -17,9 +17,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://%s:%s@%s/%s' %(setting.MYSQLDAT
                                                                 setting.MYSQLDATABASE["host"],
                                                                 setting.MYSQLDATABASE["db_neo_table"])
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=True
+app.config["DEBUG"] = True
 db = SQLAlchemy(app)
 jsonrpc = JSONRPC(app, "/")
-
 logger = setup_logger()
 
 
