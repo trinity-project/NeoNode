@@ -232,6 +232,19 @@ def get_transaction_height(txid):
         return None
 
 
+def get_application_log(txid):
+
+    try:
+        res = neo_cli_rpc.get_application_log(txid)
+        vmstate = res["result"]["executions"][0].get("vmstate")
+        vmstate = True if vmstate == "HALT, BREAK" else False
+        return vmstate
+    except:
+        return None
+
+
+
+
 # def get_transaction_by_address(address,asset,page=1):
 #     if asset==setting.NEO_ASSETID or asset==setting.GAS_ASSETID:
 #         try:

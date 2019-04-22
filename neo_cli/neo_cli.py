@@ -35,6 +35,7 @@ class NeoCliRpc(object):
         data = self.bulid_request_body("gettransactionheight",[tx_id])
         return self.make_request(data)
 
+
     def get_token_info(self,token_address):
         token_info = []
         for attr in ["name", "symbol", "decimals"]:
