@@ -597,8 +597,8 @@ def createTx(addressFrom,addressTo,value,assetId):
 
 
     if assetId == setting.NEO_ASSETID or assetId == setting.GAS_ASSETID:
-        if not _check_balance(address=addressFrom,assetId=assetId,value=value):
-            raise Exception("no enough balance")
+        # if not _check_balance(address=addressFrom,assetId=assetId,value=value):
+        #     raise Exception("no enough balance")
         time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
                                           data=bytearray.fromhex(hex(int(time.time()))[2:]))
         address_hash = TransactionAttribute(usage=TransactionAttributeUsage.Script,
