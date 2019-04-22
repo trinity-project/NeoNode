@@ -42,14 +42,11 @@ def send_raw_tx(rawTx):
 def sign_and_broadcast(txData,privtKey):
     return service.sign_and_broadcast(txData,privtKey)
 
-@jsonrpc.method("getApplicationLog")
-def get_application_log(txid):
-    return service.get_application_log(txid)
 
 
-@jsonrpc.method("getTransaction")
-def get_transaction(txid):
-    return service.get_transaction(txid)
+@jsonrpc.method("getTransactionHeight")
+def get_transaction_height(txid):
+    return service.get_transaction_height(txid)
 
 # @jsonrpc.method("getTransactionByAddress")
 # def get_transaction_by_address(address,asset,page=1):

@@ -1,17 +1,14 @@
-import json
-import random
-import time
-from collections import deque
 
+from collections import deque
 import gevent
 import requests
 
+from app import neo_cli_rpc
 from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, \
     createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx
 from app.TX.utils import pubkeyToAddress
-from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey, \
-    get_claimable_from_neoscan,handle_invoke_tx_decimal,cul_gas
-from app.model import InvokeTx, ContractTx, ClaimTx, Token, TokenHolding, ContractTxMapping, \
+from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey,handle_invoke_tx_decimal,cul_gas
+from app.model import InvokeTx, ClaimTx, Token, TokenHolding, ContractTxMapping, \
     ContractTxDetail, Utxo, BookmarkForUtxo
 from decimal import Decimal
 
@@ -214,22 +211,6 @@ def get_balance_2(address,assetIdList):
     return [task_result.value for task_result in task_results]
 
 
-def get_application_log(txid):
-    data = {
-        "jsonrpc": "2.0",
-        "method": "getapplicationlog",
-        "params": [txid],
-        "id": 1
-    }
-    res = requests.post(setting.NEOCLIURL, json=data).json()
-    try:
-        vmstate = res["result"]["executions"][0].get("vmstate")
-        vmstate = True if vmstate == "HALT, BREAK" else False
-        return vmstate
-    except:
-        return None
-
-
 def get_block_height():
     data = {
         "jsonrpc": "2.0",
@@ -243,15 +224,12 @@ def get_block_height():
     except:
         return None
 
-def get_transaction(txid):
-    contract_tx=ContractTx.query.filter_by(tx_id=txid).first()
-    if contract_tx:
-        return contract_tx.to_json()
-
-    invoke_tx=InvokeTx.query.filter_by(tx_id=txid).first()
-    if invoke_tx:
-        return invoke_tx.to_json()
-    return None
+def get_transaction_height(txid):
+    try:
+        block_height = neo_cli_rpc.get_transaction_height(txid)
+        return dict(block_height=block_height)
+    except:
+        return None
 
 
 # def get_transaction_by_address(address,asset,page=1):
