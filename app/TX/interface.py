@@ -9,6 +9,7 @@ from neocore.UInt256 import UInt256
 
 from app.TX.MyTransaction import InvocationTransaction, ContractTransaction, TransactionInput, TransactionOutput,ClaimTransaction
 from app.TX.TransactionAttribute import TransactionAttribute, TransactionAttributeUsage
+from app.model import Utxo
 from app.utils import ToScriptHash
 from config import setting
 from app.TX.utils import hex_reverse, ToAddresstHash, createTxid, createMultiSigContract, create_opdata, \
@@ -753,7 +754,7 @@ def _get_inputs(address,assetId,value):
     inputs_total=0
     inputs=[]
     if assetId == setting.GAS_ASSETID or assetId == setting.NEO_ASSETID:
-        vouts = Vout.query.filter_by(address=address,asset_id=assetId).order_by(Vout.value.desc()).all()
+        vouts = Utxo.query.filter_by(address=address,asset_id=assetId,is_used=False).all()
 
         for item in vouts:
             if float(item.value) >= value:
