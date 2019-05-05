@@ -572,19 +572,21 @@ def get_vout(address,amount):
 
 def get_neo_vout(address,amount,assetId):
     utxos = Utxo.query.filter_by(address=address, asset_id=assetId,is_used=False).order_by(Utxo.value.desc()).all()
+    utxos = [(dict(txId=item.tx_id,n=item.vout_number,value=item.value),float(item.value)) for item in utxos]
+    utxos = sorted(utxos,key=lambda x:x[1],reverse=True)
     inputs = []
     inputs_total = 0
-    for item in utxos:
-        if float(item.value) >= amount:
-            inputs.append(dict(txId=item.tx_id,n=item.vout_number,value=item.value))
+    for item,_ in utxos:
+        if float(item.get("value")) >= float(amount):
+            inputs.append(item)
             return inputs
         else:
-            inputs.append(dict(txId=item.tx_id,n=item.vout_number,value=item.value))
-            inputs_total += float(item.value)
-            if inputs_total >= amount:
+            inputs.append(item)
+            inputs_total += float(item.get("value"))
+            if inputs_total >= float(amount):
                 return inputs
 
-    return inputs
+    return []
 
 def recover_and_verify_tx(signedTx):
 
