@@ -92,13 +92,10 @@ def faucet(addressFrom,addressTo):
     return service.faucet(addressFrom,addressTo)
 
 
-@jsonrpc.method("getAllVout")
-def get_all_vout(address,assetId):
-    return service.get_all_vout(address,assetId)
+@jsonrpc.method("getNeoVout")
+def get_neo_vout(address,amount):
+    return service.get_neo_vout(address,amount,setting.NEO_ASSETID)
 
-@jsonrpc.method("getVin")
-def get_vin(txId,voutNumber):
-    return service.get_vin(txId,voutNumber)
 
 
 @jsonrpc.method("recoverAndVerifyTx")

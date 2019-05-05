@@ -577,19 +577,23 @@ def get_vout(address,amount):
     return []
 
 
-def get_all_vout(address,assetid):
-    items=Vout.query.filter_by(address=address,asset_id=assetid).order_by(Vout.value.desc()).all()
-    if items:
-        return [(item.tx_id,float(item.value),item.vout_number) for item in items]
-
-    return []
 
 
-def get_vin(txId,voutNumber):
-    exist_instance = Vin.query.filter_by(tx_id=txId,vout_number=voutNumber).first()
-    if exist_instance:
-        return exist_instance.toJson()
+def get_neo_vout(address,amount,assetId):
+    utxos = Utxo.query.filter_by(address=address, asset_id=assetId,is_used=False).order_by(Utxo.value.desc()).all()
+    inputs = []
+    inputs_total = 0
+    for item in utxos:
+        if float(item.value) >= amount:
+            inputs.append(dict(txId=item.tx_id,n=item.vout_number,value=item.value))
+            return inputs
+        else:
+            inputs.append(dict(txId=item.tx_id,n=item.vout_number,value=item.value))
+            inputs_total += float(item.value)
+            if inputs_total >= amount:
+                return inputs
 
+    return inputs
 
 def recover_and_verify_tx(signedTx):
 
