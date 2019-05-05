@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 import pymysql
 from flask_cors import CORS
 from config import setting
+from neo_cli import NeoCliRpc
 from project_log import setup_logger
 
 pymysql.install_as_MySQLdb()
@@ -21,6 +22,7 @@ app.config["DEBUG"] = True
 db = SQLAlchemy(app)
 jsonrpc = JSONRPC(app, "/")
 logger = setup_logger()
+neo_cli_rpc = NeoCliRpc(setting.NEOCLIURL)
 
 
 from .controller import *
