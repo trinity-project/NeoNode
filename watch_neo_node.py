@@ -74,7 +74,7 @@ def compare_block_number():
             local_block_number = request_block_height_from_local(setting.NEOCLIURL)
             logger.info("local_block_number:{},neoscan_block_number:{}".format(local_block_number, neoscan_block_number))
             if neoscan_block_number - local_block_number >= 20:
-                execute_shell_command("supervisorctl restart NeoNode:dotnet")
+                execute_shell_command("supervisorctl restart dotnet")
                 logger.warning("restart neo-cli")
                 send_email("m17379352738@163.com", local_block_number, neoscan_block_number)
                 time.sleep(10* 60)
