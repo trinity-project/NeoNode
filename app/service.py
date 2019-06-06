@@ -237,7 +237,7 @@ def get_application_log(txid):
     try:
         res = neo_cli_rpc.get_application_log(txid)
         vmstate = res["executions"][0].get("vmstate")
-        vmstate = True if vmstate == "HALT, BREAK" else False
+        vmstate = True if vmstate == "HALT" else False
         return vmstate
     except:
         return None
