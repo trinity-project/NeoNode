@@ -5,7 +5,7 @@ import requests
 
 from app import neo_cli_rpc
 from app.TX.interface import createTx, createMultiTx, createFundingTx, createCTX, createRDTX, createBRTX, \
-    createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx
+    createRefundTX, create_sender_HTLC_TXS, create_receiver_HTLC_TXS, createClaimTx, createTx_hardware
 from app.TX.utils import pubkeyToAddress
 from app.utils import ToScriptHash, int_to_hex, privtkey_sign, hex_reverse, privtKey_to_publicKey,handle_invoke_tx_decimal,cul_gas
 from app.model import InvokeTx, ClaimTx, Token, TokenHolding, ContractTxMapping, \
@@ -543,7 +543,7 @@ def construct_tx(addressFrom,addressTo,value,assetId):
     return res
 
 def construct_tx_hardware(addressFrom,addressTo,value,assetId):
-    res=createTx(addressFrom,addressTo,value,assetId)
+    res=createTx_hardware(addressFrom,addressTo,value,assetId)
     inputs = res.get("inputs")
     for item in inputs:
         tx_id = item.get("PrevHash")
