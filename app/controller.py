@@ -91,9 +91,9 @@ def faucet(addressFrom,addressTo):
     return service.faucet(addressFrom,addressTo)
 
 
-@jsonrpc.method("getNeoVout")
-def get_neo_vout(address,amount):
-    return service.get_neo_vout(address,amount,setting.NEO_ASSETID)
+@jsonrpc.method("getUtxo")
+def get_neo_vout(address,asset_id,amount):
+    return service.get_neo_vout(address,amount,asset_id)
 
 
 
