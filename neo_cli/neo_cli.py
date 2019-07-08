@@ -30,6 +30,10 @@ class NeoCliRpc(object):
         data = self.bulid_request_body("getapplicationlog",[tx_id])
         return self.make_request(data)
 
+    def get_raw_transaction(self,tx_id):
+        data = self.bulid_request_body("getrawtransaction",[tx_id])
+        return self.make_request(data)
+
 
     def get_transaction_height(self,tx_id):
         data = self.bulid_request_body("gettransactionheight",[tx_id])

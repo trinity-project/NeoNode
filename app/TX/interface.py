@@ -648,6 +648,59 @@ def createTx(addressFrom,addressTo,value,assetId):
         }
 
 
+def createTx_hardware(addressFrom,addressTo,value,assetId):
+
+
+    if assetId == setting.NEO_ASSETID or assetId == setting.GAS_ASSETID:
+
+        time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
+                                          data=bytearray.fromhex(hex(int(time.time()))[2:]))
+        address_hash = TransactionAttribute(usage=TransactionAttributeUsage.Script,
+                                             data=ToAddresstHash(addressFrom).Data)
+        txAttributes = [address_hash,time_stamp]
+
+        inputs,inputs_total=_get_inputs(address=addressFrom,assetId=assetId,value=value)
+
+        outputs = _get_outputs(addressFrom=addressFrom,addressTo=addressTo,value=value,
+                               assetId=assetId,inputs_total=inputs_total)
+
+        tx = ContractTransaction()
+        tx.inputs = inputs
+        tx.outputs = outputs
+        tx.Attributes = txAttributes
+
+        return {
+            "txData":tx.get_tx_data(),
+            "txid": createTxid(tx.get_tx_data()),
+            "witness": "014140{signature}2321{pubkey}ac",
+            "inputs":[item.ToJson() for item in inputs]
+        }
+
+    else :
+
+        if len(assetId) != 42:
+            return {}
+
+        time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
+                                          data=bytearray.fromhex(hex(int(time.time()))[2:]))
+        address_hash = TransactionAttribute(usage=TransactionAttributeUsage.Script,
+                                             data=ToAddresstHash(addressFrom).Data)
+
+        txAttributes = [address_hash,time_stamp]
+
+        op_data = create_opdata(address_from=addressFrom, address_to=addressTo, value=value,
+                                 contract_hash=assetId)
+        tx = InvocationTransaction()
+        tx.Version = 1
+        tx.Attributes = txAttributes
+        tx.Script = binascii.unhexlify(op_data)
+
+        return {
+            "txData": tx.get_tx_data(),
+            "txid": createTxid(tx.get_tx_data()),
+            "witness":"014140{signature}2321{pubkey}ac"
+        }
+
 def createClaimTx(address,value,claims):
     time_stamp = TransactionAttribute(usage=TransactionAttributeUsage.Remark,
                                       data=bytearray.fromhex(hex(int(time.time()))[2:]))

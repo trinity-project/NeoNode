@@ -9,6 +9,20 @@ from .utils import verify_password
 from config import setting
 
 
+@jsonrpc.method("constructTx_hardware")
+def construct_tx_hardware(addressFrom,addressTo,value,assetId):
+    if assetId.lower() == setting.NNC_ASSETID:
+        decimals = 2
+        value = int(Decimal(value) * pow(10, decimals))
+    elif assetId.lower() in [setting.GAS_ASSETID,setting.NEO_ASSETID]:
+        value = float(value)
+    else:
+        decimals = 8
+        value = int(Decimal(value) * pow(10, decimals))
+
+    return service.construct_tx_hardware(addressFrom,addressTo,value,assetId)
+
+
 @jsonrpc.method("constructTx")
 def construct_tx(addressFrom,addressTo,value,assetId):
     if assetId.lower() == setting.NNC_ASSETID:

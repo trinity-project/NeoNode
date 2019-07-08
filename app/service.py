@@ -542,7 +542,14 @@ def construct_tx(addressFrom,addressTo,value,assetId):
     res=createTx(addressFrom,addressTo,value,assetId)
     return res
 
-
+def construct_tx_hardware(addressFrom,addressTo,value,assetId):
+    res=createTx(addressFrom,addressTo,value,assetId)
+    inputs = res.get("inputs")
+    for item in inputs:
+        tx_id = item.get("PrevHash")
+        raw_tx = neo_cli_rpc.get_raw_transaction(tx_id)
+        item["raw"] = raw_tx
+    return res
 
 
 
