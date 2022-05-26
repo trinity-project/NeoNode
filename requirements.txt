@@ -70,7 +70,7 @@ scrypt==0.8.6
 six==1.11.0
 SQLAlchemy==1.2.11
 tqdm==4.20.0
-Twisted==17.9.0
+Twisted==22.4.0
 typing==3.6.4
 urllib3>=1.23
 virtualenv==15.2.0
