@@ -46,7 +46,7 @@ neo-boa==0.4.4
 neo-python==0.7.1
 neo-python-rpc==0.2.0
 neocore==0.4.8
-numpy==1.14.2
+numpy==1.22.0
 pbr==4.0.1
 peewee==2.10.2
 pluggy==0.6.0
